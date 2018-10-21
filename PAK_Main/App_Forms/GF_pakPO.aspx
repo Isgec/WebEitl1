@@ -230,7 +230,7 @@
       </tr>
     </table>
       </div>
-      <div style="width:50%;float:right"  class="ui-widget-content ui-corner-all">
+      <div style="width:60%;float:right"  class="ui-widget-content ui-corner-all">
                   <h3 class="ui-widget-header ui-corner-all" style="margin: 0; padding: 0.4em; text-align: center;">
                     IMPORT PO DETAILS FROM ERP</h3>
         <table style="margin:10px 10px 10px 10px">
@@ -250,6 +250,9 @@
             AutoCompleteType = "None"
             Runat="Server" />
           </td>
+          <td style="padding-left: 10px">
+          <asp:Button ID="cmdBoughtout" runat="server" Text="As BOUGHTOUT PO" ToolTip="Mainly used by EPC Division" OnClientClick="return confirm('Import PO as Boughtout, It is generally used by EPC Division ?');" />
+            </td>
           <td style="padding-left: 10px">
           <asp:Button ID="cmdImport" runat="server" Text="As PACKAGE PO" ToolTip="Mainly used by EPC Division" OnClientClick="return confirm('Import PO as Package, It is generally used by EPC Division ?');" />
             </td>

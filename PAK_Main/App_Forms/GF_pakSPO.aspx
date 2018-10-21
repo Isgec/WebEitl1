@@ -8,6 +8,9 @@
 <asp:UpdatePanel ID="UPNLpakSPO" runat="server">
   <ContentTemplate>
     <table width="100%"><tr><td class="sis_formview"> 
+     <div style="float:right;">
+      <asp:Label ID="ack" runat="server" Font-Bold="true" Font-Size="14px" Text="You are requested to ACKNOWLEDGE the receipt of PO. Please click on ACK button." ForeColor="red" BackColor="yellow" />
+     </div>
     <LGM:ToolBar0 
       ID = "TBLpakSPO"
       ToolType = "lgNMGrid"
@@ -246,6 +249,13 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="ACK">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdAcknowledgeWF" ValidationGroup='<%# "Acknowledge" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("AcknowledgeWFVisible") %>' Enabled='<%# EVal("AcknowledgeWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Acknowledge the receipt of PO" SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Acknowledge" & Container.DataItemIndex & """) && confirm(""Update acknowledgement of PO ?"");" %>' CommandName="AcknowledgeWF" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="DESPATCH">
           <ItemTemplate>
             <asp:ImageButton ID="cmdApproveWF" ValidationGroup='<%# "Approve" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("ApproveWFVisible") %>' Enabled='<%# EVal("ApproveWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Despatch ALL Selected Packing List of PO" SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Approve" & Container.DataItemIndex & """) && confirm(""Despatch ALL Selected Packing List of PO ?"");" %>' CommandName="ApproveWF" CommandArgument='<%# Container.DataItemIndex %>' />
@@ -279,11 +289,9 @@
               </td>
               <td></td>
               <td></td>
-              <td>
+              <td colspan="4">
                 <asp:Label ID="LabelSupplierRemarks" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# EVal("SupplierRemarks") %>'></asp:Label>
               </td>
-              <td></td>
-              <td></td>
               <td></td>
               <td></td>
             </tr>

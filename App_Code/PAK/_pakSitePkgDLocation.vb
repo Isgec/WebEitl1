@@ -30,7 +30,7 @@ Namespace SIS.PAK
     Private _PAK_SitePkgD7_SiteMarkNo As String = ""
     Private _PAK_SitePkgH8_SupplierRefNo As String = ""
     Private _PAK_Units9_Description As String = ""
-    Private _FK_PAK_SitePkgDLocation_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_SitePkgDLocation_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_SitePkgDLocation_ItemNo As SIS.PAK.pakPkgListD = Nothing
     Private _FK_PAK_SitePkgDLocation_PkgNo As SIS.PAK.pakPkgListH = Nothing
     Private _FK_PAK_SitePkgDLocation_SerialNo As SIS.PAK.pakPO = Nothing
@@ -357,10 +357,10 @@ Namespace SIS.PAK
         End Set
       End Property
     End Class
-    Public ReadOnly Property FK_PAK_SitePkgDLocation_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_SitePkgDLocation_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_SitePkgDLocation_ProjectID Is Nothing Then
-          _FK_PAK_SitePkgDLocation_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_SitePkgDLocation_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_SitePkgDLocation_ProjectID
       End Get

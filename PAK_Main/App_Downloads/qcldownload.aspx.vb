@@ -108,8 +108,12 @@ Partial Class qcldownload
           c += 1
           .Cells(r, c).Value = ((tmp.FK_PAK_QCListD_ItemNo.Quantity - tmp.FK_PAK_QCListD_ItemNo.QualityClearedQty) * tmp.FK_PAK_QCListD_ItemNo.WeightPerUnit)
           c += 1
+          'Offered Quantity
           .Cells(r, c).Value = tmp.Quantity
           c += 1
+          .Cells(r, c).Value = tmp.QCM_InspectionStages8_Description
+          c += 1
+          'Cleared Qty
           Dim tmpQty As Decimal = tmp.Quantity
           If tmp.QualityClearedQty <> "" Then
             If Convert.ToDecimal(tmp.QualityClearedQty) > 0 Then
@@ -124,7 +128,6 @@ Partial Class qcldownload
         End With
 
       Next
-
 
       xlPk.Save()
       xlPk.Dispose()
@@ -143,7 +146,7 @@ Partial Class qcldownload
 
 #Region " TMPL FOR QCL "
 
-  Private Function WriteBItemXL(ByVal xlWS As ExcelWorksheet, ByVal r As Integer, ByVal SerialNo As Integer, ByVal BOMNo As Integer, ByVal pItemNo As Integer, ByRef cnt As Integer, ByVal qclItems As List(Of SIS.PAK.pakQCListD)) As Integer
+  Private Function WriteBItemXL(ByVal xlWS As ExcelWorksheet, ByVal r As Integer, ByVal SerialNo As Integer, ByVal BOMNo As Integer, ByVal pItemNo As Integer, ByRef cnt As Integer, ByVal qcDs As List(Of SIS.PAK.pakQCListD)) As Integer
     Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(SerialNo, BOMNo, pItemNo, "")
     If Items.Count > 0 Then
       For Each tmp As SIS.PAK.pakPOBItems In Items
@@ -161,9 +164,28 @@ Partial Class qcldownload
           If Not tmp.Bottom Then
             .Cells(r, c).Style.Font.Bold = True
             .Cells(r, c).Style.Font.Color.SetColor(tmp.GetColor)
+            .Cells(r, c, r, c + 10).Style.Locked = True
           End If
+          c += 1
           If tmp.Bottom Then
-            c += 1
+            Dim OfferedQuantity As Decimal = 0
+            Dim InspectionStage As String = ""
+            For Each qcD As SIS.PAK.pakQCListD In qcDs
+              If qcD.ItemNo = tmp.ItemNo And qcD.BOMNo = tmp.BOMNo Then
+                OfferedQuantity = qcD.Quantity
+                Select Case qcD.InspectionStageID
+                  Case "1"
+                    InspectionStage = "S"
+                  Case "2"
+                    InspectionStage = "F"
+                  Case "3"
+                    InspectionStage = "SF"
+                  Case ""
+                    InspectionStage = ""
+                End Select
+                Exit For
+              End If
+            Next
             .Cells(r, c).Value = "*"
             c += 1
             If tmp.UOMQuantity <> "" Then .Cells(r, c).Value = tmp.PAK_Units10_Description
@@ -174,38 +196,38 @@ Partial Class qcldownload
             c += 1
             .Cells(r, c).Value = tmp.WeightPerUnit
             c += 1
-            .Cells(r, c).Value = (tmp.WeightPerUnit * tmp.Quantity).ToString("n")
+            .Cells(r, c).Value = Math.Round(tmp.WeightPerUnit * tmp.Quantity, 4)
             c += 1
             .Cells(r, c).Value = tmp.Quantity - tmp.QualityClearedQty
             c += 1
-            .Cells(r, c).Value = ((tmp.Quantity - tmp.QualityClearedQty) * tmp.WeightPerUnit)
+            .Cells(r, c).Value = Math.Round((tmp.Quantity - tmp.QualityClearedQty) * tmp.WeightPerUnit, 4)
             c += 1
-            Dim qclFound As Boolean = False
-            For Each tmpItm As SIS.PAK.pakQCListD In qclItems
-              If tmpItm.ItemNo = tmp.ItemNo And tmpItm.BOMNo = tmp.BOMNo Then
-                qclFound = True
-                .Cells(r, c).Value = tmpItm.Quantity
-                c += 1
-                '.Cells(r, c).Value = tmpItm.Remarks
-                'c += 1
-                qclItems.Remove(tmpItm)
-                Exit For
+            If Not AllowNegativeBalance Then
+              If tmp.Quantity - tmp.QualityClearedQty <= 0 Then
+                .Cells(r, c, r, c + 1).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                .Cells(r, c, r, c + 1).Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray)
+                .Cells(r, c, r, c + 1).Style.Locked = True
               End If
-            Next
+            End If
+            .Cells(r, c).Value = IIf(OfferedQuantity = 0, "", OfferedQuantity)
+            c += 1
+            .Cells(r, c).Value = InspectionStage
+            c += 1
           End If
           cnt += 1
           r += 1
-
           If Not tmp.Bottom Then
-            r = WriteBItemXL(xlWS, r, tmp.SerialNo, tmp.BOMNo, tmp.ItemNo, cnt, qclItems)
+            r = WriteBItemXL(xlWS, r, tmp.SerialNo, tmp.BOMNo, tmp.ItemNo, cnt, qcDs)
           End If
         End With
       Next
     End If
     Return r
   End Function
-
+  Dim AllowNegativeBalance As Boolean = False
+  Dim PORTRequired As Boolean = False
   Private Sub DownloadTmplForQCL(ByVal Value As String)
+    AllowNegativeBalance = Convert.ToBoolean(ConfigurationManager.AppSettings("AllowNegativeBalance"))
 
     Dim aVal() As String = Value.Split("|".ToCharArray)
 
@@ -250,9 +272,14 @@ Partial Class qcldownload
 
       r = 9
       c = 1
+      Try
+        PORTRequired = SIS.PAK.pakPO.pakPOGetByID(SerialNo).PortRequired
+      Catch ex As Exception
+      End Try
+
       Dim POBOMs As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.pakPOBOMSelectList(0, 99999, "", False, "", SerialNo)
 
-      Dim qclItems As List(Of SIS.PAK.pakQCListD) = SIS.PAK.pakQCListD.pakQCListDSelectList(0, 99999, "", False, "", SerialNo, QCLNo)
+      Dim qcDs As List(Of SIS.PAK.pakQCListD) = SIS.PAK.pakQCListD.pakQCListDSelectList(0, 99999, "", False, "", SerialNo, QCLNo)
 
       For Each tmp As SIS.PAK.pakPOBOM In POBOMs
         If BOMNo <> String.Empty Then If tmp.BOMNo <> BOMNo Then Continue For
@@ -270,11 +297,12 @@ Partial Class qcldownload
           If Not tmp.Bottom Then
             .Cells(r, c).Style.Font.Bold = True
             .Cells(r, c).Style.Font.Color.SetColor(tmp.GetColor)
+            .Cells(r, c, r, c + 10).Style.Locked = True
           End If
           cnt += 1
           r += 1
         End With
-        r = WriteBItemXL(xlWS, r, SerialNo, tmp.BOMNo, tmp.ItemNo, cnt, qclItems)
+        r = WriteBItemXL(xlWS, r, SerialNo, tmp.BOMNo, tmp.ItemNo, cnt, qcDs)
 
       Next
 

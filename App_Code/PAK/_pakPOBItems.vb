@@ -54,6 +54,20 @@ Namespace SIS.PAK
     Private _SupplierQuantity As Decimal = 0
     Private _Accepted As Boolean = False
     Private _SupplierWeightPerUnit As Decimal = 0
+    Public Property ItemReference As String = ""
+    Public Property SubItem As String = ""
+    Public Property SubItem2 As String = ""
+    Public Property SubItem3 As String = ""
+    Public Property SubItem4 As String = ""
+    Public Property QuantityDespatchedToPort As Decimal = 0
+    Public Property TotalWeightDespatchedToPort As Decimal = 0
+    Public Property QuantityReceivedAtPort As Decimal = 0
+    Public Property TotalWeightReceivedAtPort As Decimal = 0
+    Public Property QuantityDespatchedfromPort As Decimal = 0
+    Public Property TotalWeightDespatchedFromPort As Decimal = 0
+    Public Property TotalWeight As Decimal = 0
+    Public Property QualityClearedQty As Decimal = 0
+    Public Property QualityClearedQtyStage As Decimal = 0
     Private _aspnet_Users1_UserFullName As String = ""
     Private _aspnet_Users2_UserFullName As String = ""
     Private _PAK_Divisions3_Description As String = ""
@@ -76,7 +90,6 @@ Namespace SIS.PAK
     Private _FK_PAK_POBItems_StatusID As SIS.PAK.pakPOBOMStatus = Nothing
     Private _FK_PAK_POBItems_UOMQuantity As SIS.PAK.pakUnits = Nothing
     Private _FK_PAK_POBItems_UOMWeight As SIS.PAK.pakUnits = Nothing
-    Public Property QualityClearedQty As Decimal = 0
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -161,6 +174,7 @@ Namespace SIS.PAK
     End Property
     Public Property WeightPerUnit() As Decimal
       Get
+        If _WeightPerUnit <= 0 Then Return 0
         Return _WeightPerUnit
       End Get
       Set(ByVal value As Decimal)
@@ -958,6 +972,12 @@ Namespace SIS.PAK
         .Accepted = Record.Accepted
         .SupplierWeightPerUnit = Record.SupplierWeightPerUnit
         .QualityClearedQty = Record.QualityClearedQty
+        .ItemReference = Record.ItemReference
+        .SubItem = Record.SubItem
+        .SubItem2 = Record.SubItem2
+        .SubItem3 = Record.SubItem3
+        .SubItem4 = Record.SubItem4
+        .QualityClearedQtyStage = Record.QualityClearedQtyStage
       End With
       Return SIS.PAK.pakPOBItems.InsertData(_Rec)
     End Function
@@ -966,6 +986,9 @@ Namespace SIS.PAK
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "sppakPOBItemsInsert"
+          With Record
+            .TotalWeight = SIS.PAK.pakPO.GetTotalWeight(.Quantity, .WeightPerUnit, .UOMQuantity, .UOMWeight)
+          End With
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ItemNo",SqlDbType.Int,11, Record.ItemNo)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ItemCode",SqlDbType.NVarChar,51, Iif(Record.ItemCode= "" ,Convert.DBNull, Record.ItemCode))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ItemDescription",SqlDbType.NVarChar,101, Iif(Record.ItemDescription= "" ,Convert.DBNull, Record.ItemDescription))
@@ -1014,6 +1037,19 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Accepted",SqlDbType.Bit,3, Record.Accepted)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierWeightPerUnit",SqlDbType.Decimal,21, Record.SupplierWeightPerUnit)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QualityClearedQty", SqlDbType.Decimal, 21, Record.QualityClearedQty)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ItemReference", SqlDbType.NVarChar, 201, IIf(Record.ItemReference = "", Convert.DBNull, Record.ItemReference))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SubItem", SqlDbType.NVarChar, 10, IIf(Record.SubItem = "", Convert.DBNull, Record.SubItem))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SubItem2", SqlDbType.NVarChar, 151, IIf(Record.SubItem2 = "", Convert.DBNull, Record.SubItem2))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SubItem3", SqlDbType.NVarChar, 151, IIf(Record.SubItem3 = "", Convert.DBNull, Record.SubItem3))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SubItem4", SqlDbType.NVarChar, 151, IIf(Record.SubItem4 = "", Convert.DBNull, Record.SubItem4))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QuantityReceivedAtPort", SqlDbType.Decimal, 21, Record.QuantityReceivedAtPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeightReceivedAtPort", SqlDbType.Decimal, 21, Record.TotalWeightReceivedAtPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QuantityDespatchedfromPort", SqlDbType.Decimal, 21, Record.QuantityDespatchedfromPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeightDespatchedFromPort", SqlDbType.Decimal, 21, Record.TotalWeightDespatchedFromPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QuantityDespatchedToPort", SqlDbType.Decimal, 21, Record.QuantityDespatchedToPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeightDespatchedToPort", SqlDbType.Decimal, 21, Record.TotalWeightDespatchedToPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QualityClearedQtyStage", SqlDbType.Decimal, 21, Record.QualityClearedQtyStage)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeight", SqlDbType.Decimal, 21, Record.TotalWeight)
           Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_SerialNo").Direction = ParameterDirection.Output
           Cmd.Parameters.Add("@Return_BOMNo", SqlDbType.Int, 11)
@@ -1078,6 +1114,11 @@ Namespace SIS.PAK
         .Accepted = Record.Accepted
         .SupplierWeightPerUnit = Record.SupplierWeightPerUnit
         .QualityClearedQty = Record.QualityClearedQty
+        .ItemReference = Record.ItemReference
+        .SubItem = Record.SubItem
+        .SubItem2 = Record.SubItem2
+        .SubItem3 = Record.SubItem3
+        .SubItem4 = Record.SubItem4
       End With
       Return SIS.PAK.pakPOBItems.UpdateData(_Rec)
     End Function
@@ -1086,7 +1127,10 @@ Namespace SIS.PAK
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "sppakPOBItemsUpdate"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_ItemNo",SqlDbType.Int,11, Record.ItemNo)
+          With Record
+            .TotalWeight = SIS.PAK.pakPO.GetTotalWeight(.Quantity, .WeightPerUnit, .UOMQuantity, .UOMWeight)
+          End With
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_ItemNo", SqlDbType.Int, 11, Record.ItemNo)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_BOMNo",SqlDbType.Int,11, Record.BOMNo)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_SerialNo",SqlDbType.Int,11, Record.SerialNo)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ItemNo",SqlDbType.Int,11, Record.ItemNo)
@@ -1137,6 +1181,19 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Accepted",SqlDbType.Bit,3, Record.Accepted)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierWeightPerUnit",SqlDbType.Decimal,21, Record.SupplierWeightPerUnit)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QualityClearedQty", SqlDbType.Decimal, 21, Record.QualityClearedQty)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ItemReference", SqlDbType.NVarChar, 201, IIf(Record.ItemReference = "", Convert.DBNull, Record.ItemReference))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SubItem", SqlDbType.NVarChar, 10, IIf(Record.SubItem = "", Convert.DBNull, Record.SubItem))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SubItem2", SqlDbType.NVarChar, 151, IIf(Record.SubItem2 = "", Convert.DBNull, Record.SubItem2))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SubItem3", SqlDbType.NVarChar, 151, IIf(Record.SubItem3 = "", Convert.DBNull, Record.SubItem3))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SubItem4", SqlDbType.NVarChar, 151, IIf(Record.SubItem4 = "", Convert.DBNull, Record.SubItem4))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QuantityReceivedAtPort", SqlDbType.Decimal, 21, Record.QuantityReceivedAtPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeightReceivedAtPort", SqlDbType.Decimal, 21, Record.TotalWeightReceivedAtPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QuantityDespatchedfromPort", SqlDbType.Decimal, 21, Record.QuantityDespatchedfromPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeightDespatchedFromPort", SqlDbType.Decimal, 21, Record.TotalWeightDespatchedFromPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QuantityDespatchedToPort", SqlDbType.Decimal, 21, Record.QuantityDespatchedToPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeightDespatchedToPort", SqlDbType.Decimal, 21, Record.TotalWeightDespatchedToPort)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QualityClearedQtyStage", SqlDbType.Decimal, 21, Record.QualityClearedQtyStage)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeight", SqlDbType.Decimal, 21, Record.TotalWeight)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

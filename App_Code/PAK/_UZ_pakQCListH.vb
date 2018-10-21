@@ -140,6 +140,11 @@ Namespace SIS.PAK
         .CreatedOn = Now
         .TotalWeight = qcH.QualityClearedWt
         .StatusID = pakPkgStates.Free
+        Try
+          .ProjectID = qcH.FK_PAK_QCListH_SerialNo.ProjectID
+          .PortID = qcH.FK_PAK_QCListH_SerialNo.PortID
+        Catch ex As Exception
+        End Try
       End With
       pkgH = SIS.PAK.pakPkgListH.InsertData(pkgH)
       qcH.PkgNo = pkgH.PkgNo
@@ -178,51 +183,34 @@ Namespace SIS.PAK
       Return qcH
     End Function
 
-    Public Shared Function InitiateWF(ByVal SerialNo As Int32, ByVal QCLNo As Int32) As SIS.PAK.pakQCListH
+    Public Shared Function InitiateWF(ByVal SerialNo As Int32, ByVal QCLNo As Int32, ByVal QCRequestNo As String) As SIS.PAK.pakQCListH
+      If QCRequestNo Is Nothing Then QCRequestNo = ""
+      Dim AllowNegativeBalance As Boolean = Convert.ToBoolean(ConfigurationManager.AppSettings("AllowNegativeBalance"))
+
       Dim Results As SIS.PAK.pakQCListH = pakQCListHGetByID(SerialNo, QCLNo)
       Dim qcItems As List(Of SIS.PAK.pakQCListD) = SIS.PAK.pakQCListD.pakQCListDSelectList(0, 99999, "", False, "", SerialNo, QCLNo)
       If qcItems.Count <= 0 Then
         Throw New Exception("No Item found for QC, can not forward.")
       End If
-      Dim totWt As Decimal = 0
-      For Each qcItm As SIS.PAK.pakQCListD In qcItems
-        'Can be deleted after July 2018========================
-        If qcItm.TotalWeight = 0 Then
-          Dim mc As SIS.PAK.UnitMultiplicationFactor = Nothing
-          ''Calculate Total QC List Wt
-          Try
-            If qcItm.FK_PAK_QCListD_UOMQuantity.UnitSetID = 3 Then '3=>Weight Unit Set
-              Try
-                mc = New SIS.PAK.UnitMultiplicationFactor
-                mc.Unit = qcItm.FK_PAK_QCListD_UOMQuantity
-                mc = SIS.PAK.UnitMultiplicationFactor.GetMultiplicationFactorToBaseUnit(mc)
-                qcItm.TotalWeight = qcItm.Quantity * mc.MF
-              Catch ex As Exception
-              End Try
-            Else
-              Try
-                mc = New SIS.PAK.UnitMultiplicationFactor
-                mc.Unit = qcItm.FK_PAK_QCListD_UOMWeight
-                mc = SIS.PAK.UnitMultiplicationFactor.GetMultiplicationFactorToBaseUnit(mc)
-                qcItm.TotalWeight = qcItm.Quantity * qcItm.WeightPerUnit * mc.MF
-              Catch ex As Exception
-              End Try
-            End If
-          Catch ex As Exception
-          End Try
-          qcItm = SIS.PAK.pakQCListD.UpdateData(qcItm)
-        End If
-        '============== End of Can be deleted======================
-        totWt += qcItm.TotalWeight
-      Next
+      If Not AllowNegativeBalance Then
+        'This check is imperfect as In-Process quantity is not maintained
+        For Each qcD As SIS.PAK.pakQCListD In qcItems
+          If qcD.FK_PAK_QCListD_ItemNo.Quantity - qcD.FK_PAK_QCListD_ItemNo.QualityClearedQty - qcD.Quantity < 0 Then
+            Throw New Exception("Offered Quantity can not exceed PO Quantity: " & qcD.ItemNo)
+          End If
+        Next
+      End If
       With Results
-        .TotalWeight = totWt
-        .UOMTotalWeight = 6 '6=>Kg
+        .QCRequestNo = QCRequestNo
         .StatusID = pakQCStates.UnderQualityInspection
         .CreatedBy = HttpContext.Current.Session("LoginID")
         .CreatedOn = Now
       End With
       Results = SIS.PAK.pakQCListH.UpdateData(Results)
+      Try
+        SIS.CT.ctUpdates.CT_QCOffered(Results)
+      Catch ex As Exception
+      End Try
       Return Results
     End Function
     Public Shared Function SetDefaultValues(ByVal sender As System.Web.UI.WebControls.FormView, ByVal e As System.EventArgs) As System.Web.UI.WebControls.FormView

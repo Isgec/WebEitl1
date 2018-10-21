@@ -98,7 +98,8 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
-    Public Shared Function ApproveWF(ByVal SerialNo As Int32, ByVal QCLNo As Int32, ByVal Remarks As String) As SIS.PAK.pakIQCListH
+    Public Shared Function ApproveWF(ByVal SerialNo As Int32, ByVal QCLNo As Int32, ByVal QCRequestNo As String, ByVal Remarks As String) As SIS.PAK.pakIQCListH
+      If QCRequestNo Is Nothing Then QCRequestNo = ""
       Dim Results As SIS.PAK.pakIQCListH = pakIQCListHGetByID(SerialNo, QCLNo)
       Dim tmpDs As List(Of SIS.PAK.pakIQCListD) = SIS.PAK.pakIQCListD.pakIQCListDSelectList(0, 99999, "", False, "", SerialNo, QCLNo)
       For Each tmpD As SIS.PAK.pakIQCListD In tmpDs
@@ -106,7 +107,12 @@ Namespace SIS.PAK
         If tmpItm IsNot Nothing Then
           Dim x As Decimal = 0
           If tmpD.QualityClearedQty <> "" Then x = Convert.ToDecimal(tmpD.QualityClearedQty)
-          tmpItm.QualityClearedQty += x
+          Select Case tmpD.InspectionStageID
+            Case "2", "3"
+              tmpItm.QualityClearedQty += x
+            Case Else
+              tmpItm.QualityClearedQtyStage += x
+          End Select
           tmpItm = SIS.PAK.pakPOBItems.UpdateData(tmpItm)
         End If
       Next
@@ -114,9 +120,14 @@ Namespace SIS.PAK
         .ClearedBy = HttpContext.Current.Session("LoginID")
         .ClearedOn = Now
         .StatusID = pakQCStates.QCCompleted
+        .QCRequestNo = QCRequestNo
         .Remarks = Remarks
       End With
       Results = SIS.PAK.pakIQCListH.UpdateData(Results)
+      Try
+        SIS.CT.ctUpdates.CT_QCCleared(Results)
+      Catch ex As Exception
+      End Try
       Return Results
     End Function
     Public Shared Function RejectWF(ByVal SerialNo As Int32, ByVal QCLNo As Int32, ByVal Remarks As String) As SIS.PAK.pakIQCListH

@@ -300,6 +300,12 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle CssClass="alignCenter" Width="80px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="Inspection Stage" SortExpression="QCM_InspectionStages8_Description">
+          <ItemTemplate>
+             <asp:Label ID="L_InspectionStageID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("InspectionStageID") %>' Text='<%# Eval("QCM_InspectionStages8_Description") %>'></asp:Label>
+          </ItemTemplate>
+          <HeaderStyle Width="100px" />
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="Quality Cleared Qty" SortExpression="QualityClearedQty">
           <ItemTemplate>
             <asp:Label ID="LabelQualityClearedQty" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# EVal("QualityClearedQty") %>'></asp:Label>

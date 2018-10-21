@@ -8,6 +8,17 @@ Namespace SIS.PAK
   Partial Public Class pakPkgListH
     Private Shared _RecordCount As Integer
     Private _SerialNo As Int32 = 0
+    Private _ReceivedAtPortOn As String = ""
+    Private _ReceivedAtPortBy As String = ""
+    Private _PortID As String = ""
+    Private _ProjectID As String = ""
+    Private _VRRaised As Boolean = False
+    Private _VRRaisedOn As String = ""
+    Private _VRConverted As Boolean = False
+    Private _VRConvertedOn As String = ""
+    Private _VRConvertedBy As String = ""
+    Private _VRRequestNo As String = ""
+    Private _VRExecuted As Boolean = False
     Private _PkgNo As Int32 = 0
     Private _SupplierRefNo As String = ""
     Private _TransporterID As String = ""
@@ -18,24 +29,32 @@ Namespace SIS.PAK
     Private _VRExecutionNo As String = ""
     Private _Remarks As String = ""
     Private _CreatedBy As String = ""
-    Private _UOMTotalWeight As String = ""
-    Private _Additional1Info As String = ""
-    Private _Additional2Info As String = ""
     Private _CreatedOn As String = ""
     Private _TotalWeight As String = "0.00"
+    Private _UOMTotalWeight As String = ""
     Private _StatusID As String = ""
+    Private _Additional2Info As String = ""
+    Private _Additional1Info As String = ""
     Private _aspnet_Users1_UserFullName As String = ""
     Private _PAK_PO2_PODescription As String = ""
     Private _PAK_Units3_Description As String = ""
     Private _VR_BusinessPartner4_BPName As String = ""
     Private _VR_RequestExecution5_ExecutionDescription As String = ""
     Private _PAK_PkgStatus6_Description As String = ""
+    Private _aspnet_Users7_UserFullName As String = ""
+    Private _ELOG_Ports8_Description As String = ""
+    Private _IDM_Projects9_Description As String = ""
+    Private _aspnet_Users10_UserFullName As String = ""
     Private _FK_PAK_PkgListH_CreatedBy As SIS.QCM.qcmUsers = Nothing
     Private _FK_PAK_PkgListH_SerialNo As SIS.PAK.pakPO = Nothing
     Private _FK_PAK_PkgListH_UOMTotalWeight As SIS.PAK.pakUnits = Nothing
     Private _FK_PAK_PkgListH_TransporterID As SIS.PAK.pakBusinessPartner = Nothing
     Private _FK_PAK_PkgListH_VRExecutionNo As SIS.VR.vrRequestExecution = Nothing
     Private _FK_PAK_PkgListH_StatusID As SIS.PAK.pakPkgStatus = Nothing
+    Private _FK_PAK_PkgListH_ReceivedAtPortBy As SIS.QCM.qcmUsers = Nothing
+    Private _FK_PAK_PkgListH_PortID As SIS.ELOG.elogPorts = Nothing
+    Private _FK_PAK_PkgListH_ProjectID As SIS.QCM.qcmProjects = Nothing
+    Private _FK_PAK_PkgListH_VRConvertedBy As SIS.QCM.qcmUsers = Nothing
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -74,6 +93,135 @@ Namespace SIS.PAK
         _SerialNo = value
       End Set
     End Property
+    Public Property ReceivedAtPortOn() As String
+      Get
+        If Not _ReceivedAtPortOn = String.Empty Then
+          Return Convert.ToDateTime(_ReceivedAtPortOn).ToString("dd/MM/yyyy")
+        End If
+        Return _ReceivedAtPortOn
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _ReceivedAtPortOn = ""
+        Else
+          _ReceivedAtPortOn = value
+        End If
+      End Set
+    End Property
+    Public Property ReceivedAtPortBy() As String
+      Get
+        Return _ReceivedAtPortBy
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _ReceivedAtPortBy = ""
+        Else
+          _ReceivedAtPortBy = value
+        End If
+      End Set
+    End Property
+    Public Property PortID() As String
+      Get
+        Return _PortID
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _PortID = ""
+        Else
+          _PortID = value
+        End If
+      End Set
+    End Property
+    Public Property ProjectID() As String
+      Get
+        Return _ProjectID
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _ProjectID = ""
+        Else
+          _ProjectID = value
+        End If
+      End Set
+    End Property
+    Public Property VRRaised() As Boolean
+      Get
+        Return _VRRaised
+      End Get
+      Set(ByVal value As Boolean)
+        _VRRaised = value
+      End Set
+    End Property
+    Public Property VRRaisedOn() As String
+      Get
+        If Not _VRRaisedOn = String.Empty Then
+          Return Convert.ToDateTime(_VRRaisedOn).ToString("dd/MM/yyyy")
+        End If
+        Return _VRRaisedOn
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _VRRaisedOn = ""
+        Else
+          _VRRaisedOn = value
+        End If
+      End Set
+    End Property
+    Public Property VRConverted() As Boolean
+      Get
+        Return _VRConverted
+      End Get
+      Set(ByVal value As Boolean)
+        _VRConverted = value
+      End Set
+    End Property
+    Public Property VRConvertedOn() As String
+      Get
+        If Not _VRConvertedOn = String.Empty Then
+          Return Convert.ToDateTime(_VRConvertedOn).ToString("dd/MM/yyyy")
+        End If
+        Return _VRConvertedOn
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _VRConvertedOn = ""
+        Else
+          _VRConvertedOn = value
+        End If
+      End Set
+    End Property
+    Public Property VRConvertedBy() As String
+      Get
+        Return _VRConvertedBy
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _VRConvertedBy = ""
+        Else
+          _VRConvertedBy = value
+        End If
+      End Set
+    End Property
+    Public Property VRRequestNo() As String
+      Get
+        Return _VRRequestNo
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _VRRequestNo = ""
+        Else
+          _VRRequestNo = value
+        End If
+      End Set
+    End Property
+    Public Property VRExecuted() As Boolean
+      Get
+        Return _VRExecuted
+      End Get
+      Set(ByVal value As Boolean)
+        _VRExecuted = value
+      End Set
+    End Property
     Public Property PkgNo() As Int32
       Get
         Return _PkgNo
@@ -87,11 +235,11 @@ Namespace SIS.PAK
         Return _SupplierRefNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _SupplierRefNo = ""
-         Else
-           _SupplierRefNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _SupplierRefNo = ""
+        Else
+          _SupplierRefNo = value
+        End If
       End Set
     End Property
     Public Property TransporterID() As String
@@ -99,11 +247,11 @@ Namespace SIS.PAK
         Return _TransporterID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _TransporterID = ""
-         Else
-           _TransporterID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _TransporterID = ""
+        Else
+          _TransporterID = value
+        End If
       End Set
     End Property
     Public Property TransporterName() As String
@@ -111,11 +259,11 @@ Namespace SIS.PAK
         Return _TransporterName
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _TransporterName = ""
-         Else
-           _TransporterName = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _TransporterName = ""
+        Else
+          _TransporterName = value
+        End If
       End Set
     End Property
     Public Property VehicleNo() As String
@@ -123,11 +271,11 @@ Namespace SIS.PAK
         Return _VehicleNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _VehicleNo = ""
-         Else
-           _VehicleNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _VehicleNo = ""
+        Else
+          _VehicleNo = value
+        End If
       End Set
     End Property
     Public Property GRNo() As String
@@ -135,11 +283,11 @@ Namespace SIS.PAK
         Return _GRNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _GRNo = ""
-         Else
-           _GRNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _GRNo = ""
+        Else
+          _GRNo = value
+        End If
       End Set
     End Property
     Public Property GRDate() As String
@@ -150,11 +298,11 @@ Namespace SIS.PAK
         Return _GRDate
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _GRDate = ""
-         Else
-           _GRDate = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _GRDate = ""
+        Else
+          _GRDate = value
+        End If
       End Set
     End Property
     Public Property VRExecutionNo() As String
@@ -162,11 +310,11 @@ Namespace SIS.PAK
         Return _VRExecutionNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _VRExecutionNo = ""
-         Else
-           _VRExecutionNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _VRExecutionNo = ""
+        Else
+          _VRExecutionNo = value
+        End If
       End Set
     End Property
     Public Property Remarks() As String
@@ -174,11 +322,11 @@ Namespace SIS.PAK
         Return _Remarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _Remarks = ""
-         Else
-           _Remarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _Remarks = ""
+        Else
+          _Remarks = value
+        End If
       End Set
     End Property
     Public Property CreatedBy() As String
@@ -186,47 +334,11 @@ Namespace SIS.PAK
         Return _CreatedBy
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _CreatedBy = ""
-         Else
-           _CreatedBy = value
-         End If
-      End Set
-    End Property
-    Public Property UOMTotalWeight() As String
-      Get
-        Return _UOMTotalWeight
-      End Get
-      Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _UOMTotalWeight = ""
-         Else
-           _UOMTotalWeight = value
-         End If
-      End Set
-    End Property
-    Public Property Additional1Info() As String
-      Get
-        Return _Additional1Info
-      End Get
-      Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _Additional1Info = ""
-         Else
-           _Additional1Info = value
-         End If
-      End Set
-    End Property
-    Public Property Additional2Info() As String
-      Get
-        Return _Additional2Info
-      End Get
-      Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _Additional2Info = ""
-         Else
-           _Additional2Info = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _CreatedBy = ""
+        Else
+          _CreatedBy = value
+        End If
       End Set
     End Property
     Public Property CreatedOn() As String
@@ -237,11 +349,11 @@ Namespace SIS.PAK
         Return _CreatedOn
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _CreatedOn = ""
-         Else
-           _CreatedOn = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _CreatedOn = ""
+        Else
+          _CreatedOn = value
+        End If
       End Set
     End Property
     Public Property TotalWeight() As String
@@ -249,11 +361,23 @@ Namespace SIS.PAK
         Return _TotalWeight
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _TotalWeight = "0.00"
-         Else
-           _TotalWeight = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _TotalWeight = "0.0000"
+        Else
+          _TotalWeight = value
+        End If
+      End Set
+    End Property
+    Public Property UOMTotalWeight() As String
+      Get
+        Return _UOMTotalWeight
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _UOMTotalWeight = ""
+        Else
+          _UOMTotalWeight = value
+        End If
       End Set
     End Property
     Public Property StatusID() As String
@@ -261,11 +385,35 @@ Namespace SIS.PAK
         Return _StatusID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _StatusID = ""
-         Else
-           _StatusID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _StatusID = ""
+        Else
+          _StatusID = value
+        End If
+      End Set
+    End Property
+    Public Property Additional2Info() As String
+      Get
+        Return _Additional2Info
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _Additional2Info = ""
+        Else
+          _Additional2Info = value
+        End If
+      End Set
+    End Property
+    Public Property Additional1Info() As String
+      Get
+        Return _Additional1Info
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _Additional1Info = ""
+        Else
+          _Additional1Info = value
+        End If
       End Set
     End Property
     Public Property aspnet_Users1_UserFullName() As String
@@ -281,11 +429,11 @@ Namespace SIS.PAK
         Return _PAK_PO2_PODescription
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_PO2_PODescription = ""
-         Else
-           _PAK_PO2_PODescription = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_PO2_PODescription = ""
+        Else
+          _PAK_PO2_PODescription = value
+        End If
       End Set
     End Property
     Public Property PAK_Units3_Description() As String
@@ -293,11 +441,11 @@ Namespace SIS.PAK
         Return _PAK_Units3_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_Units3_Description = ""
-         Else
-           _PAK_Units3_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_Units3_Description = ""
+        Else
+          _PAK_Units3_Description = value
+        End If
       End Set
     End Property
     Public Property VR_BusinessPartner4_BPName() As String
@@ -313,11 +461,11 @@ Namespace SIS.PAK
         Return _VR_RequestExecution5_ExecutionDescription
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _VR_RequestExecution5_ExecutionDescription = ""
-         Else
-           _VR_RequestExecution5_ExecutionDescription = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _VR_RequestExecution5_ExecutionDescription = ""
+        Else
+          _VR_RequestExecution5_ExecutionDescription = value
+        End If
       End Set
     End Property
     Public Property PAK_PkgStatus6_Description() As String
@@ -325,19 +473,55 @@ Namespace SIS.PAK
         Return _PAK_PkgStatus6_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_PkgStatus6_Description = ""
-         Else
-           _PAK_PkgStatus6_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_PkgStatus6_Description = ""
+        Else
+          _PAK_PkgStatus6_Description = value
+        End If
       End Set
     End Property
-    Public Readonly Property DisplayField() As String
+    Public Property aspnet_Users7_UserFullName() As String
+      Get
+        Return _aspnet_Users7_UserFullName
+      End Get
+      Set(ByVal value As String)
+        _aspnet_Users7_UserFullName = value
+      End Set
+    End Property
+    Public Property ELOG_Ports8_Description() As String
+      Get
+        Return _ELOG_Ports8_Description
+      End Get
+      Set(ByVal value As String)
+        If Convert.IsDBNull(value) Then
+          _ELOG_Ports8_Description = ""
+        Else
+          _ELOG_Ports8_Description = value
+        End If
+      End Set
+    End Property
+    Public Property IDM_Projects9_Description() As String
+      Get
+        Return _IDM_Projects9_Description
+      End Get
+      Set(ByVal value As String)
+        _IDM_Projects9_Description = value
+      End Set
+    End Property
+    Public Property aspnet_Users10_UserFullName() As String
+      Get
+        Return _aspnet_Users10_UserFullName
+      End Get
+      Set(ByVal value As String)
+        _aspnet_Users10_UserFullName = value
+      End Set
+    End Property
+    Public ReadOnly Property DisplayField() As String
       Get
         Return "" & _SupplierRefNo.ToString.PadRight(50, " ")
       End Get
     End Property
-    Public Readonly Property PrimaryKey() As String
+    Public ReadOnly Property PrimaryKey() As String
       Get
         Return _SerialNo & "|" & _PkgNo
       End Get
@@ -418,14 +602,46 @@ Namespace SIS.PAK
         Return _FK_PAK_PkgListH_StatusID
       End Get
     End Property
-    <DataObjectMethod(DataObjectMethodType.Select)> _
+    Public ReadOnly Property FK_PAK_PkgListH_ReceivedAtPortBy() As SIS.QCM.qcmUsers
+      Get
+        If _FK_PAK_PkgListH_ReceivedAtPortBy Is Nothing Then
+          _FK_PAK_PkgListH_ReceivedAtPortBy = SIS.QCM.qcmUsers.qcmUsersGetByID(_ReceivedAtPortBy)
+        End If
+        Return _FK_PAK_PkgListH_ReceivedAtPortBy
+      End Get
+    End Property
+    Public ReadOnly Property FK_PAK_PkgListH_PortID() As SIS.ELOG.elogPorts
+      Get
+        If _FK_PAK_PkgListH_PortID Is Nothing Then
+          _FK_PAK_PkgListH_PortID = SIS.ELOG.elogPorts.elogPortsGetByID(_PortID)
+        End If
+        Return _FK_PAK_PkgListH_PortID
+      End Get
+    End Property
+    Public ReadOnly Property FK_PAK_PkgListH_ProjectID() As SIS.QCM.qcmProjects
+      Get
+        If _FK_PAK_PkgListH_ProjectID Is Nothing Then
+          _FK_PAK_PkgListH_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
+        End If
+        Return _FK_PAK_PkgListH_ProjectID
+      End Get
+    End Property
+    Public ReadOnly Property FK_PAK_PkgListH_VRConvertedBy() As SIS.QCM.qcmUsers
+      Get
+        If _FK_PAK_PkgListH_VRConvertedBy Is Nothing Then
+          _FK_PAK_PkgListH_VRConvertedBy = SIS.QCM.qcmUsers.qcmUsersGetByID(_VRConvertedBy)
+        End If
+        Return _FK_PAK_PkgListH_VRConvertedBy
+      End Get
+    End Property
+    <DataObjectMethod(DataObjectMethodType.Select)>
     Public Shared Function pakPkgListHSelectList(ByVal OrderBy As String) As List(Of SIS.PAK.pakPkgListH)
       Dim Results As List(Of SIS.PAK.pakPkgListH) = Nothing
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "sppakPkgListHSelectList"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NvarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
           Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
           Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
@@ -519,13 +735,23 @@ Namespace SIS.PAK
         .GRDate = Record.GRDate
         .VRExecutionNo = Record.VRExecutionNo
         .Remarks = Record.Remarks
-        .CreatedBy =  Global.System.Web.HttpContext.Current.Session("LoginID")
+        .CreatedBy = Global.System.Web.HttpContext.Current.Session("LoginID")
         .UOMTotalWeight = Record.UOMTotalWeight
         .Additional1Info = Record.Additional1Info
         .Additional2Info = Record.Additional2Info
         .CreatedOn = Now
         .TotalWeight = Record.TotalWeight
         .StatusID = pakPkgStates.Free
+        Try
+          .PortID = Record.FK_PAK_PkgListH_SerialNo.PortID
+        Catch ex As Exception
+          .PortID = Record.PortID
+        End Try
+        Try
+          .ProjectID = Record.FK_PAK_PkgListH_SerialNo.ProjectID
+        Catch ex As Exception
+          .ProjectID = Record.ProjectID
+        End Try
       End With
       Return SIS.PAK.pakPkgListH.InsertData(_Rec)
     End Function
@@ -550,6 +776,17 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn",SqlDbType.DateTime,21, Iif(Record.CreatedOn= "" ,Convert.DBNull, Record.CreatedOn))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeight",SqlDbType.Decimal,21, Iif(Record.TotalWeight= "" ,Convert.DBNull, Record.TotalWeight))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StatusID",SqlDbType.Int,11, Iif(Record.StatusID= "" ,Convert.DBNull, Record.StatusID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedAtPortOn", SqlDbType.DateTime, 21, IIf(Record.ReceivedAtPortOn = "", Convert.DBNull, Record.ReceivedAtPortOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedAtPortBy", SqlDbType.NVarChar, 9, IIf(Record.ReceivedAtPortBy = "", Convert.DBNull, Record.ReceivedAtPortBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PortID", SqlDbType.Int, 11, IIf(Record.PortID = "", Convert.DBNull, Record.PortID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ProjectID", SqlDbType.NVarChar, 7, IIf(Record.ProjectID = "", Convert.DBNull, Record.ProjectID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRRaised", SqlDbType.Bit, 3, Record.VRRaised)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRRaisedOn", SqlDbType.DateTime, 21, IIf(Record.VRRaisedOn = "", Convert.DBNull, Record.VRRaisedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRConverted", SqlDbType.Bit, 3, Record.VRConverted)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRConvertedOn", SqlDbType.DateTime, 21, IIf(Record.VRConvertedOn = "", Convert.DBNull, Record.VRConvertedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRConvertedBy", SqlDbType.NVarChar, 9, IIf(Record.VRConvertedBy = "", Convert.DBNull, Record.VRConvertedBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRRequestNo", SqlDbType.Int, 11, IIf(Record.VRRequestNo = "", Convert.DBNull, Record.VRRequestNo))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRExecuted", SqlDbType.Bit, 3, Record.VRExecuted)
           Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_SerialNo").Direction = ParameterDirection.Output
           Cmd.Parameters.Add("@Return_PkgNo", SqlDbType.Int, 11)
@@ -607,6 +844,17 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn",SqlDbType.DateTime,21, Iif(Record.CreatedOn= "" ,Convert.DBNull, Record.CreatedOn))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeight",SqlDbType.Decimal,21, Iif(Record.TotalWeight= "" ,Convert.DBNull, Record.TotalWeight))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StatusID",SqlDbType.Int,11, Iif(Record.StatusID= "" ,Convert.DBNull, Record.StatusID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedAtPortOn", SqlDbType.DateTime, 21, IIf(Record.ReceivedAtPortOn = "", Convert.DBNull, Record.ReceivedAtPortOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedAtPortBy", SqlDbType.NVarChar, 9, IIf(Record.ReceivedAtPortBy = "", Convert.DBNull, Record.ReceivedAtPortBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PortID", SqlDbType.Int, 11, IIf(Record.PortID = "", Convert.DBNull, Record.PortID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ProjectID", SqlDbType.NVarChar, 7, IIf(Record.ProjectID = "", Convert.DBNull, Record.ProjectID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRRaised", SqlDbType.Bit, 3, Record.VRRaised)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRRaisedOn", SqlDbType.DateTime, 21, IIf(Record.VRRaisedOn = "", Convert.DBNull, Record.VRRaisedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRConverted", SqlDbType.Bit, 3, Record.VRConverted)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRConvertedOn", SqlDbType.DateTime, 21, IIf(Record.VRConvertedOn = "", Convert.DBNull, Record.VRConvertedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRConvertedBy", SqlDbType.NVarChar, 9, IIf(Record.VRConvertedBy = "", Convert.DBNull, Record.VRConvertedBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRRequestNo", SqlDbType.Int, 11, IIf(Record.VRRequestNo = "", Convert.DBNull, Record.VRRequestNo))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRExecuted", SqlDbType.Bit, 3, Record.VRExecuted)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

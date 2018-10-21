@@ -14,7 +14,7 @@ Namespace SIS.PAK
     Private _Quantity As Decimal = 0
     Private _IDM_Projects1_Description As String = ""
     Private _PAK_Units2_Description As String = ""
-    Private _FK_PAK_SiteItemMaster_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_SiteItemMaster_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_SiteItemMaster_UOMQuantity As SIS.PAK.pakUnits = Nothing
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
@@ -152,10 +152,10 @@ Namespace SIS.PAK
         End Set
       End Property
     End Class
-    Public ReadOnly Property FK_PAK_SiteItemMaster_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_SiteItemMaster_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_SiteItemMaster_ProjectID Is Nothing Then
-          _FK_PAK_SiteItemMaster_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_SiteItemMaster_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_SiteItemMaster_ProjectID
       End Get

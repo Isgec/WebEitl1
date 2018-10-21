@@ -353,10 +353,11 @@
                 <td>
                 </td>
                 <td>
+                  <asp:HiddenField ID="IsUploaded" runat="server" ClientIDMode="Static" ></asp:HiddenField>
                   <asp:FileUpload ID="F_FileUpload" runat="server" Width="180px"  ToolTip="Upload Item Template" />
                 </td>
                 <td>
-                  <asp:Button ID="cmdFileUpload" OnClientClick="return this.style.display='none';true;" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="Upload" CommandArgument="" />
+                  <asp:Button ID="cmdFileUpload" OnClientClick="$get('IsUploaded').value='YES';" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="Upload" CommandArgument="" />
                 </td>
               </tr>
             </table>

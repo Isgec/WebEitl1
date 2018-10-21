@@ -19,7 +19,8 @@ Partial Class GF_pakIQCListH
         Dim Remarks As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_Remarks"), TextBox).Text
         Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
-        SIS.PAK.pakIQCListH.ApproveWF(SerialNo, QCLNo, Remarks)
+        Dim QCRequestNo As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_QCRequestNo"), LC_qcmSRequests).SelectedValue
+        SIS.PAK.pakIQCListH.ApproveWF(SerialNo, QCLNo, QCRequestNo, Remarks)
         GVpakIQCListH.DataBind()
       Catch ex As Exception
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
@@ -28,6 +29,7 @@ Partial Class GF_pakIQCListH
     If e.CommandName.ToLower = "rejectwf".ToLower Then
       Try
         Dim Remarks As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_Remarks"), TextBox).Text
+        Dim QCRequestNo As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_QCRequestNo"), LC_qcmSRequests).SelectedValue
         Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
         SIS.PAK.pakIQCListH.RejectWF(SerialNo, QCLNo, Remarks)
@@ -490,6 +492,8 @@ Partial Class GF_pakIQCListH
   End Function
   Private st As Long = HttpContext.Current.Server.ScriptTimeout
   Private Sub cmdTmplUpload_Command(sender As Object, e As CommandEventArgs) Handles cmdTmplUpload.Command
+    If IsUploaded.Value <> "YES" Then Exit Sub
+    IsUploaded.Value = ""
     HttpContext.Current.Server.ScriptTimeout = Integer.MaxValue
     If e.CommandName.ToLower = "tmplupload" Then
       Try
@@ -554,6 +558,8 @@ Partial Class GF_pakIQCListH
                   Exit Sub
               End Select
               'End of status Checking
+              Dim AllowNegativeBalance As Boolean = Convert.ToBoolean(ConfigurationManager.AppSettings("AllowNegativeBalance"))
+
               Dim qcHqcWt As Decimal = 0
               Dim ItemNo As String = ""
               Dim Updatable As Boolean = False
@@ -566,8 +572,8 @@ Partial Class GF_pakIQCListH
                 ItemNo = wsD.Cells(I, 3).Text
                 Updatable = IIf(wsD.Cells(I, 6).Text <> String.Empty, True, False)
                 If Not Updatable Then Continue For
-                tmpQCQuantity = wsD.Cells(I, 15).Text
-                tmpRemarks = wsD.Cells(I, 16).Text
+                tmpQCQuantity = wsD.Cells(I, 16).Text
+                tmpRemarks = wsD.Cells(I, 17).Text
 
                 If Not IsNumeric(tmpQCQuantity) Then
                   tmpQCQuantity = "0.0000"
@@ -575,6 +581,11 @@ Partial Class GF_pakIQCListH
                 Dim tmpListD As SIS.PAK.pakQCListD = Nothing
                 tmpListD = SIS.PAK.pakQCListD.pakQCListDGetByID(SerialNo, QCLNo, BOMNo, ItemNo)
                 If tmpListD IsNot Nothing Then
+                  If Not AllowNegativeBalance Then
+                    If tmpListD.Quantity < Convert.ToDecimal(tmpQCQuantity) Then
+                      Continue For
+                    End If
+                  End If
                   With tmpListD
                     .QualityClearedQty = tmpQCQuantity
                     .Remarks = tmpRemarks
@@ -604,6 +615,7 @@ Partial Class GF_pakIQCListH
               Else
                 ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize("Updated") & "');", True)
               End If
+              GVpakIQCListH.DataBind()
             End Using
           End If
         End With

@@ -78,7 +78,7 @@ Partial Class GF_pakPO
   <System.Web.Services.WebMethod()>
   <System.Web.Script.Services.ScriptMethod()>
   Public Shared Function ProjectIDCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
-    Return SIS.EITL.eitlProjects.SelecteitlProjectsAutoCompleteList(prefixText, count, contextKey)
+    Return SIS.QCM.qcmProjects.SelectqcmProjectsAutoCompleteList(prefixText, count, contextKey)
   End Function
   Protected Sub F_POStatusID_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles F_POStatusID.SelectedIndexChanged
     Session("F_POStatusID") = F_POStatusID.SelectedValue
@@ -499,7 +499,7 @@ Partial Class GF_pakPO
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String = "0|" & aVal(0)
     Dim ProjectID As String = CType(aVal(1), String)
-    Dim oVar As SIS.EITL.eitlProjects = SIS.EITL.eitlProjects.eitlProjectsGetByID(ProjectID)
+    Dim oVar As SIS.QCM.qcmProjects = SIS.QCM.qcmProjects.qcmProjectsGetByID(ProjectID)
     If oVar Is Nothing Then
       mRet = "1|" & aVal(0) & "|Record not found."
     Else
@@ -545,5 +545,17 @@ Partial Class GF_pakPO
       ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
     End Try
 
+  End Sub
+
+  Private Sub cmdBoughtout_Click(sender As Object, e As EventArgs) Handles cmdBoughtout.Click
+    Try
+      If F_PONumber.Text = "" Then Throw New Exception("PO Number is Blank.")
+      SIS.PAK.erpData.erpPO.ImportFromERP("", F_PONumber.Text, False, False, True)
+      GVpakPO.DataBind()
+    Catch ex As Exception
+      Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+      Dim script As String = String.Format("alert({0});", message)
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+    End Try
   End Sub
 End Class

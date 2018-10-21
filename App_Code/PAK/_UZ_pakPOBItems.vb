@@ -446,36 +446,38 @@ Namespace SIS.PAK
       RecordCount = Results.Count
       Return Results
     End Function
-    Public Shared Function UZ_pakPOBItemsInsert(ByVal Record As SIS.PAK.pakPOBItems) As SIS.PAK.pakPOBItems
-      Dim _Result As SIS.PAK.pakPOBItems = pakPOBItemsInsert(Record)
-      Return _Result
-    End Function
-    Public Shared Function UZ_pakPOBItemsUpdate(ByVal Record As SIS.PAK.pakPOBItems) As SIS.PAK.pakPOBItems
-      Dim _Rec As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(Record.SerialNo, Record.BOMNo, Record.ItemNo)
-      With _Rec
-        .Quantity = Record.Quantity
-        .WeightPerUnit = Record.WeightPerUnit
-        .UOMWeight = Record.UOMWeight
-        .ISGECRemarks = Record.ISGECRemarks
-        .UOMQuantity = Record.UOMQuantity
-      End With
-      Return SIS.PAK.pakPOBItems.UpdateData(_Rec)
-    End Function
-    Public Shared Function UZ_pakPOBIEnggUpdate(ByVal Record As SIS.PAK.pakPOBItems) As SIS.PAK.pakPOBItems
-      Dim _Rec As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(Record.SerialNo, Record.BOMNo, Record.ItemNo)
-      With _Rec
-        .ItemCode = Record.ItemCode
-        .SupplierItemCode = Record.SupplierItemCode
-        .ItemDescription = Record.ItemDescription
-        .ElementID = Record.ElementID
-        .Quantity = Record.Quantity
-        .WeightPerUnit = Record.WeightPerUnit
-        .UOMWeight = Record.UOMWeight
-        .ISGECRemarks = Record.ISGECRemarks
-        .UOMQuantity = Record.UOMQuantity
-      End With
-      Return SIS.PAK.pakPOBItems.UpdateData(_Rec)
-    End Function
+    'Public Shared Function UZ_pakPOBItemsInsert(ByVal Record As SIS.PAK.pakPOBItems) As SIS.PAK.pakPOBItems
+    '  Dim _Result As SIS.PAK.pakPOBItems = pakPOBItemsInsert(Record)
+    '  Return _Result
+    'End Function
+    'Public Shared Function UZ_pakPOBItemsUpdate(ByVal Record As SIS.PAK.pakPOBItems) As SIS.PAK.pakPOBItems
+    '  Dim _Rec As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(Record.SerialNo, Record.BOMNo, Record.ItemNo)
+    '  With _Rec
+    '    .Quantity = Record.Quantity
+    '    .WeightPerUnit = Record.WeightPerUnit
+    '    .UOMWeight = Record.UOMWeight
+    '    .ISGECRemarks = Record.ISGECRemarks
+    '    .UOMQuantity = Record.UOMQuantity
+    '    .TotalWeight = SIS.PAK.pakPO.GetTotalWeight(.Quantity, .WeightPerUnit, .UOMQuantity, .UOMWeight)
+    '  End With
+    '  Return SIS.PAK.pakPOBItems.UpdateData(_Rec)
+    'End Function
+    'Public Shared Function UZ_pakPOBIEnggUpdate(ByVal Record As SIS.PAK.pakPOBItems) As SIS.PAK.pakPOBItems
+    '  Dim _Rec As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(Record.SerialNo, Record.BOMNo, Record.ItemNo)
+    '  With _Rec
+    '    .ItemCode = Record.ItemCode
+    '    .SupplierItemCode = Record.SupplierItemCode
+    '    .ItemDescription = Record.ItemDescription
+    '    .ElementID = Record.ElementID
+    '    .Quantity = Record.Quantity
+    '    .WeightPerUnit = Record.WeightPerUnit
+    '    .UOMWeight = Record.UOMWeight
+    '    .ISGECRemarks = Record.ISGECRemarks
+    '    .UOMQuantity = Record.UOMQuantity
+    '    .TotalWeight = SIS.PAK.pakPO.GetTotalWeight(.Quantity, .WeightPerUnit, .UOMQuantity, .UOMWeight)
+    '  End With
+    '  Return SIS.PAK.pakPOBItems.UpdateData(_Rec)
+    'End Function
     Public Shared Function UZ_pakPOBItemsDelete(ByVal Record As SIS.PAK.pakPOBItems) As Integer
       Dim _Result As Integer = pakPOBItemsDelete(Record)
       Return _Result

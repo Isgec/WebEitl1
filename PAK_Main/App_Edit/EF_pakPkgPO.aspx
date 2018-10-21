@@ -255,8 +255,9 @@
         <td style="text-align:center">
           <asp:UpdatePanel ID="UpdatePanel1" runat="server">
             <ContentTemplate>
+              <asp:HiddenField ID="IsUploaded" runat="server" ClientIDMode="Static" ></asp:HiddenField>
               <asp:FileUpload ID="F_FileUpload" runat="server" Width="250px" ToolTip="Browse Packing List Template" />
-              <asp:Button ID="cmdTmplUpload" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="tmplUpload" CommandArgument='<%# Eval("PrimaryKey") %>' />
+              <asp:Button ID="cmdTmplUpload" Text="Upload" OnClientClick="$get('IsUploaded').value='YES';" runat="server" ToolTip="Click to upload & process template file." CommandName="tmplUpload" CommandArgument='<%# Eval("PrimaryKey") %>' />
             </ContentTemplate>
             <Triggers>
               <asp:PostBackTrigger ControlID="cmdTmplUpload" />
@@ -355,6 +356,13 @@
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="RAISE VEHICLE REQUEST">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdVRRequest" ValidationGroup="VRRequest" runat="server" Visible='<%# Eval("VRVisible") %>' AlternateText="VRRequest" ToolTip="Raise Vehicle Request." SkinID="Vehicle" OnClientClick="return confirm('Raise Vehicle Request, Packing list can not be modified once Vehicle Request is Raised.');" CommandName="VRRequestWF" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="DESPATCH">
           <ItemTemplate>

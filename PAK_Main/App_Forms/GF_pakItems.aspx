@@ -149,7 +149,7 @@
             <asp:Label ID="LabelItemDescription" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("ItemDescription") %>'></asp:Label>
           </ItemTemplate>
           <ItemStyle CssClass="" />
-        <HeaderStyle CssClass="" Width="100px" />
+        <HeaderStyle CssClass="" Width="300px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Element ID" SortExpression="PAK_Elements3_Description">
           <ItemTemplate>

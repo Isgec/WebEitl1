@@ -39,7 +39,7 @@ Namespace SIS.PAK
     Private _FK_PAK_PO_BuyerID As SIS.QCM.qcmUsers = Nothing
     Private _FK_PAK_PO_IssuedBy As SIS.QCM.qcmUsers = Nothing
     Private _FK_PAK_PO_ClosedBy As SIS.QCM.qcmUsers = Nothing
-    Private _FK_PAK_PO_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_PO_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_PO_DivisionID As SIS.PAK.pakDivisions = Nothing
     Private _FK_PAK_PO_POStatusID As SIS.PAK.pakPOStatus = Nothing
     Private _FK_PAK_PO_POTypeID As SIS.PAK.pakPOTypes = Nothing
@@ -89,11 +89,11 @@ Namespace SIS.PAK
         Return _POConsignee
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _POConsignee = ""
-         Else
-           _POConsignee = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _POConsignee = ""
+        Else
+          _POConsignee = value
+        End If
       End Set
     End Property
     Public Property POOtherDetails() As String
@@ -101,11 +101,11 @@ Namespace SIS.PAK
         Return _POOtherDetails
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _POOtherDetails = ""
-         Else
-           _POOtherDetails = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _POOtherDetails = ""
+        Else
+          _POOtherDetails = value
+        End If
       End Set
     End Property
     Public Property IssueReasonID() As String
@@ -113,11 +113,11 @@ Namespace SIS.PAK
         Return _IssueReasonID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssueReasonID = ""
-         Else
-           _IssueReasonID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssueReasonID = ""
+        Else
+          _IssueReasonID = value
+        End If
       End Set
     End Property
     Public Property PONumber() As String
@@ -125,11 +125,11 @@ Namespace SIS.PAK
         Return _PONumber
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PONumber = ""
-         Else
-           _PONumber = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PONumber = ""
+        Else
+          _PONumber = value
+        End If
       End Set
     End Property
     Public Property PORevision() As String
@@ -137,11 +137,11 @@ Namespace SIS.PAK
         Return _PORevision
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PORevision = ""
-         Else
-           _PORevision = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PORevision = ""
+        Else
+          _PORevision = value
+        End If
       End Set
     End Property
     Public Property PODate() As String
@@ -152,11 +152,11 @@ Namespace SIS.PAK
         Return _PODate
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PODate = ""
-         Else
-           _PODate = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PODate = ""
+        Else
+          _PODate = value
+        End If
       End Set
     End Property
     Public Property PODescription() As String
@@ -164,11 +164,11 @@ Namespace SIS.PAK
         Return _PODescription
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PODescription = ""
-         Else
-           _PODescription = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PODescription = ""
+        Else
+          _PODescription = value
+        End If
       End Set
     End Property
     Public Property POTypeID() As String
@@ -176,11 +176,11 @@ Namespace SIS.PAK
         Return _POTypeID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _POTypeID = ""
-         Else
-           _POTypeID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _POTypeID = ""
+        Else
+          _POTypeID = value
+        End If
       End Set
     End Property
     Public Property SupplierID() As String
@@ -188,11 +188,11 @@ Namespace SIS.PAK
         Return _SupplierID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _SupplierID = ""
-         Else
-           _SupplierID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _SupplierID = ""
+        Else
+          _SupplierID = value
+        End If
       End Set
     End Property
     Public Property ProjectID() As String
@@ -200,11 +200,11 @@ Namespace SIS.PAK
         Return _ProjectID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _ProjectID = ""
-         Else
-           _ProjectID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _ProjectID = ""
+        Else
+          _ProjectID = value
+        End If
       End Set
     End Property
     Public Property BuyerID() As String
@@ -212,11 +212,11 @@ Namespace SIS.PAK
         Return _BuyerID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _BuyerID = ""
-         Else
-           _BuyerID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _BuyerID = ""
+        Else
+          _BuyerID = value
+        End If
       End Set
     End Property
     Public Property POStatusID() As String
@@ -224,11 +224,11 @@ Namespace SIS.PAK
         Return _POStatusID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _POStatusID = ""
-         Else
-           _POStatusID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _POStatusID = ""
+        Else
+          _POStatusID = value
+        End If
       End Set
     End Property
     Public Property ISGECRemarks() As String
@@ -236,11 +236,11 @@ Namespace SIS.PAK
         Return _ISGECRemarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _ISGECRemarks = ""
-         Else
-           _ISGECRemarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _ISGECRemarks = ""
+        Else
+          _ISGECRemarks = value
+        End If
       End Set
     End Property
     Public Property SupplierRemarks() As String
@@ -248,11 +248,11 @@ Namespace SIS.PAK
         Return _SupplierRemarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _SupplierRemarks = ""
-         Else
-           _SupplierRemarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _SupplierRemarks = ""
+        Else
+          _SupplierRemarks = value
+        End If
       End Set
     End Property
     Public Property IssuedBy() As String
@@ -260,11 +260,11 @@ Namespace SIS.PAK
         Return _IssuedBy
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssuedBy = ""
-         Else
-           _IssuedBy = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssuedBy = ""
+        Else
+          _IssuedBy = value
+        End If
       End Set
     End Property
     Public Property IssuedOn() As String
@@ -275,11 +275,11 @@ Namespace SIS.PAK
         Return _IssuedOn
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssuedOn = ""
-         Else
-           _IssuedOn = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssuedOn = ""
+        Else
+          _IssuedOn = value
+        End If
       End Set
     End Property
     Public Property ClosedBy() As String
@@ -287,11 +287,11 @@ Namespace SIS.PAK
         Return _ClosedBy
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _ClosedBy = ""
-         Else
-           _ClosedBy = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _ClosedBy = ""
+        Else
+          _ClosedBy = value
+        End If
       End Set
     End Property
     Public Property ClosedOn() As String
@@ -302,11 +302,11 @@ Namespace SIS.PAK
         Return _ClosedOn
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _ClosedOn = ""
-         Else
-           _ClosedOn = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _ClosedOn = ""
+        Else
+          _ClosedOn = value
+        End If
       End Set
     End Property
     Public Property DivisionID() As String
@@ -314,11 +314,11 @@ Namespace SIS.PAK
         Return _DivisionID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _DivisionID = ""
-         Else
-           _DivisionID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _DivisionID = ""
+        Else
+          _DivisionID = value
+        End If
       End Set
     End Property
     Public Property aspnet_Users1_UserFullName() As String
@@ -358,11 +358,11 @@ Namespace SIS.PAK
         Return _PAK_Divisions5_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_Divisions5_Description = ""
-         Else
-           _PAK_Divisions5_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_Divisions5_Description = ""
+        Else
+          _PAK_Divisions5_Description = value
+        End If
       End Set
     End Property
     Public Property PAK_POStatus6_Description() As String
@@ -370,11 +370,11 @@ Namespace SIS.PAK
         Return _PAK_POStatus6_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_POStatus6_Description = ""
-         Else
-           _PAK_POStatus6_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_POStatus6_Description = ""
+        Else
+          _PAK_POStatus6_Description = value
+        End If
       End Set
     End Property
     Public Property PAK_POTypes7_Description() As String
@@ -382,11 +382,11 @@ Namespace SIS.PAK
         Return _PAK_POTypes7_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_POTypes7_Description = ""
-         Else
-           _PAK_POTypes7_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_POTypes7_Description = ""
+        Else
+          _PAK_POTypes7_Description = value
+        End If
       End Set
     End Property
     Public Property PAK_Reasons8_Description() As String
@@ -394,11 +394,11 @@ Namespace SIS.PAK
         Return _PAK_Reasons8_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_Reasons8_Description = ""
-         Else
-           _PAK_Reasons8_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_Reasons8_Description = ""
+        Else
+          _PAK_Reasons8_Description = value
+        End If
       End Set
     End Property
     Public Property VR_BusinessPartner9_BPName() As String
@@ -409,12 +409,12 @@ Namespace SIS.PAK
         _VR_BusinessPartner9_BPName = value
       End Set
     End Property
-    Public Readonly Property DisplayField() As String
+    Public ReadOnly Property DisplayField() As String
       Get
         Return "" & _PODescription.ToString.PadRight(100, " ")
       End Get
     End Property
-    Public Readonly Property PrimaryKey() As String
+    Public ReadOnly Property PrimaryKey() As String
       Get
         Return _SerialNo
       End Get
@@ -462,10 +462,10 @@ Namespace SIS.PAK
         Return _FK_PAK_PO_ClosedBy
       End Get
     End Property
-    Public ReadOnly Property FK_PAK_PO_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_PO_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_PO_ProjectID Is Nothing Then
-          _FK_PAK_PO_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_PO_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_PO_ProjectID
       End Get

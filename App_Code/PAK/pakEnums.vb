@@ -67,12 +67,16 @@ End Enum
 Public Enum pakPkgStates
   Free = 1
   ReadyToDespatch = 2
-  Despatched = 3
+  UnderReceiveAtSite = 3
   ReceivedAtSite = 4
+  UnderReceiveAtPort = 5
+  ReceivedAtPort = 6
+  DespatchedFromPort = 7
 End Enum
 Public Enum pakErpPOTypes
   ISGECEngineered = 1
   Package = 2
+  Boughtout = 3
 End Enum
 Public Enum siteIssueTypes
   Issue = 1

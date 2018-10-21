@@ -75,7 +75,7 @@ Partial Class GF_pakSitePkgH
   <System.Web.Services.WebMethod()> _
   <System.Web.Script.Services.ScriptMethod()> _
   Public Shared Function ProjectIDCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
-    Return SIS.EITL.eitlProjects.SelecteitlProjectsAutoCompleteList(prefixText, count, contextKey)
+    Return SIS.QCM.qcmProjects.SelectqcmProjectsAutoCompleteList(prefixText, count, contextKey)
   End Function
   Protected Sub F_SupplierID_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles F_SupplierID.TextChanged
     Session("F_SupplierID") = F_SupplierID.Text
@@ -452,7 +452,7 @@ Partial Class GF_pakSitePkgH
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String="0|" & aVal(0)
     Dim ProjectID As String = CType(aVal(1),String)
-    Dim oVar As SIS.EITL.eitlProjects = SIS.EITL.eitlProjects.eitlProjectsGetByID(ProjectID)
+    Dim oVar As SIS.QCM.qcmProjects = SIS.QCM.qcmProjects.qcmProjectsGetByID(ProjectID)
     If oVar Is Nothing Then
       mRet = "1|" & aVal(0) & "|Record not found." 
     Else

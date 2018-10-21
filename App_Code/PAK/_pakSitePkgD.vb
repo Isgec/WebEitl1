@@ -33,6 +33,7 @@ Namespace SIS.PAK
     Private _PackingMark As String = ""
     Private _DocumentRevision As String = ""
     Private _ProjectID As String = ""
+    Public Property TotalWeight As Decimal = 0
     Private _aspnet_Users1_UserFullName As String = ""
     Private _IDM_Projects2_Description As String = ""
     Private _PAK_Documents3_cmba As String = ""
@@ -47,7 +48,7 @@ Namespace SIS.PAK
     Private _PAK_Units12_Description As String = ""
     Private _VR_MaterialStates13_Description As String = ""
     Private _FK_PAK_SitePkgD_InventoryUpdatedBy As SIS.QCM.qcmUsers = Nothing
-    Private _FK_PAK_SitePkgD_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_SitePkgD_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_SitePkgD_DocumentNo As SIS.PAK.pakDocuments = Nothing
     Private _FK_PAK_SitePkgD_InventoryStatusID As SIS.PAK.pakInventoryStatus = Nothing
     Private _FK_PAK_SitePkgD_PAKTypeID As SIS.PAK.pakPakTypes = Nothing
@@ -547,10 +548,10 @@ Namespace SIS.PAK
         Return _FK_PAK_SitePkgD_InventoryUpdatedBy
       End Get
     End Property
-    Public ReadOnly Property FK_PAK_SitePkgD_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_SitePkgD_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_SitePkgD_ProjectID Is Nothing Then
-          _FK_PAK_SitePkgD_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_SitePkgD_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_SitePkgD_ProjectID
       End Get
@@ -795,6 +796,7 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PackingMark",SqlDbType.NVarChar,51, Iif(Record.PackingMark= "" ,Convert.DBNull, Record.PackingMark))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentRevision",SqlDbType.NVarChar,11, Iif(Record.DocumentRevision= "" ,Convert.DBNull, Record.DocumentRevision))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ProjectID",SqlDbType.NVarChar,7, Record.ProjectID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeight", SqlDbType.Decimal, 21, Record.TotalWeight)
           Cmd.Parameters.Add("@Return_ProjectID", SqlDbType.NVarChar, 7)
           Cmd.Parameters("@Return_ProjectID").Direction = ParameterDirection.Output
           Cmd.Parameters.Add("@Return_RecNo", SqlDbType.Int, 11)
@@ -837,6 +839,7 @@ Namespace SIS.PAK
         .PackWidth = Record.PackWidth
         .PackingMark = Record.PackingMark
         .DocumentRevision = Record.DocumentRevision
+        .TotalWeight = SIS.PAK.pakPO.GetTotalWeight(Record.Quantity, Record.FK_PAK_SitePkgD_ItemNo.WeightPerUnit, Record.FK_PAK_SitePkgD_ItemNo.UOMQuantity, Record.FK_PAK_SitePkgD_ItemNo.UOMWeight)
       End With
       Return SIS.PAK.pakSitePkgD.UpdateData(_Rec)
     End Function
@@ -873,6 +876,7 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PackingMark",SqlDbType.NVarChar,51, Iif(Record.PackingMark= "" ,Convert.DBNull, Record.PackingMark))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentRevision",SqlDbType.NVarChar,11, Iif(Record.DocumentRevision= "" ,Convert.DBNull, Record.DocumentRevision))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ProjectID",SqlDbType.NVarChar,7, Record.ProjectID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeight", SqlDbType.Decimal, 21, Record.TotalWeight)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

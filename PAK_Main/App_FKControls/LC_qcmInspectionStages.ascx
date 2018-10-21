@@ -39,7 +39,6 @@
   SkinID = "DropDownSkin"
   Width="200px"
   CssClass = "myddl"
-  onblur="validate_stage(this);"
   Runat="server" />
 <asp:RequiredFieldValidator 
   ID = "RequiredFieldValidatorqcmInspectionStages"

@@ -250,7 +250,7 @@
         <td class="alignright">
           <asp:Label ID="L_Quantity" runat="server" Text="Quantity :" /><span style="color:red">*</span>
         </td>
-        <td colspan="3">
+        <td>
           <asp:TextBox ID="F_Quantity"
             Text='<%# Bind("Quantity") %>'
             Width="184px"
@@ -259,30 +259,27 @@
             ValidationGroup="pakQCListD"
             MaxLength="22"
             onfocus = "return this.select();"
+            onblur ="return dc(this,4);"
             runat="server" />
-          <AJX:MaskedEditExtender 
-            ID = "MEEQuantity"
-            runat = "server"
-            mask = "999999999.9999"
-            AcceptNegative = "Left"
-            MaskType="Number"
-            MessageValidatorTip="true"
-            InputDirection="RightToLeft"
-            ErrorTooltipEnabled="true"
-            TargetControlID="F_Quantity" />
-          <AJX:MaskedEditValidator 
-            ID = "MEVQuantity"
-            runat = "server"
-            ControlToValidate = "F_Quantity"
-            ControlExtender = "MEEQuantity"
-            EmptyValueBlurredText = "<div class='errorLG'>Required!</div>"
-            Display = "Dynamic"
-            EnableClientScript = "true"
-            ValidationGroup = "pakQCListD"
-            IsValidEmpty = "false"
-            MinimumValue = "0.01"
-            SetFocusOnError="true" />
         </td>
+        <td class="alignright">
+          <asp:Label ID="L_InspectionStageID" runat="server" Text="Inspection Stage :" /><span style="color:red">*</span>
+        </td>
+        <td>
+          <LGM:LC_qcmInspectionStages
+            ID="F_InspectionStageID"
+            SelectedValue='<%# Bind("InspectionStageID") %>'
+            OrderBy="DisplayField"
+            DataTextField="DisplayField"
+            DataValueField="PrimaryKey"
+            IncludeDefault="true"
+            DefaultText="-- Select --"
+            Width="200px"
+            CssClass="myddl"
+            ValidationGroup = "pakQCListD"
+            RequiredFieldErrorMessage = "<div class='errorLG'>Required!</div>"
+            Runat="Server" />
+          </td>
       </tr>
     </table>
     </div>

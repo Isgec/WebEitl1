@@ -18,10 +18,10 @@ Namespace SIS.PAK
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           If SearchState Then
-            Cmd.CommandText = "sppakDPendingSelectListSearch"
+            Cmd.CommandText = "sppak_LG_DPendingSelectListSearch"
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
           Else
-            Cmd.CommandText = "sppakDPendingSelectListFilteres"
+            Cmd.CommandText = "sppak_LG_DPendingSelectListFilteres"
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_PkgNo",SqlDbType.Int,10, IIf(PkgNo = Nothing, 0,PkgNo))
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SerialNo",SqlDbType.Int,10, IIf(SerialNo = Nothing, 0,SerialNo))
           End If

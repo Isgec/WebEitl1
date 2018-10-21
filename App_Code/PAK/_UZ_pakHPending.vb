@@ -53,6 +53,31 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
+    Public Shared Shadows Function ReceivedAtPortWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As SIS.PAK.pakHPending
+      Dim Results As SIS.PAK.pakHPending = pakHPendingGetByID(SerialNo, PkgNo)
+      Dim tmpItems As List(Of SIS.PAK.pakDPending) = SIS.PAK.pakDPending.pakDPendingSelectList(0, 99999, "", False, "", PkgNo, SerialNo)
+      For Each tmpI As SIS.PAK.pakDPending In tmpItems
+        With tmpI
+          .FK_PAK_PkgListD_ItemNo.QuantityReceivedAtPort += .Quantity
+          .FK_PAK_PkgListD_ItemNo.TotalWeightReceivedAtPort += .TotalWeight
+          .QuantityBalance = .Quantity
+          .TotalWeightBalance = .TotalWeight
+        End With
+        SIS.PAK.pakPOBItems.UpdateData(tmpI.FK_PAK_PkgListD_ItemNo)
+        SIS.PAK.pakDPending.UpdateData(tmpI)
+      Next
+      With Results
+        .ReceivedAtPortBy = HttpContext.Current.Session("LoginID")
+        .ReceivedAtPortOn = Now
+        .StatusID = pakPkgStates.ReceivedAtPort
+      End With
+      Results = SIS.PAK.pakHPending.UpdateData(Results)
+      Try
+        SIS.CT.ctUpdates.CT_ReceivedAtPort(Results)
+      Catch ex As Exception
+      End Try
+      Return Results
+    End Function
     Public Shared Shadows Function ApproveWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As SIS.PAK.pakHPending
       Dim Results As SIS.PAK.pakHPending = pakHPendingGetByID(SerialNo, PkgNo)
       'Create Receipt Header
@@ -120,6 +145,38 @@ Namespace SIS.PAK
       End Using
       Return Results
     End Function
+    Public Shared Function UZ_pakHPendingAtPortSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As Int32) As List(Of SIS.PAK.pakHPending)
+      Dim Results As List(Of SIS.PAK.pakHPending) = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          'Project ID Belongs to SiteUserProjects and PackageStatus is Despatched
+          If SearchState Then
+            Cmd.CommandText = "sppak_LG_HPendingAtPortSelectListSearch"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
+          Else
+            Cmd.CommandText = "sppak_LG_HPendingAtPortSelectListFilteres"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SerialNo", SqlDbType.Int, 10, IIf(SerialNo = Nothing, 0, SerialNo))
+          End If
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          RecordCount = -1
+          Results = New List(Of SIS.PAK.pakHPending)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.PAK.pakHPending(Reader))
+          End While
+          Reader.Close()
+          RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
+      Return Results
+    End Function
     Public Shared Function UZ_pakHPendingUpdate(ByVal Record As SIS.PAK.pakHPending) As SIS.PAK.pakHPending
       Dim _Result As SIS.PAK.pakHPending = pakHPendingUpdate(Record)
       Return _Result
@@ -127,13 +184,16 @@ Namespace SIS.PAK
     Public Shared Function GetSitePkgH(ByVal pkgH As SIS.PAK.pakPkgListH) As SIS.PAK.pakSitePkgH
       Dim tmp As New SIS.PAK.pakSitePkgH
       With tmp
-        .ProjectID = pkgH.FK_PAK_PkgListH_SerialNo.ProjectID
+        .ProjectID = pkgH.ProjectID
         .RecNo = 0
         .SerialNo = pkgH.SerialNo
         .PkgNo = pkgH.PkgNo
         .MRNNo = ""
-        .SupplierID = pkgH.FK_PAK_PkgListH_SerialNo.SupplierID
-        .SupplierName = pkgH.FK_PAK_PkgListH_SerialNo.VR_BusinessPartner9_BPName
+        Try
+          .SupplierID = pkgH.FK_PAK_PkgListH_SerialNo.SupplierID
+          .SupplierName = pkgH.FK_PAK_PkgListH_SerialNo.VR_BusinessPartner9_BPName
+        Catch ex As Exception
+        End Try
         .SupplierRefNo = pkgH.SupplierRefNo
         .TransporterID = pkgH.TransporterID
         .TransporterName = pkgH.TransporterName

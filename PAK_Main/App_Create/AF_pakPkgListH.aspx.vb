@@ -39,8 +39,10 @@ Partial Class AF_pakPkgListH
       Page.ClientScript.RegisterClientScriptBlock(GetType(System.String), "scriptpakPkgListH", mStr)
     End If
     If Request.QueryString("SerialNo") IsNot Nothing Then
-      CType(FVpakPkgListH.FindControl("F_SerialNo"), TextBox).Text = Request.QueryString("SerialNo")
+      Dim SerialNo As String = Request.QueryString("SerialNo")
+      CType(FVpakPkgListH.FindControl("F_SerialNo"), TextBox).Text = SerialNo
       CType(FVpakPkgListH.FindControl("F_SerialNo"), TextBox).Enabled = False
+      CType(FVpakPkgListH.FindControl("F_PortID"), LC_elogPorts).SelectedValue = SIS.PAK.pakPO.pakPOGetByID(SerialNo).PortID
     End If
     If Request.QueryString("PkgNo") IsNot Nothing Then
       CType(FVpakPkgListH.FindControl("F_PkgNo"), TextBox).Text = Request.QueryString("PkgNo")
@@ -92,12 +94,17 @@ Partial Class AF_pakPkgListH
   Public Shared Function validate_FK_PAK_PkgListH_VRExecutionNo(ByVal value As String) As String
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String="0|" & aVal(0)
-    Dim VRExecutionNo As Int32 = CType(aVal(1),Int32)
+    Dim VRExecutionNo As Int32 = 0
+    Try
+      VRExecutionNo = CType(aVal(1), Int32)
+    Catch ex As Exception
+      VRExecutionNo = 0
+    End Try
     Dim oVar As SIS.VR.vrRequestExecution = SIS.VR.vrRequestExecution.vrRequestExecutionGetByID(VRExecutionNo)
     If oVar Is Nothing Then
-      mRet = "1|" & aVal(0) & "|Record not found." 
+      mRet = "1|" & aVal(0) & "|Record not found.|"
     Else
-      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField 
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField & "|" & oVar.TransporterID
     End If
     Return mRet
   End Function

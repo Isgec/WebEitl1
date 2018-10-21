@@ -10,7 +10,6 @@ Partial Class LGDefault
   Inherits System.Web.UI.Page
 
   Private Sub LGDefault_Load(sender As Object, e As EventArgs) Handles Me.Load
-    xx.Text = System.Enum.GetName(GetType(pakItemStates), 9)
   End Sub
 
   <System.Web.Services.WebMethod()>

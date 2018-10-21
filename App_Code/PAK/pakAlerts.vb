@@ -50,7 +50,9 @@ Namespace SIS.PAK
                 aErr.Add(oPO.BuyerID & " " & oPO.FK_PAK_PO_BuyerID.UserFullName)
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                End If
               End If
               'Default CC Include
               .CC.Add(New MailAddress("harishkumar@isgec.co.in", "Harish Kumar"))
@@ -111,7 +113,9 @@ Namespace SIS.PAK
                 aErr.Add(oPO.BuyerID & " " & oPO.FK_PAK_PO_BuyerID.UserFullName)
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                End If
               End If
             Catch ex As Exception
               .To.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
@@ -371,7 +375,9 @@ Namespace SIS.PAK
                 aErr.Add(oPO.BuyerID & " " & oPO.FK_PAK_PO_BuyerID.UserFullName)
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                End If
               End If
               'Default CC Include
               .CC.Add(New MailAddress("harishkumar@isgec.co.in", "Harish Kumar"))
@@ -433,7 +439,9 @@ Namespace SIS.PAK
                 aErr.Add(oPO.BuyerID & " " & oPO.FK_PAK_PO_BuyerID.UserFullName)
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                End If
               End If
             Catch ex As Exception
               .To.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
@@ -452,17 +460,17 @@ Namespace SIS.PAK
         End Select
 
         'Add Project wise Alert Group in CC
-        ''Dim Users As List(Of SIS.EITL.eitlProjectWiseUser) = SIS.EITL.eitlProjectWiseUser.GetByProjectID(oPO.ProjectID, "")
-        ''For Each usr As SIS.EITL.eitlProjectWiseUser In Users
-        ''  Try
-        ''    Dim ad As MailAddress = New MailAddress(usr.FK_EITL_ProjectWiseUser_UserID.EMailID, usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
-        ''    If Not .CC.Contains(ad) Then
-        ''      .CC.Add(ad)
-        ''    End If
-        ''  Catch ex As Exception
-        ''    aErr.Add(usr.UserID & " " & usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
-        ''  End Try
-        ''Next
+        Dim Users As List(Of SIS.EITL.eitlProjectWiseUser) = SIS.EITL.eitlProjectWiseUser.GetByProjectID(oPO.ProjectID, "")
+        For Each usr As SIS.EITL.eitlProjectWiseUser In Users
+          Try
+            Dim ad As MailAddress = New MailAddress(usr.FK_EITL_ProjectWiseUser_UserID.EMailID, usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
+            If Not .CC.Contains(ad) Then
+              .CC.Add(ad)
+            End If
+          Catch ex As Exception
+            aErr.Add(usr.UserID & " " & usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
+          End Try
+        Next
         'End of Add Project Users
       End With
       With oMsg

@@ -38,38 +38,10 @@
             ValidationGroup = "pakPkgListH"
             onblur= "script_pakPkgListH.validate_SerialNo(this);"
             Runat="Server" />
-          <asp:RequiredFieldValidator 
-            ID = "RFVSerialNo"
-            runat = "server"
-            ControlToValidate = "F_SerialNo"
-            ErrorMessage = "<div class='errorLG'>Required!</div>"
-            Display = "Dynamic"
-            EnableClientScript = "true"
-            ValidationGroup = "pakPkgListH"
-            SetFocusOnError="true" />
           <asp:Label
             ID = "F_SerialNo_Display"
             Text='<%# Eval("PAK_PO2_PODescription") %>'
             CssClass="myLbl"
-            Runat="Server" />
-          <AJX:AutoCompleteExtender
-            ID="ACESerialNo"
-            BehaviorID="B_ACESerialNo"
-            ContextKey=""
-            UseContextKey="true"
-            ServiceMethod="SerialNoCompletionList"
-            TargetControlID="F_SerialNo"
-            EnableCaching="false"
-            CompletionInterval="100"
-            FirstRowSelected="true"
-            MinimumPrefixLength="1"
-            OnClientItemSelected="script_pakPkgListH.ACESerialNo_Selected"
-            OnClientPopulating="script_pakPkgListH.ACESerialNo_Populating"
-            OnClientPopulated="script_pakPkgListH.ACESerialNo_Populated"
-            CompletionSetCount="10"
-            CompletionListCssClass = "autocomplete_completionListElement"
-            CompletionListItemCssClass = "autocomplete_listItem"
-            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
             Runat="Server" />
         </td>
       </tr>
@@ -85,7 +57,7 @@
         <td class="alignright">
           <asp:Label ID="L_SupplierRefNo" runat="server" Text="Supplier Ref. No :" />&nbsp;
         </td>
-        <td colspan="3">
+        <td>
           <asp:TextBox ID="F_SupplierRefNo"
             Text='<%# Bind("SupplierRefNo") %>'
             CssClass = "mytxt"
@@ -93,8 +65,65 @@
             onblur= "this.value=this.value.replace(/\'/g,'');"
             ToolTip="Enter value for Supplier Ref. No."
             MaxLength="50"
-            Width="408px"
+            Width="300px"
             runat="server" />
+        </td>
+        <td class="alignright">
+          <asp:Label ID="L_PortID" runat="server" Text="Destination Port :" />
+        </td>
+        <td>
+          <LGM:LC_elogPorts
+            ID="F_PortID"
+            SelectedValue='<%# Bind("PortID") %>'
+            OrderBy="DisplayField"
+            DataTextField="DisplayField"
+            DataValueField="PrimaryKey"
+            IncludeDefault="true"
+            DefaultText="-- Select --"
+            Width="200px"
+            CssClass="myddl"
+            Runat="Server" />
+          </td>
+      </tr>
+      <tr>
+        <td class="alignright">
+          <asp:Label ID="L_VRExecutionNo" runat="server" Text="Vehicle Execution No. :" />&nbsp;
+        </td>
+        <td colspan="3">
+          <asp:TextBox
+            ID = "F_VRExecutionNo"
+            CssClass = "myfktxt"
+            Width="88px"
+            Text='<%# Bind("VRExecutionNo") %>'
+            AutoCompleteType = "None"
+            onfocus = "return this.select();"
+            ToolTip="Enter value for Vehicle Execution No.."
+            onblur= "script_pakPkgListH.validate_VRExecutionNo(this);"
+            Runat="Server" />
+          <asp:Label
+            ID = "F_VRExecutionNo_Display"
+            Text='<%# Eval("VR_RequestExecution5_ExecutionDescription") %>'
+            CssClass="myLbl"
+            Runat="Server" />
+          <AJX:AutoCompleteExtender
+            ID="ACEVRExecutionNo"
+            BehaviorID="B_ACEVRExecutionNo"
+            ContextKey=""
+            UseContextKey="true"
+            ServiceMethod="VRExecutionNoCompletionList"
+            TargetControlID="F_VRExecutionNo"
+            EnableCaching="false"
+            CompletionInterval="100"
+            FirstRowSelected="true"
+            MinimumPrefixLength="1"
+            OnClientItemSelected="script_pakPkgListH.ACEVRExecutionNo_Selected"
+            OnClientPopulating="script_pakPkgListH.ACEVRExecutionNo_Populating"
+            OnClientPopulated="script_pakPkgListH.ACEVRExecutionNo_Populated"
+            CompletionSetCount="10"
+            CompletionListCssClass = "autocomplete_completionListElement"
+            CompletionListItemCssClass = "autocomplete_listItem"
+            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
+            Runat="Server" />
         </td>
       </tr>
       <tr>
@@ -167,7 +196,7 @@
             onblur= "this.value=this.value.replace(/\'/g,'');"
             ToolTip="Enter value for Vehicle No."
             MaxLength="50"
-            Width="408px"
+            Width="300px"
             runat="server" />
           <asp:RequiredFieldValidator 
             ID = "RFVVehicleNo"
@@ -193,7 +222,7 @@
             onblur= "this.value=this.value.replace(/\'/g,'');"
             ToolTip="Enter value for GR No."
             MaxLength="50"
-            Width="408px"
+            Width="300px"
             runat="server" />
           <asp:RequiredFieldValidator 
             ID = "RFVGRNo"
@@ -247,47 +276,6 @@
       </tr>
       <tr>
         <td class="alignright">
-          <asp:Label ID="L_VRExecutionNo" runat="server" Text="Vehicle Execution No. :" />&nbsp;
-        </td>
-        <td colspan="3">
-          <asp:TextBox
-            ID = "F_VRExecutionNo"
-            CssClass = "myfktxt"
-            Width="88px"
-            Text='<%# Bind("VRExecutionNo") %>'
-            AutoCompleteType = "None"
-            onfocus = "return this.select();"
-            ToolTip="Enter value for Vehicle Execution No.."
-            onblur= "script_pakPkgListH.validate_VRExecutionNo(this);"
-            Runat="Server" />
-          <asp:Label
-            ID = "F_VRExecutionNo_Display"
-            Text='<%# Eval("VR_RequestExecution5_ExecutionDescription") %>'
-            CssClass="myLbl"
-            Runat="Server" />
-          <AJX:AutoCompleteExtender
-            ID="ACEVRExecutionNo"
-            BehaviorID="B_ACEVRExecutionNo"
-            ContextKey=""
-            UseContextKey="true"
-            ServiceMethod="VRExecutionNoCompletionList"
-            TargetControlID="F_VRExecutionNo"
-            EnableCaching="false"
-            CompletionInterval="100"
-            FirstRowSelected="true"
-            MinimumPrefixLength="1"
-            OnClientItemSelected="script_pakPkgListH.ACEVRExecutionNo_Selected"
-            OnClientPopulating="script_pakPkgListH.ACEVRExecutionNo_Populating"
-            OnClientPopulated="script_pakPkgListH.ACEVRExecutionNo_Populated"
-            CompletionSetCount="10"
-            CompletionListCssClass = "autocomplete_completionListElement"
-            CompletionListItemCssClass = "autocomplete_listItem"
-            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
-            Runat="Server" />
-        </td>
-      </tr>
-      <tr>
-        <td class="alignright">
           <asp:Label ID="L_Remarks" runat="server" Text="Remarks :" />&nbsp;
         </td>
         <td colspan="3">
@@ -298,7 +286,7 @@
             onblur= "this.value=this.value.replace(/\'/g,'');"
             ToolTip="Enter value for Remarks."
             MaxLength="500"
-            Width="350px"
+            Width="300px"
             runat="server" />
         </td>
       </tr>

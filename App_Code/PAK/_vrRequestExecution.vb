@@ -135,17 +135,18 @@ Namespace SIS.VR
     End Function
     '		Autocomplete Method
     Public Shared Function SelectvrRequestExecutionAutoCompleteList(ByVal Prefix As String, ByVal count As Integer, ByVal contextKey As String) As String()
-			Dim Results As List(Of String) = Nothing
+      Dim Results As List(Of String) = Nothing
+      If contextKey Is Nothing Then contextKey = ""
       Dim aVal() As String = contextKey.Split("|".ToCharArray)
 			Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
 				Using Cmd As SqlCommand = Con.CreateCommand()
 					Cmd.CommandType = CommandType.StoredProcedure
-					Cmd.CommandText = "spvrRequestExecutionAutoCompleteList"
+          Cmd.CommandText = "spvr_LG_VehicleExecutionAutoCompleteForDespatch"
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NvarChar, 9, HttpContext.Current.Session("LoginID"))
-					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@prefix", SqlDbType.NVarChar, 50, Prefix)
-					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@records", SqlDbType.Int, -1, count)
-					SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@bycode", SqlDbType.Int, 1, IIf(IsNumeric(Prefix), 0, 1))
-					Results = New List(Of String)()
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Prefix", SqlDbType.NVarChar, 50, Prefix)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@records", SqlDbType.Int, -1, count)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ContextKey", SqlDbType.NVarChar, contextKey.Length, contextKey)
+          Results = New List(Of String)()
 					Con.Open()
 					Dim Reader As SqlDataReader = Cmd.ExecuteReader()
 					If Not Reader.HasRows Then

@@ -37,7 +37,7 @@ Namespace SIS.PAK
     Private _VR_RequestExecution6_ExecutionDescription As String = ""
     Private _VR_BusinessPartner7_BPName As String = ""
     Private _FK_VR_LorryReceipts_CreatedBy As SIS.QCM.qcmUsers = Nothing
-    Private _FK_VR_LorryReceipts_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_VR_LorryReceipts_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_VR_LorryReceipts_CustomerID As SIS.PAK.pakBusinessPartner = Nothing
     Private _FK_VR_LorryReceipts_MaterialStatusID As SIS.PAK.pakMaterialStates = Nothing
     Private _FK_VR_LorryReceipts_ExecutionNo As SIS.VR.vrRequestExecution = Nothing
@@ -96,11 +96,11 @@ Namespace SIS.PAK
         Return _MRNDate
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _MRNDate = ""
-         Else
-           _MRNDate = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _MRNDate = ""
+        Else
+          _MRNDate = value
+        End If
       End Set
     End Property
     Public Property RequestExecutionNo() As String
@@ -108,11 +108,11 @@ Namespace SIS.PAK
         Return _RequestExecutionNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _RequestExecutionNo = ""
-         Else
-           _RequestExecutionNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _RequestExecutionNo = ""
+        Else
+          _RequestExecutionNo = value
+        End If
       End Set
     End Property
     Public Property CustomerID() As String
@@ -120,11 +120,11 @@ Namespace SIS.PAK
         Return _CustomerID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _CustomerID = ""
-         Else
-           _CustomerID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _CustomerID = ""
+        Else
+          _CustomerID = value
+        End If
       End Set
     End Property
     Public Property VehicleInDate() As String
@@ -135,11 +135,11 @@ Namespace SIS.PAK
         Return _VehicleInDate
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _VehicleInDate = ""
-         Else
-           _VehicleInDate = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _VehicleInDate = ""
+        Else
+          _VehicleInDate = value
+        End If
       End Set
     End Property
     Public Property VehicleOutDate() As String
@@ -150,11 +150,11 @@ Namespace SIS.PAK
         Return _VehicleOutDate
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _VehicleOutDate = ""
-         Else
-           _VehicleOutDate = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _VehicleOutDate = ""
+        Else
+          _VehicleOutDate = value
+        End If
       End Set
     End Property
     Public Property TransporterID() As String
@@ -162,11 +162,11 @@ Namespace SIS.PAK
         Return _TransporterID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _TransporterID = ""
-         Else
-           _TransporterID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _TransporterID = ""
+        Else
+          _TransporterID = value
+        End If
       End Set
     End Property
     Public Property TransporterName() As String
@@ -174,11 +174,11 @@ Namespace SIS.PAK
         Return _TransporterName
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _TransporterName = ""
-         Else
-           _TransporterName = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _TransporterName = ""
+        Else
+          _TransporterName = value
+        End If
       End Set
     End Property
     Public Property VehicleRegistrationNo() As String
@@ -186,11 +186,11 @@ Namespace SIS.PAK
         Return _VehicleRegistrationNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _VehicleRegistrationNo = ""
-         Else
-           _VehicleRegistrationNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _VehicleRegistrationNo = ""
+        Else
+          _VehicleRegistrationNo = value
+        End If
       End Set
     End Property
     Public Property WayBillFormNo() As String
@@ -198,11 +198,11 @@ Namespace SIS.PAK
         Return _WayBillFormNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _WayBillFormNo = ""
-         Else
-           _WayBillFormNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _WayBillFormNo = ""
+        Else
+          _WayBillFormNo = value
+        End If
       End Set
     End Property
     Public Property PaymentMadeAtSite() As Boolean
@@ -226,11 +226,11 @@ Namespace SIS.PAK
         Return _CreatedBy
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _CreatedBy = ""
-         Else
-           _CreatedBy = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _CreatedBy = ""
+        Else
+          _CreatedBy = value
+        End If
       End Set
     End Property
     Public Property CreatedOn() As String
@@ -241,11 +241,11 @@ Namespace SIS.PAK
         Return _CreatedOn
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _CreatedOn = ""
-         Else
-           _CreatedOn = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _CreatedOn = ""
+        Else
+          _CreatedOn = value
+        End If
       End Set
     End Property
     Public Property OverDimensionConsignment() As String
@@ -269,11 +269,11 @@ Namespace SIS.PAK
         Return _ReasonForDetention
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _ReasonForDetention = ""
-         Else
-           _ReasonForDetention = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _ReasonForDetention = ""
+        Else
+          _ReasonForDetention = value
+        End If
       End Set
     End Property
     Public Property OtherRemarks() As String
@@ -281,11 +281,11 @@ Namespace SIS.PAK
         Return _OtherRemarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _OtherRemarks = ""
-         Else
-           _OtherRemarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _OtherRemarks = ""
+        Else
+          _OtherRemarks = value
+        End If
       End Set
     End Property
     Public Property MaterialStateID() As String
@@ -293,11 +293,11 @@ Namespace SIS.PAK
         Return _MaterialStateID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _MaterialStateID = ""
-         Else
-           _MaterialStateID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _MaterialStateID = ""
+        Else
+          _MaterialStateID = value
+        End If
       End Set
     End Property
     Public Property RemarksForDamageOrShortage() As String
@@ -305,11 +305,11 @@ Namespace SIS.PAK
         Return _RemarksForDamageOrShortage
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _RemarksForDamageOrShortage = ""
-         Else
-           _RemarksForDamageOrShortage = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _RemarksForDamageOrShortage = ""
+        Else
+          _RemarksForDamageOrShortage = value
+        End If
       End Set
     End Property
     Public Property DriverNameAndContactNo() As String
@@ -317,11 +317,11 @@ Namespace SIS.PAK
         Return _DriverNameAndContactNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _DriverNameAndContactNo = ""
-         Else
-           _DriverNameAndContactNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _DriverNameAndContactNo = ""
+        Else
+          _DriverNameAndContactNo = value
+        End If
       End Set
     End Property
     Public Property TempMRNNo() As String
@@ -329,11 +329,11 @@ Namespace SIS.PAK
         Return _TempMRNNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _TempMRNNo = ""
-         Else
-           _TempMRNNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _TempMRNNo = ""
+        Else
+          _TempMRNNo = value
+        End If
       End Set
     End Property
     Public Property aspnet_Users1_UserFullName() As String
@@ -373,11 +373,11 @@ Namespace SIS.PAK
         Return _VR_RequestExecution6_ExecutionDescription
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _VR_RequestExecution6_ExecutionDescription = ""
-         Else
-           _VR_RequestExecution6_ExecutionDescription = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _VR_RequestExecution6_ExecutionDescription = ""
+        Else
+          _VR_RequestExecution6_ExecutionDescription = value
+        End If
       End Set
     End Property
     Public Property VR_BusinessPartner7_BPName() As String
@@ -388,12 +388,12 @@ Namespace SIS.PAK
         _VR_BusinessPartner7_BPName = value
       End Set
     End Property
-    Public Readonly Property DisplayField() As String
+    Public ReadOnly Property DisplayField() As String
       Get
         Return "" & _TransporterName.ToString.PadRight(50, " ")
       End Get
     End Property
-    Public Readonly Property PrimaryKey() As String
+    Public ReadOnly Property PrimaryKey() As String
       Get
         Return _ProjectID & "|" & _MRNNo
       End Get
@@ -434,10 +434,10 @@ Namespace SIS.PAK
         Return _FK_VR_LorryReceipts_CreatedBy
       End Get
     End Property
-    Public ReadOnly Property FK_VR_LorryReceipts_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_VR_LorryReceipts_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_VR_LorryReceipts_ProjectID Is Nothing Then
-          _FK_VR_LorryReceipts_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_VR_LorryReceipts_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_VR_LorryReceipts_ProjectID
       End Get

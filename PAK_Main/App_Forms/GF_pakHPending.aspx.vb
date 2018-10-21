@@ -1,18 +1,11 @@
 Imports System.Web.Script.Serialization
 Partial Class GF_pakHPending
   Inherits SIS.SYS.GridBase
-  Private _InfoUrl As String = "~/PAK_Main/App_Display/DF_pakHPending.aspx"
-  Protected Sub Info_Click(ByVal sender As Object, ByVal e As System.Web.UI.ImageClickEventArgs)
-    Dim oBut As ImageButton = CType(sender, ImageButton)
-    Dim aVal() As String = oBut.CommandArgument.ToString.Split(",".ToCharArray)
-    Dim RedirectUrl As String = _InfoUrl  & "?SerialNo=" & aVal(0) & "&PkgNo=" & aVal(1)
-    Response.Redirect(RedirectUrl)
-  End Sub
   Protected Sub GVpakHPending_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakHPending.RowCommand
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakHPending.DataKeys(e.CommandArgument).Values("SerialNo")  
-        Dim PkgNo As Int32 = GVpakHPending.DataKeys(e.CommandArgument).Values("PkgNo")  
+        Dim SerialNo As Int32 = GVpakHPending.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim PkgNo As Int32 = GVpakHPending.DataKeys(e.CommandArgument).Values("PkgNo")
         Dim RedirectUrl As String = TBLpakHPending.EditUrl & "?SerialNo=" & SerialNo & "&PkgNo=" & PkgNo
         Response.Redirect(RedirectUrl)
       Catch ex As Exception
@@ -21,8 +14,8 @@ Partial Class GF_pakHPending
     End If
     If e.CommandName.ToLower = "approvewf".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakHPending.DataKeys(e.CommandArgument).Values("SerialNo")  
-        Dim PkgNo As Int32 = GVpakHPending.DataKeys(e.CommandArgument).Values("PkgNo")  
+        Dim SerialNo As Int32 = GVpakHPending.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim PkgNo As Int32 = GVpakHPending.DataKeys(e.CommandArgument).Values("PkgNo")
         SIS.PAK.pakHPending.ApproveWF(SerialNo, PkgNo)
         GVpakHPending.DataBind()
       Catch ex As Exception

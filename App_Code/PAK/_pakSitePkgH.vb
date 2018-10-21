@@ -21,7 +21,7 @@ Namespace SIS.PAK
     Private _GRNo As String = ""
     Private _GRDate As String = ""
     Private _UOMTotalWeight As String = ""
-    Private _TotalWeight As String = "0.00"
+    Private _TotalWeight As String = "0.0000"
     Private _ODC As String = ""
     Private _MaterialStatusID As String = ""
     Private _Remarks As String = ""
@@ -39,7 +39,7 @@ Namespace SIS.PAK
     Private _VR_LorryReceipts9_TransporterName As String = ""
     Private _VR_MaterialStates10_Description As String = ""
     Private _FK_PAK_SitePkgH_CreatedBy As SIS.QCM.qcmUsers = Nothing
-    Private _FK_PAK_SitePkgH_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_SitePkgH_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_SitePkgH_PkgNo As SIS.PAK.pakPkgListH = Nothing
     Private _FK_PAK_SitePkgH_SerialNo As SIS.PAK.pakPO = Nothing
     Private _FK_PAK_SitePkgH_ReceiveStatusID As SIS.PAK.pakReceiveStatus = Nothing
@@ -235,8 +235,8 @@ Namespace SIS.PAK
       End Get
       Set(ByVal value As String)
          If Convert.IsDBNull(Value) Then
-           _UOMTotalWeight = ""
-         Else
+          _UOMTotalWeight = ""
+        Else
            _UOMTotalWeight = value
          End If
       End Set
@@ -247,8 +247,8 @@ Namespace SIS.PAK
       End Get
       Set(ByVal value As String)
          If Convert.IsDBNull(Value) Then
-           _TotalWeight = "0.00"
-         Else
+          _TotalWeight = "0.0000"
+        Else
            _TotalWeight = value
          End If
       End Set
@@ -474,10 +474,10 @@ Namespace SIS.PAK
         Return _FK_PAK_SitePkgH_CreatedBy
       End Get
     End Property
-    Public ReadOnly Property FK_PAK_SitePkgH_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_SitePkgH_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_SitePkgH_ProjectID Is Nothing Then
-          _FK_PAK_SitePkgH_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_SitePkgH_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_SitePkgH_ProjectID
       End Get

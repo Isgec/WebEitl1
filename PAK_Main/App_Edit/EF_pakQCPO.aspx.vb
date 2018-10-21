@@ -60,6 +60,7 @@ Partial Class EF_pakQCPO
     If Not Page.ClientScript.IsClientScriptBlockRegistered("scriptpakQCPO") Then
       Page.ClientScript.RegisterClientScriptBlock(GetType(System.String), "scriptpakQCPO", mStr)
     End If
+    CType(FVpakQCPO.FindControl("IsUploaded"), HiddenField).Value = ""
   End Sub
   Partial Class gvBase
     Inherits SIS.SYS.GridBase
@@ -85,9 +86,10 @@ Partial Class EF_pakQCPO
     End If
     If e.CommandName.ToLower = "initiatewf".ToLower Then
       Try
+        Dim QCRequestNo As String = CType(GVpakQCListH.Rows(e.CommandArgument).FindControl("F_QCRequestNo"), LC_qcmSRequests).SelectedValue
         Dim SerialNo As Int32 = GVpakQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim QCLNo As Int32 = GVpakQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
-        SIS.PAK.pakQCListH.InitiateWF(SerialNo, QCLNo)
+        SIS.PAK.pakQCListH.InitiateWF(SerialNo, QCLNo, QCRequestNo)
         GVpakQCListH.DataBind()
       Catch ex As Exception
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
@@ -123,6 +125,9 @@ Partial Class EF_pakQCPO
   End Sub
   Private st As Long = HttpContext.Current.Server.ScriptTimeout
   Private Sub FVpakQCPO_ItemCommand(sender As Object, e As FormViewCommandEventArgs) Handles FVpakQCPO.ItemCommand
+    If CType(FVpakQCPO.FindControl("IsUploaded"), HiddenField).Value <> "YES" Then Exit Sub
+    CType(FVpakQCPO.FindControl("IsUploaded"), HiddenField).Value = ""
+    Dim AllowNegativeBalance As Boolean = Convert.ToBoolean(ConfigurationManager.AppSettings("AllowNegativeBalance"))
     HttpContext.Current.Server.ScriptTimeout = Integer.MaxValue
     If e.CommandName.ToLower = "tmplupload" Then
       Try
@@ -207,6 +212,7 @@ Partial Class EF_pakQCPO
               Dim tmpItemNo As String = ""
               Dim Updatable As Boolean = False
               Dim tmpQCQuantity As String = ""
+              Dim tmpStage As String = ""
 
               For I As Integer = 9 To 99999
                 tmpBomNo = wsD.Cells(I, 2).Text
@@ -215,15 +221,16 @@ Partial Class EF_pakQCPO
                 Updatable = IIf(wsD.Cells(I, 6).Text <> String.Empty, True, False)
                 If Not Updatable Then Continue For
                 tmpQCQuantity = wsD.Cells(I, 14).Text.Trim
+                tmpStage = wsD.Cells(I, 15).Text.Trim
                 '======================================
                 If tmpQCQuantity = "" Then Continue For
                 If Not IsNumeric(tmpQCQuantity) Then Continue For
                 '============================
                 Dim Found As Boolean = True
                 Dim tmpListD As SIS.PAK.pakQCListD = Nothing
+                Dim tmpPOBItem As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(tmpSerialNo, tmpBomNo, tmpItemNo)
                 tmpListD = SIS.PAK.pakQCListD.pakQCListDGetByID(SerialNo, tmpQCLNo, tmpBomNo, tmpItemNo)
                 If tmpListD Is Nothing Then
-                  Dim tmpPOBItem As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(tmpSerialNo, tmpBomNo, tmpItemNo)
                   Found = False
                   tmpListD = New SIS.PAK.pakQCListD
                   With tmpListD
@@ -237,9 +244,25 @@ Partial Class EF_pakQCPO
                   End With
                 End If
                 With tmpListD
-                  .Quantity = IIf(tmpQCQuantity = "", 0, tmpQCQuantity)
+                  .Quantity = tmpQCQuantity
                   .QualityClearedQty = 0.0000
                 End With
+                Select Case tmpStage.ToLower
+                  Case "s"
+                    tmpListD.InspectionStageID = "1"
+                  Case "f"
+                    tmpListD.InspectionStageID = "2"
+                  Case "sf", "fs"
+                    tmpListD.InspectionStageID = "3"
+                  Case Else
+                    tmpListD.InspectionStageID = "1"
+                End Select
+                'Check For Negative Balance
+                If Not AllowNegativeBalance Then
+                  If tmpPOBItem.Quantity - tmpPOBItem.QualityClearedQty - tmpListD.Quantity < 0 Then
+                    Continue For
+                  End If
+                End If
                 tmpListD.TotalWeight = SIS.PAK.pakPO.GetTotalWeight(tmpListD.Quantity, tmpListD.WeightPerUnit, tmpListD.UOMQuantity, tmpListD.UOMWeight)
                 If Found Then
                   If tmpListD.Quantity <= 0 Then
@@ -274,6 +297,7 @@ Partial Class EF_pakQCPO
               'Update QC Header
               Dim qcH As SIS.PAK.pakQCListH = SIS.PAK.pakQCListH.pakQCListHGetByID(SerialNo, tmpQCLNo)
               qcH.TotalWeight = tmpQCHWt
+              qcH.UOMTotalWeight = 6 '=>Kg
               qcH = SIS.PAK.pakQCListH.UpdateData(qcH)
               '================
               xlP.Dispose()
@@ -282,7 +306,7 @@ Partial Class EF_pakQCPO
               Else
                 ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize("Updated") & "');", True)
               End If
-              'GVpakSTCPOLRD.DataBind()
+              GVpakQCListH.DataBind()
             End Using
           End If
         End With

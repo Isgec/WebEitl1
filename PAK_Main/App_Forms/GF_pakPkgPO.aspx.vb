@@ -1,17 +1,10 @@
 Imports System.Web.Script.Serialization
 Partial Class GF_pakPkgPO
   Inherits SIS.SYS.GridBase
-  Private _InfoUrl As String = "~/PAK_Main/App_Display/DF_pakPkgPO.aspx"
-  Protected Sub Info_Click(ByVal sender As Object, ByVal e As System.Web.UI.ImageClickEventArgs)
-    Dim oBut As ImageButton = CType(sender, ImageButton)
-    Dim aVal() As String = oBut.CommandArgument.ToString.Split(",".ToCharArray)
-    Dim RedirectUrl As String = _InfoUrl  & "?SerialNo=" & aVal(0)
-    Response.Redirect(RedirectUrl)
-  End Sub
   Protected Sub GVpakPkgPO_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakPkgPO.RowCommand
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")  
+        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim RedirectUrl As String = TBLpakPkgPO.EditUrl & "?SerialNo=" & SerialNo
         Response.Redirect(RedirectUrl)
       Catch ex As Exception
@@ -20,16 +13,17 @@ Partial Class GF_pakPkgPO
     End If
     If e.CommandName.ToLower = "initiatewf".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")  
+        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")
         SIS.PAK.pakPkgPO.InitiateWF(SerialNo)
         GVpakPkgPO.DataBind()
       Catch ex As Exception
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
+    'PO Acknowledgement
     If e.CommandName.ToLower = "approvewf".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")  
+        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")
         SIS.PAK.pakPkgPO.ApproveWF(SerialNo)
         GVpakPkgPO.DataBind()
       Catch ex As Exception
@@ -38,7 +32,7 @@ Partial Class GF_pakPkgPO
     End If
     If e.CommandName.ToLower = "rejectwf".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")  
+        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")
         SIS.PAK.pakPkgPO.RejectWF(SerialNo)
         GVpakPkgPO.DataBind()
       Catch ex As Exception
@@ -47,7 +41,7 @@ Partial Class GF_pakPkgPO
     End If
     If e.CommandName.ToLower = "completewf".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")  
+        Dim SerialNo As Int32 = GVpakPkgPO.DataKeys(e.CommandArgument).Values("SerialNo")
         SIS.PAK.pakPkgPO.CompleteWF(SerialNo)
         GVpakPkgPO.DataBind()
       Catch ex As Exception
@@ -70,7 +64,7 @@ Partial Class GF_pakPkgPO
   <System.Web.Services.WebMethod()> _
   <System.Web.Script.Services.ScriptMethod()> _
   Public Shared Function ProjectIDCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
-    Return SIS.EITL.eitlProjects.SelecteitlProjectsAutoCompleteList(prefixText, count, contextKey)
+    Return SIS.QCM.qcmProjects.SelectqcmProjectsAutoCompleteList(prefixText, count, contextKey)
   End Function
   Protected Sub F_BuyerID_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles F_BuyerID.TextChanged
     Session("F_BuyerID") = F_BuyerID.Text
@@ -384,7 +378,7 @@ Partial Class GF_pakPkgPO
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String="0|" & aVal(0)
     Dim ProjectID As String = CType(aVal(1),String)
-    Dim oVar As SIS.EITL.eitlProjects = SIS.EITL.eitlProjects.eitlProjectsGetByID(ProjectID)
+    Dim oVar As SIS.QCM.qcmProjects = SIS.QCM.qcmProjects.qcmProjectsGetByID(ProjectID)
     If oVar Is Nothing Then
       mRet = "1|" & aVal(0) & "|Record not found." 
     Else

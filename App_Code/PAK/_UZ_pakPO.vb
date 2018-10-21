@@ -3,6 +3,7 @@ Imports System.Collections.Generic
 Imports System.Data
 Imports System.Data.SqlClient
 Imports System.ComponentModel
+
 Namespace SIS.PAK
   Partial Public Class pakPO
     Public ReadOnly Property GetNotesLink() As String
@@ -47,7 +48,7 @@ Namespace SIS.PAK
     Public Function GetEditable() As Boolean
       Dim mRet As Boolean = False
       Select Case POStatusID
-        Case pakPOStates.Free, pakPOStates.UnderISGECApproval
+        Case pakPOStates.Free, pakPOStates.UnderISGECApproval, pakPOStates.ImportedFromERP
           mRet = True
       End Select
       Return mRet
@@ -213,10 +214,18 @@ Namespace SIS.PAK
       End If
       '===========================================
       'Send Verification E-Mail
-      SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POVerification)
+      If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+        SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POVerification)
+      End If
       '===========================================
+      Try
+        SIS.CT.ctUpdates.CT_POIssued(Results)
+      Catch ex As Exception
+        Throw New Exception(ex.Message)
+      End Try
       Return Results
     End Function
+
     Public Shared Function ApproveWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
       Dim tmp As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.UZ_pakPOBOMSelectList(0, 999, "", False, "", SerialNo)
       If tmp.Count <= 0 Then
@@ -230,6 +239,9 @@ Namespace SIS.PAK
         Next
       End If
       Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
+      If Results.PortRequired AndAlso Results.PortID = String.Empty Then
+        Throw New Exception("Pl. EDIT PO and Select PORT of Shipment before PO Issue.")
+      End If
       With Results
         .POStatusID = pakPOStates.UnderDespatch
         .IssuedBy = HttpContext.Current.Session("LoginID")
@@ -272,7 +284,15 @@ Namespace SIS.PAK
         End If
       End If
       'Send Issue E-Mail
-      SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POIssued)
+      If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+        SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POIssued)
+      End If
+      Try
+        SIS.CT.ctUpdates.CT_POIssued(Results)
+      Catch ex As Exception
+        Throw New Exception(ex.Message)
+      End Try
+
       Return Results
     End Function
     Public Shared Function RejectWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
@@ -330,7 +350,7 @@ Namespace SIS.PAK
       Dim _Rec As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(Record.SerialNo)
       With _Rec
         .IssueReasonID = Record.IssueReasonID
-        .POTypeID = Record.POTypeID
+        .PortID = Record.PortID
         .ISGECRemarks = Record.ISGECRemarks
       End With
       Return SIS.PAK.pakPO.UpdateData(_Rec)

@@ -129,9 +129,9 @@
       <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
       <tr>
         <td class="alignright">
-          <asp:Label ID="L_Quantity" runat="server" Text="Quantity :" />&nbsp;
+          <asp:Label ID="L_Quantity" runat="server" Text="Quantity Offered :" />&nbsp;
         </td>
-        <td colspan="3">
+        <td>
           <asp:TextBox ID="F_Quantity"
             Text='<%# Bind("Quantity") %>'
             ToolTip="Value of Quantity."
@@ -140,6 +140,12 @@
             CssClass = "dmytxt"
             style="text-align: right"
             runat="server" />
+        </td>
+        <td class="alignright">
+          <asp:Label ID="L_InspectionStageID" runat="server" Text="Inspection Stage :" />
+        </td>
+        <td>
+         <asp:Label ID="Label1" runat="server" Title='<%# Eval("InspectionStageID") %>' Text='<%# Eval("QCM_InspectionStages8_Description") %>'></asp:Label>
         </td>
       </tr>
       <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
@@ -189,27 +195,8 @@
             CssClass = "mytxt"
             MaxLength="22"
             onfocus = "return this.select();"
+            onblur ="return dc(this,4);"
             runat="server" />
-          <AJX:MaskedEditExtender 
-            ID = "MEEQualityClearedQty"
-            runat = "server"
-            mask = "999999999.9999"
-            AcceptNegative = "Left"
-            MaskType="Number"
-            MessageValidatorTip="true"
-            InputDirection="RightToLeft"
-            ErrorTooltipEnabled="true"
-            TargetControlID="F_QualityClearedQty" />
-          <AJX:MaskedEditValidator 
-            ID = "MEVQualityClearedQty"
-            runat = "server"
-            ControlToValidate = "F_QualityClearedQty"
-            ControlExtender = "MEEQualityClearedQty"
-            EmptyValueBlurredText = "<div class='errorLG'>Required!</div>"
-            Display = "Dynamic"
-            EnableClientScript = "true"
-            IsValidEmpty = "True"
-            SetFocusOnError="true" />
         </td>
       </tr>
       <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>

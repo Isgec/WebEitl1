@@ -296,6 +296,7 @@ Namespace SIS.PAK
     End Property
     Public Property WeightPerUnit() As Decimal
       Get
+        If _WeightPerUnit <= 0 Then Return 0
         Return _WeightPerUnit
       End Get
       Set(ByVal value As Decimal)

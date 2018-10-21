@@ -1,21 +1,14 @@
 Partial Class GF_eitlProjectWiseUser
   Inherits SIS.SYS.GridBase
-  Private _InfoUrl As String = "~/EITL_Main/App_Display/DF_eitlProjectWiseUser.aspx"
-  Protected Sub Info_Click(ByVal sender As Object, ByVal e As System.Web.UI.ImageClickEventArgs)
-    Dim oBut As ImageButton = CType(sender, ImageButton)
-    Dim aVal() As String = oBut.CommandArgument.ToString.Split(",".ToCharArray)
-    Dim RedirectUrl As String = _InfoUrl  & "?SerialNo=" & aVal(0)
-    Response.Redirect(RedirectUrl)
-  End Sub
   Protected Sub GVeitlProjectWiseUser_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVeitlProjectWiseUser.RowCommand
-		If e.CommandName.ToLower = "lgedit".ToLower Then
-			Try
-				Dim SerialNo As Int64 = GVeitlProjectWiseUser.DataKeys(e.CommandArgument).Values("SerialNo")  
-				Dim RedirectUrl As String = TBLeitlProjectWiseUser.EditUrl & "?SerialNo=" & SerialNo
-				Response.Redirect(RedirectUrl)
-			Catch ex As Exception
-			End Try
-		End If
+    If e.CommandName.ToLower = "lgedit".ToLower Then
+      Try
+        Dim SerialNo As Int64 = GVeitlProjectWiseUser.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim RedirectUrl As String = TBLeitlProjectWiseUser.EditUrl & "?SerialNo=" & SerialNo
+        Response.Redirect(RedirectUrl)
+      Catch ex As Exception
+      End Try
+    End If
   End Sub
   Protected Sub GVeitlProjectWiseUser_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles GVeitlProjectWiseUser.Init
     DataClassName = "GeitlProjectWiseUser"
@@ -42,7 +35,7 @@ Partial Class GF_eitlProjectWiseUser
 	<System.Web.Services.WebMethod()> _
 	<System.Web.Script.Services.ScriptMethod()> _
   Public Shared Function ProjectIDCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
-    Return SIS.EITL.eitlProjects.SelecteitlProjectsAutoCompleteList(prefixText, count, contextKey)
+    Return SIS.QCM.qcmProjects.SelectqcmProjectsAutoCompleteList(prefixText, count, contextKey)
   End Function
   Protected Sub Page_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Init
     F_UserID_Display.Text = String.Empty
@@ -237,7 +230,7 @@ Partial Class GF_eitlProjectWiseUser
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String="0|" & aVal(0)
 		Dim ProjectID As String = CType(aVal(1),String)
-		Dim oVar As SIS.EITL.eitlProjects = SIS.EITL.eitlProjects.eitlProjectsGetByID(ProjectID)
+    Dim oVar As SIS.QCM.qcmProjects = SIS.QCM.qcmProjects.qcmProjectsGetByID(ProjectID)
     If oVar Is Nothing Then
 			mRet = "1|" & aVal(0) & "|Record not found." 
     Else

@@ -27,7 +27,7 @@ Namespace SIS.PAK
     Private _aspnet_Users6_UserFullName As String = ""
     Private _FK_PAK_SiteIssueH_IssueToCardNo As SIS.QCM.qcmUsers = Nothing
     Private _FK_PAK_SiteIssueH_IssuedBy As SIS.QCM.qcmUsers = Nothing
-    Private _FK_PAK_SiteIssueH_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_SiteIssueH_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_SiteIssueH_IssueStatusID As SIS.PAK.pakIssueStatus = Nothing
     Private _FK_PAK_SiteIssueH_IssueTypeID As SIS.PAK.pakIssueTypes = Nothing
     Private _FK_PAK_SiteIssueH_RequestedBy As SIS.QCM.qcmUsers = Nothing
@@ -82,11 +82,11 @@ Namespace SIS.PAK
         Return _IssueToName
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssueToName = ""
-         Else
-           _IssueToName = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssueToName = ""
+        Else
+          _IssueToName = value
+        End If
       End Set
     End Property
     Public Property RequesterRemarks() As String
@@ -94,11 +94,11 @@ Namespace SIS.PAK
         Return _RequesterRemarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _RequesterRemarks = ""
-         Else
-           _RequesterRemarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _RequesterRemarks = ""
+        Else
+          _RequesterRemarks = value
+        End If
       End Set
     End Property
     Public Property IssuedOn() As String
@@ -109,11 +109,11 @@ Namespace SIS.PAK
         Return _IssuedOn
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssuedOn = ""
-         Else
-           _IssuedOn = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssuedOn = ""
+        Else
+          _IssuedOn = value
+        End If
       End Set
     End Property
     Public Property RequestedBy() As String
@@ -121,11 +121,11 @@ Namespace SIS.PAK
         Return _RequestedBy
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _RequestedBy = ""
-         Else
-           _RequestedBy = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _RequestedBy = ""
+        Else
+          _RequestedBy = value
+        End If
       End Set
     End Property
     Public Property IssuedBy() As String
@@ -133,11 +133,11 @@ Namespace SIS.PAK
         Return _IssuedBy
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssuedBy = ""
-         Else
-           _IssuedBy = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssuedBy = ""
+        Else
+          _IssuedBy = value
+        End If
       End Set
     End Property
     Public Property IssueStatusID() As String
@@ -145,11 +145,11 @@ Namespace SIS.PAK
         Return _IssueStatusID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssueStatusID = ""
-         Else
-           _IssueStatusID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssueStatusID = ""
+        Else
+          _IssueStatusID = value
+        End If
       End Set
     End Property
     Public Property IssueToCardNo() As String
@@ -157,11 +157,11 @@ Namespace SIS.PAK
         Return _IssueToCardNo
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssueToCardNo = ""
-         Else
-           _IssueToCardNo = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssueToCardNo = ""
+        Else
+          _IssueToCardNo = value
+        End If
       End Set
     End Property
     Public Property IssueTypeID() As String
@@ -169,11 +169,11 @@ Namespace SIS.PAK
         Return _IssueTypeID
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssueTypeID = ""
-         Else
-           _IssueTypeID = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssueTypeID = ""
+        Else
+          _IssueTypeID = value
+        End If
       End Set
     End Property
     Public Property RequestedOn() As String
@@ -184,11 +184,11 @@ Namespace SIS.PAK
         Return _RequestedOn
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _RequestedOn = ""
-         Else
-           _RequestedOn = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _RequestedOn = ""
+        Else
+          _RequestedOn = value
+        End If
       End Set
     End Property
     Public Property IssueRemarks() As String
@@ -196,11 +196,11 @@ Namespace SIS.PAK
         Return _IssueRemarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssueRemarks = ""
-         Else
-           _IssueRemarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssueRemarks = ""
+        Else
+          _IssueRemarks = value
+        End If
       End Set
     End Property
     Public Property aspnet_Users1_UserFullName() As String
@@ -232,11 +232,11 @@ Namespace SIS.PAK
         Return _PAK_IssueStatus4_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_IssueStatus4_Description = ""
-         Else
-           _PAK_IssueStatus4_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_IssueStatus4_Description = ""
+        Else
+          _PAK_IssueStatus4_Description = value
+        End If
       End Set
     End Property
     Public Property PAK_IssueTypes5_Description() As String
@@ -244,11 +244,11 @@ Namespace SIS.PAK
         Return _PAK_IssueTypes5_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_IssueTypes5_Description = ""
-         Else
-           _PAK_IssueTypes5_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_IssueTypes5_Description = ""
+        Else
+          _PAK_IssueTypes5_Description = value
+        End If
       End Set
     End Property
     Public Property aspnet_Users6_UserFullName() As String
@@ -259,12 +259,12 @@ Namespace SIS.PAK
         _aspnet_Users6_UserFullName = value
       End Set
     End Property
-    Public Readonly Property DisplayField() As String
+    Public ReadOnly Property DisplayField() As String
       Get
         Return "" & _RequesterRemarks.ToString.PadRight(100, " ")
       End Get
     End Property
-    Public Readonly Property PrimaryKey() As String
+    Public ReadOnly Property PrimaryKey() As String
       Get
         Return _ProjectID & "|" & _IssueNo
       End Get
@@ -313,10 +313,10 @@ Namespace SIS.PAK
         Return _FK_PAK_SiteIssueH_IssuedBy
       End Get
     End Property
-    Public ReadOnly Property FK_PAK_SiteIssueH_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_SiteIssueH_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_SiteIssueH_ProjectID Is Nothing Then
-          _FK_PAK_SiteIssueH_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_SiteIssueH_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_SiteIssueH_ProjectID
       End Get

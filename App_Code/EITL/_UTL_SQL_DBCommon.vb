@@ -1,34 +1,29 @@
-Imports System
 Imports System.Data
 Imports System.Data.SqlClient
-Imports System.Configuration
 Imports System.Web.Configuration
-Imports Microsoft.VisualBasic
 
 Namespace SIS.SYS.SQLDatabase
   Public Class DBCommon
     Implements IDisposable
-    Private Shared ReadOnly _conString As String = ""
-    Private Shared ReadOnly _banString As String = ""
+    Public Shared Property BaaNLive As Boolean = False
+    Public Shared Property JoomlaLive As Boolean = False
     Public Shared Function GetBaaNConnectionString() As String
-      Return _banString
+      If BaaNLive Then
+        Return "Data Source=192.9.200.129;Initial Catalog=inforerpdb;Integrated Security=False;User Instance=False;Persist Security Info=True;User ID=lalit;Password=scorpions"
+      Else
+        Return "Data Source=192.9.200.45;Initial Catalog=inforerpdb;Integrated Security=False;User Instance=False;Persist Security Info=True;User ID=lalit;Password=scorpions"
+      End If
     End Function
     Public Shared Function GetConnectionString() As String
-      Return _conString
+      If JoomlaLive Then
+        Return "Data Source=192.9.200.150;Initial Catalog=IJTPerks;Integrated Security=False;User Instance=False;Persist Security Info=True;User ID=sa;Password=isgec12345"
+      Else
+        Return "Data Source=.\LGSQL;Initial Catalog=IJTPerks;Integrated Security=False;User Instance=False;User ID=sa;Password=isgec12345"
+      End If
     End Function
     Shared Sub New()
-      Dim conSettings As ConnectionStringSettings = WebConfigurationManager.ConnectionStrings("AspNetDBConnection")
-      If conSettings Is Nothing Then
-        Throw New ConfigurationErrorsException("Missing AspNetDBConnection connection String.")
-      End If
-      Dim tmpERP As ConnectionStringSettings = Nothing
-      If WebConfigurationManager.AppSettings("UseBaaN").ToString.ToLower = "Live".ToLower Then
-        tmpERP = WebConfigurationManager.ConnectionStrings("BaaNLiveConnection")
-      Else
-        tmpERP = WebConfigurationManager.ConnectionStrings("BaaNTestConnection")
-      End If
-      _conString = conSettings.ConnectionString
-      _banString = tmpERP.ConnectionString
+      BaaNLive = Convert.ToBoolean(ConfigurationManager.AppSettings("BaaNLive"))
+      JoomlaLive = Convert.ToBoolean(ConfigurationManager.AppSettings("JoomlaLive"))
     End Sub
     Public Shared Sub AddDBParameter(ByRef Cmd As SqlCommand, ByVal name As String, ByVal type As SqlDbType, ByVal size As Integer, ByVal value As Object)
       Dim Parm As SqlParameter = Cmd.CreateParameter()

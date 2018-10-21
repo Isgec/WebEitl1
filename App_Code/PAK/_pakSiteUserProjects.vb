@@ -13,7 +13,7 @@ Namespace SIS.PAK
     Private _aspnet_Users1_UserFullName As String = ""
     Private _IDM_Projects2_Description As String = ""
     Private _FK_PAK_SiteUserProjects_UserID As SIS.QCM.qcmUsers = Nothing
-    Private _FK_PAK_SiteUserProjects_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_SiteUserProjects_ProjectID As SIS.QCM.qcmProjects = Nothing
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -134,10 +134,10 @@ Namespace SIS.PAK
         Return _FK_PAK_SiteUserProjects_UserID
       End Get
     End Property
-    Public ReadOnly Property FK_PAK_SiteUserProjects_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_SiteUserProjects_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_SiteUserProjects_ProjectID Is Nothing Then
-          _FK_PAK_SiteUserProjects_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_SiteUserProjects_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_SiteUserProjects_ProjectID
       End Get

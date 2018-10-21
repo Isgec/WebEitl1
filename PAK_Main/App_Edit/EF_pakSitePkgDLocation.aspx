@@ -237,29 +237,8 @@
             ValidationGroup= "pakSitePkgDLocation"
             MaxLength="20"
             onfocus = "return this.select();"
+            onblur="return dc(this,4);"
             runat="server" />
-          <AJX:MaskedEditExtender 
-            ID = "MEEQuantity"
-            runat = "server"
-            mask = "9999999999999999.9999"
-            AcceptNegative = "Left"
-            MaskType="Number"
-            MessageValidatorTip="true"
-            InputDirection="RightToLeft"
-            ErrorTooltipEnabled="true"
-            TargetControlID="F_Quantity" />
-          <AJX:MaskedEditValidator 
-            ID = "MEVQuantity"
-            runat = "server"
-            ControlToValidate = "F_Quantity"
-            ControlExtender = "MEEQuantity"
-            EmptyValueBlurredText = "<div class='errorLG'>Required!</div>"
-            Display = "Dynamic"
-            EnableClientScript = "true"
-            ValidationGroup = "pakSitePkgDLocation"
-            IsValidEmpty = "false"
-            MinimumValue = "0.01"
-            SetFocusOnError="true" />
         </td>
       </tr>
       <tr>

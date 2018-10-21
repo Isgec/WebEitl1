@@ -201,7 +201,7 @@
           <ItemTemplate>
             <asp:Label ID="LabelRecNo" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("RecNo") %>'></asp:Label>
           </ItemTemplate>
-          <ItemStyle CssClass="alignright" />
+          <ItemStyle CssClass="alignCenter" />
           <HeaderStyle CssClass="alignright" Width="40px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Serial No" SortExpression="PAK_PO4_PODescription">
@@ -234,7 +234,7 @@
           <ItemTemplate>
             <asp:Label ID="LabelTotalWeight" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("TotalWeight") %>'></asp:Label>
           </ItemTemplate>
-          <ItemStyle CssClass="alignright" />
+          <ItemStyle CssClass="alignCenter" />
           <HeaderStyle CssClass="alignright" Width="80px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Transporter Name" SortExpression="TransporterName">
@@ -248,6 +248,7 @@
           <ItemTemplate>
              <asp:Label ID="L_ReceiveStatusID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("ReceiveStatusID") %>' Text='<%# Eval("PAK_ReceiveStatus5_Description") %>'></asp:Label>
           </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="RECEIVED">

@@ -42,6 +42,15 @@
         }
       }
     }
+    function dc(o, p) {
+      var dec = /^-?\d+(?:\.\d{0,6})?$/;
+      var v = o.value;
+      if (v.match(dec)) {
+        o.value = parseFloat(v).toFixed(p);
+      } else {
+        o.value = parseFloat('0').toFixed(p);
+      }
+    }
   </script>
   <div id="divmain" class="master_table">
     <table style="width: 100%">

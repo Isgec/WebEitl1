@@ -100,6 +100,7 @@ Namespace SIS.PAK
         .NotFromPackingList = False
         .InventoryUpdatedOn = Now
         .InventoryUpdatedBy = HttpContext.Current.Session("LoginID")
+        .TotalWeight = SIS.PAK.pakPO.GetTotalWeight(tmpRecD.Quantity, tmpRecD.WeightPerUnit, tmpRecD.UOMQuantity, tmpRecD.UOMWeight)
       End With
       Return tmp
     End Function

@@ -264,22 +264,19 @@
                         runat="Server" />
                     </td>
                     <td class="alignright">
-                      <asp:Label ID="L_POTypeID" runat="server" Text="PO Type :" /><span style="color: red">*</span>
+                      <asp:Label ID="L_PortID" runat="server" Text="Port ID :" />
                     </td>
-                    <td>
-                      <LGM:LC_pakPOTypes
-                        ID="F_POTypeID"
-                        SelectedValue='<%# Bind("POTypeID") %>'
+                    <td colspan="3">
+                      <LGM:LC_elogPorts
+                        ID="F_PortID"
+                        SelectedValue='<%# Bind("PortID") %>'
                         OrderBy="DisplayField"
                         DataTextField="DisplayField"
                         DataValueField="PrimaryKey"
                         IncludeDefault="true"
                         DefaultText="-- Select --"
                         Width="200px"
-                        CssClass="dmyddl"
-                        Enabled="false"
-                        ValidationGroup="pakPO"
-                        RequiredFieldErrorMessage="<div class='errorLG'>Required!</div>"
+                        CssClass="myddl"
                         runat="Server" />
                     </td>
                   </tr>
@@ -330,7 +327,6 @@
                         <tr>
                           <td>
                             <asp:Panel ID="Panel1" runat="server" Visible='<%# DUListVisible %>' class="file_upload" Style="width: auto; margin: 10px 10px 10px 10px; padding: 10px 10px 10px 10px">
-
                               <table>
                                 <tr>
                                   <td colspan="4">
@@ -341,10 +337,11 @@
                                   <td><b>Upload Template</b></td>
                                   <td></td>
                                   <td>
+                                    <asp:HiddenField ID="IsUploaded" runat="server" ClientIDMode="Static"></asp:HiddenField>
                                     <asp:FileUpload ID="F_FileUpload" runat="server" Width="180px" ToolTip="Upload Item Template" />
                                   </td>
                                   <td>
-                                    <asp:Button ID="cmdFileUpload" OnClientClick="return this.style.display='none';true;" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="Upload" CommandArgument="" />
+                                    <asp:Button ID="cmdFileUpload" OnClientClick="$get('IsUploaded').value='YES';" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="Upload" CommandArgument="" />
                                   </td>
                                 </tr>
                               </table>

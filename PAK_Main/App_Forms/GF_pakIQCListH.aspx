@@ -17,8 +17,9 @@
         <td style="text-align:center">
           <asp:UpdatePanel ID="UpdatePanel1" runat="server">
             <ContentTemplate>
+              <asp:HiddenField ID="IsUploaded" runat="server" ClientIDMode="Static" ></asp:HiddenField>
               <asp:FileUpload ID="F_FileUpload" runat="server" Width="250px" ToolTip="Browse QC List" />
-              <asp:Button ID="cmdTmplUpload" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="tmplUpload"  />
+              <asp:Button ID="cmdTmplUpload" Text="Upload" OnClientClick="$get('IsUploaded').value='YES';" runat="server" ToolTip="Click to upload & process template file." CommandName="tmplUpload"  />
             </ContentTemplate>
             <Triggers>
               <asp:PostBackTrigger ControlID="cmdTmplUpload" />
@@ -368,17 +369,16 @@
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Alloted Request">
           <ItemTemplate>
-            <LGM:LC_qcmRequests 
+            <LGM:LC_qcmSRequests 
               ID="F_QCRequestNo"
               SelectedValue='<%# Bind("QCRequestNo") %>'
-              OrderBy='<%# Eval("FK_PAK_QCListH_SerialNo.SupplierID") %>'
+              OrderBy='<%# Eval("PrimaryKey") %>'
               DataTextField="DisplayField"
               DataValueField="PrimaryKey"
               IncludeDefault="true"
               DefaultText="-- Select --"
               Width="100px"
               CssClass="myddl"
-              ValidationGroup='<%# "Approve" & Container.DataItemIndex %>'
               Runat="Server" />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />

@@ -62,16 +62,74 @@
         <td class="alignright">
           <asp:Label ID="L_SupplierRefNo" runat="server" Text="Supplier Ref. No :" />&nbsp;
         </td>
-        <td colspan="3">
+        <td>
           <asp:TextBox ID="F_SupplierRefNo"
             Text='<%# Bind("SupplierRefNo") %>'
-            Width="408px"
+            Width="300px"
             CssClass = "mytxt"
             onfocus = "return this.select();"
             onblur= "this.value=this.value.replace(/\'/g,'');"
             ToolTip="Enter value for Supplier Ref. No."
             MaxLength="50"
             runat="server" />
+        </td>
+        <td class="alignright">
+          <asp:Label ID="L_PortID" runat="server" Text="Destination Port :" />
+        </td>
+        <td>
+          <LGM:LC_elogPorts
+            ID="F_PortID"
+            SelectedValue='<%# Bind("PortID") %>'
+            OrderBy="DisplayField"
+            DataTextField="DisplayField"
+            DataValueField="PrimaryKey"
+            IncludeDefault="true"
+            DefaultText="-- Select --"
+            Width="200px"
+            CssClass="myddl"
+            Runat="Server" />
+          </td>
+      </tr>
+      <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
+      <tr>
+        <td class="alignright">
+          <asp:Label ID="L_VRExecutionNo" runat="server" Text="Vehicle Execution No. :" />&nbsp;
+        </td>
+        <td colspan="3">
+          <asp:TextBox
+            ID = "F_VRExecutionNo"
+            CssClass = "myfktxt"
+            Text='<%# Bind("VRExecutionNo") %>'
+            AutoCompleteType = "None"
+            Width="88px"
+            onfocus = "return this.select();"
+            ToolTip="Enter value for Vehicle Execution No.."
+            onblur= "script_pakPkgListH.validate_VRExecutionNo(this);"
+            Runat="Server" />
+          <asp:Label
+            ID = "F_VRExecutionNo_Display"
+            Text='<%# Eval("VR_RequestExecution5_ExecutionDescription") %>'
+            CssClass="myLbl"
+            Runat="Server" />
+          <AJX:AutoCompleteExtender
+            ID="ACEVRExecutionNo"
+            BehaviorID="B_ACEVRExecutionNo"
+            ContextKey=""
+            UseContextKey="true"
+            ServiceMethod="VRExecutionNoCompletionList"
+            TargetControlID="F_VRExecutionNo"
+            EnableCaching="false"
+            CompletionInterval="100"
+            FirstRowSelected="true"
+            MinimumPrefixLength="1"
+            OnClientItemSelected="script_pakPkgListH.ACEVRExecutionNo_Selected"
+            OnClientPopulating="script_pakPkgListH.ACEVRExecutionNo_Populating"
+            OnClientPopulated="script_pakPkgListH.ACEVRExecutionNo_Populated"
+            CompletionSetCount="10"
+            CompletionListCssClass = "autocomplete_completionListElement"
+            CompletionListItemCssClass = "autocomplete_listItem"
+            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
+            Runat="Server" />
         </td>
       </tr>
       <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
@@ -124,7 +182,7 @@
         <td colspan="3">
           <asp:TextBox ID="F_TransporterName"
             Text='<%# Bind("TransporterName") %>'
-            Width="408px"
+            Width="300px"
             CssClass = "mytxt"
             onfocus = "return this.select();"
             onblur= "this.value=this.value.replace(/\'/g,'');"
@@ -141,7 +199,7 @@
         <td colspan="3">
           <asp:TextBox ID="F_VehicleNo"
             Text='<%# Bind("VehicleNo") %>'
-            Width="408px"
+            Width="300px"
             CssClass = "mytxt"
             onfocus = "return this.select();"
             ValidationGroup="pakPkgListH"
@@ -168,7 +226,7 @@
         <td>
           <asp:TextBox ID="F_GRNo"
             Text='<%# Bind("GRNo") %>'
-            Width="408px"
+            Width="300px"
             CssClass = "mytxt"
             onfocus = "return this.select();"
             ValidationGroup="pakPkgListH"
@@ -229,48 +287,6 @@
       <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
       <tr>
         <td class="alignright">
-          <asp:Label ID="L_VRExecutionNo" runat="server" Text="Vehicle Execution No. :" />&nbsp;
-        </td>
-        <td colspan="3">
-          <asp:TextBox
-            ID = "F_VRExecutionNo"
-            CssClass = "myfktxt"
-            Text='<%# Bind("VRExecutionNo") %>'
-            AutoCompleteType = "None"
-            Width="88px"
-            onfocus = "return this.select();"
-            ToolTip="Enter value for Vehicle Execution No.."
-            onblur= "script_pakPkgListH.validate_VRExecutionNo(this);"
-            Runat="Server" />
-          <asp:Label
-            ID = "F_VRExecutionNo_Display"
-            Text='<%# Eval("VR_RequestExecution5_ExecutionDescription") %>'
-            CssClass="myLbl"
-            Runat="Server" />
-          <AJX:AutoCompleteExtender
-            ID="ACEVRExecutionNo"
-            BehaviorID="B_ACEVRExecutionNo"
-            ContextKey=""
-            UseContextKey="true"
-            ServiceMethod="VRExecutionNoCompletionList"
-            TargetControlID="F_VRExecutionNo"
-            EnableCaching="false"
-            CompletionInterval="100"
-            FirstRowSelected="true"
-            MinimumPrefixLength="1"
-            OnClientItemSelected="script_pakPkgListH.ACEVRExecutionNo_Selected"
-            OnClientPopulating="script_pakPkgListH.ACEVRExecutionNo_Populating"
-            OnClientPopulated="script_pakPkgListH.ACEVRExecutionNo_Populated"
-            CompletionSetCount="10"
-            CompletionListCssClass = "autocomplete_completionListElement"
-            CompletionListItemCssClass = "autocomplete_listItem"
-            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
-            Runat="Server" />
-        </td>
-      </tr>
-      <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
-      <tr>
-        <td class="alignright">
           <asp:Label ID="L_TotalWeight" runat="server" Text="Total Weight :" />&nbsp;
         </td>
         <td>
@@ -281,27 +297,8 @@
             CssClass = "mytxt"
             MaxLength="20"
             onfocus = "return this.select();"
+            onblur="return dc(this,4);"
             runat="server" />
-          <AJX:MaskedEditExtender 
-            ID = "MEETotalWeight"
-            runat = "server"
-            mask = "9999999999999999.9999"
-            AcceptNegative = "Left"
-            MaskType="Number"
-            MessageValidatorTip="true"
-            InputDirection="RightToLeft"
-            ErrorTooltipEnabled="true"
-            TargetControlID="F_TotalWeight" />
-          <AJX:MaskedEditValidator 
-            ID = "MEVTotalWeight"
-            runat = "server"
-            ControlToValidate = "F_TotalWeight"
-            ControlExtender = "MEETotalWeight"
-            EmptyValueBlurredText = "<div class='errorLG'>Required!</div>"
-            Display = "Dynamic"
-            EnableClientScript = "true"
-            IsValidEmpty = "True"
-            SetFocusOnError="true" />
         </td>
         <td class="alignright">
           <asp:Label ID="L_UOMTotalWeight" runat="server" Text="UOM [Total Weight] :" />&nbsp;
@@ -328,7 +325,7 @@
         <td colspan="3">
           <asp:TextBox ID="F_Remarks"
             Text='<%# Bind("Remarks") %>'
-            Width="350px"
+            Width="300px"
             CssClass = "mytxt"
             onfocus = "return this.select();"
             onblur= "this.value=this.value.replace(/\'/g,'');"
@@ -429,12 +426,13 @@
           <ItemTemplate>
              <asp:Label ID="L_ItemNo" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("ItemNo") %>' Text='<%# Eval("PAK_POBItems4_ItemDescription") %>'></asp:Label>
           </ItemTemplate>
-          <HeaderStyle Width="100px" />
+          <HeaderStyle Width="300px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="UOM Quantity" SortExpression="PAK_Units6_Description">
           <ItemTemplate>
              <asp:Label ID="L_UOMQuantity" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("UOMQuantity") %>' Text='<%# Eval("PAK_Units6_Description") %>'></asp:Label>
           </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Quantity" SortExpression="Quantity">
@@ -448,6 +446,7 @@
           <ItemTemplate>
              <asp:Label ID="L_UOMWeight" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("UOMWeight") %>' Text='<%# Eval("PAK_Units7_Description") %>'></asp:Label>
           </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Weight Per Unit" SortExpression="WeightPerUnit">

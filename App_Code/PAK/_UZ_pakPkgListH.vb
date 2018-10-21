@@ -19,6 +19,11 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
+    Public ReadOnly Property GetDownloadPortLink() As String
+      Get
+        Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Downloads/pkgdownload.aspx?PortPkg=" & PrimaryKey & "', 'win" & PkgNo & "', 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1'); return false;"
+      End Get
+    End Property
     Public ReadOnly Property GetDownloadLink() As String
       Get
         Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Downloads/pkgdownload.aspx?pkg=" & PrimaryKey & "', 'win" & PkgNo & "', 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1'); return false;"
@@ -26,9 +31,16 @@ Namespace SIS.PAK
     End Property
     Public Function GetColor() As System.Drawing.Color
       Dim mRet As System.Drawing.Color = Drawing.Color.Black
-      If StatusID = pakPkgStates.Despatched Then
-        mRet = Drawing.Color.Green
-      End If
+      Select Case StatusID
+        Case pakPkgStates.UnderReceiveAtSite
+          mRet = Drawing.Color.Gold
+        Case pakPkgStates.ReceivedAtSite
+          mRet = Drawing.Color.Green
+        Case pakPkgStates.UnderReceiveAtPort
+          mRet = Drawing.Color.DarkGoldenrod
+        Case pakPkgStates.ReceivedAtPort
+          mRet = Drawing.Color.Green
+      End Select
       Return mRet
     End Function
     Public Function GetVisible() As Boolean
@@ -89,6 +101,18 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
+    Public ReadOnly Property VRVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          If StatusID = pakPkgStates.Free AndAlso Not VRRaised Then
+            mRet = True
+          End If
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
     Public ReadOnly Property InitiateWFEnable() As Boolean
       Get
         Dim mRet As Boolean = True
@@ -123,7 +147,7 @@ Namespace SIS.PAK
       Get
         Dim mRet As Boolean = False
         Try
-          If StatusID = pakPkgStates.Despatched Then
+          If StatusID = pakPkgStates.UnderReceiveAtSite Then
             mRet = IsAdmin
           End If
         Catch ex As Exception
@@ -133,7 +157,7 @@ Namespace SIS.PAK
     End Property
     Public Shared Function RejectWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32, ByVal UnProtected As Boolean) As SIS.PAK.pakPkgListH
       Dim Results As SIS.PAK.pakPkgListH = pakPkgListHGetByID(SerialNo, PkgNo)
-      If Results.StatusID <> pakPkgStates.Despatched Then Return Results
+      If Results.StatusID <> pakPkgStates.UnderReceiveAtSite Then Return Results
       'Delete Packing List From ERP Detail & Header
       Dim ReceiptCreated As Boolean = False
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
@@ -193,6 +217,50 @@ Namespace SIS.PAK
       Results = SIS.PAK.pakPkgListH.UpdateData(Results)
       Return Results
     End Function
+    Public Shared Function InitiatePortWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As SIS.PAK.pakPkgListH
+      Dim Results As SIS.PAK.pakPkgListH = pakPkgPortHGetByID(SerialNo, PkgNo)
+      If Results.GRNo = "" Or Results.GRDate = "" Then
+        'Throw New Exception("GR No / GR Date is blank Cannot despatch.")
+      End If
+      Dim pkgDs As List(Of SIS.PAK.pakPkgListD) = SIS.PAK.pakPkgListD.UZ_pakPkgPortDSelectList(0, 99999, "", False, "", PkgNo, SerialNo)
+      If pkgDs.Count <= 0 Then
+        Throw New Exception("No Item entered in packing list. Cannot despatch.")
+      End If
+      ''=======================
+      Dim AllowNegativeBalance As Boolean = Convert.ToBoolean(ConfigurationManager.AppSettings("AllowNegativeBalance"))
+      If Not AllowNegativeBalance Then
+        For Each pkgD As SIS.PAK.pakPkgListD In pkgDs
+          If pkgD.FK_PAK_PkgListD_ItemNo.QuantityReceivedAtPort - pkgD.FK_PAK_PkgListD_ItemNo.QuantityDespatchedfromPort - pkgD.Quantity < 0 Then
+            Throw New Exception("Negative Balance NOT Allowed, Can not forward.: " & pkgD.ItemNo)
+          End If
+        Next
+      End If
+      'Change
+      ''===========End Negative Balance =======================
+      'Update POBItems From Packing List Items
+      Dim tmpTotalWt As Decimal = 0
+      For Each pkgD As SIS.PAK.pakPkgListD In pkgDs
+        tmpTotalWt += pkgD.TotalWeight
+        'Update BOM Item Despached
+        Dim bomItm As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(pkgD.SerialNo, pkgD.BOMNo, pkgD.ItemNo)
+        bomItm.QuantityDespatchedfromPort += pkgD.Quantity
+        bomItm.TotalWeightDespatchedFromPort += pkgD.TotalWeight
+        bomItm.QuantityDespatched += pkgD.Quantity
+        bomItm.TotalWeightDespatched += pkgD.TotalWeight
+        bomItm = SIS.PAK.pakPOBItems.UpdateData(bomItm)
+      Next
+      Results.StatusID = pakPkgStates.UnderReceiveAtSite
+      Results.CreatedBy = HttpContext.Current.Session("LoginID")
+      Results.CreatedOn = Now
+      Results.TotalWeight = tmpTotalWt
+      Results = SIS.PAK.pakPkgListH.UpdateData(Results)
+      Try
+        SIS.CT.ctUpdates.CT_Shipped(Results)
+      Catch ex As Exception
+      End Try
+      Return Results
+    End Function
+    'Called From Normal Despatch
     Public Shared Function InitiateWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As SIS.PAK.pakPkgListH
       Dim Results As SIS.PAK.pakPkgListH = pakPkgListHGetByID(SerialNo, PkgNo)
       If Results.GRNo = "" Or Results.GRDate = "" Then
@@ -202,25 +270,40 @@ Namespace SIS.PAK
       If pkgDs.Count <= 0 Then
         Throw New Exception("No Item entered in packing list. Cannot despatch.")
       End If
+      'Check for Negative Balance, It is incomplete as, not taking care of In-Process Quantity
+      Dim AllowNegativeBalance As Boolean = Convert.ToBoolean(ConfigurationManager.AppSettings("AllowNegativeBalance"))
+      If Not AllowNegativeBalance Then
+        Dim QCRequired As Boolean = Results.FK_PAK_PkgListH_SerialNo.QCRequired
+        Dim PortRequired As Boolean = Results.FK_PAK_PkgListH_SerialNo.PortRequired
+        For Each pkgD As SIS.PAK.pakPkgListD In pkgDs
+          Dim OriginalQuantity As Decimal = IIf(QCRequired, pkgD.FK_PAK_PkgListD_ItemNo.QualityClearedQty, pkgD.FK_PAK_PkgListD_ItemNo.Quantity)
+          Dim DespatchedQuantity As Decimal = IIf(PortRequired, pkgD.FK_PAK_PkgListD_ItemNo.QuantityDespatchedToPort, pkgD.FK_PAK_PkgListD_ItemNo.QuantityDespatched)
+          If OriginalQuantity - DespatchedQuantity - pkgD.Quantity < 0 Then
+            Throw New Exception("Negative Balance NOT Allowed, Can not forward.: " & pkgD.ItemNo)
+          End If
+        Next
+      End If
+      '===========End Negative Balance =======================
       'Update POBItems From Packing List Items
       Dim tmpTotalWt As Decimal = 0
-      Results.StatusID = pakPkgStates.Despatched
+      If Results.FK_PAK_PkgListH_SerialNo.PortRequired Then
+        Results.StatusID = pakPkgStates.UnderReceiveAtPort
+      Else
+        Results.StatusID = pakPkgStates.UnderReceiveAtSite
+      End If
       Results.CreatedBy = HttpContext.Current.Session("LoginID")
       Results.CreatedOn = Now
       For Each pkgD As SIS.PAK.pakPkgListD In pkgDs
-        'Packing List Uploaded earlier, where Total Weight is not calculated
-        '=========Can be deleted after July 2018===============
-        If pkgD.TotalWeight = 0 Then
-          pkgD.TotalWeight = SIS.PAK.pakPO.GetTotalWeight(pkgD.Quantity, pkgD.WeightPerUnit, pkgD.UOMQuantity, pkgD.UOMWeight)
-          pkgD = SIS.PAK.pakPkgListD.UpdateData(pkgD)
-        End If
-        '===========End Of Can Be Deleted After July==============
-        '=========================================================
         tmpTotalWt += pkgD.TotalWeight
         'Update BOM Item Despached
         Dim bomItm As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(pkgD.SerialNo, pkgD.BOMNo, pkgD.ItemNo)
-        bomItm.QuantityDespatched += pkgD.Quantity
-        bomItm.TotalWeightDespatched += pkgD.TotalWeight
+        If Results.FK_PAK_PkgListH_SerialNo.PortRequired Then
+          bomItm.QuantityDespatchedToPort += pkgD.Quantity
+          bomItm.TotalWeightDespatchedToPort += pkgD.TotalWeight
+        Else
+          bomItm.QuantityDespatched += pkgD.Quantity
+          bomItm.TotalWeightDespatched += pkgD.TotalWeight
+        End If
         bomItm = SIS.PAK.pakPOBItems.UpdateData(bomItm)
       Next
       Results.TotalWeight = tmpTotalWt
@@ -254,6 +337,10 @@ Namespace SIS.PAK
       Catch ex As Exception
         Throw New Exception("E-Mail : " & ex.Message)
       End Try
+      Try
+        SIS.CT.ctUpdates.CT_Despatched(Results)
+      Catch ex As Exception
+      End Try
       Return Results
     End Function
     Private Shared Function GetNextPkgNo() As Integer
@@ -269,9 +356,82 @@ Namespace SIS.PAK
       End Using
       Return NextNo
     End Function
+    Public Shared Function VRRequestWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As SIS.PAK.pakPkgListH
+      Dim Results As SIS.PAK.pakPkgListH = pakPkgListHGetByID(SerialNo, PkgNo)
+      Dim pkgDs As List(Of SIS.PAK.pakPkgListD) = SIS.PAK.pakPkgListD.pakPkgListDSelectList(0, 99999, "", False, "", PkgNo, SerialNo)
+      If pkgDs.Count <= 0 Then
+        Throw New Exception("No Item entered in packing list. Cannot Raise Vehicle Request.")
+      End If
+      Results.VRRaised = True
+      Results.VRRaisedOn = Now
+      Results.CreatedBy = HttpContext.Current.Session("LoginID")
+      Results.CreatedOn = Now
+      Results = SIS.PAK.pakPkgListH.UpdateData(Results)
+      'Send E-Mail
+      Try
+        'SendVREMail(Results)
+      Catch ex As Exception
+        Throw New Exception("E-Mail : " & ex.Message)
+      End Try
+      'Try
+      '  SIS.CT.ctUpdates.CT_Despatched(Results)
+      'Catch ex As Exception
+      'End Try
+      Return Results
+    End Function
 
     Public Shared Function ApproveWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As SIS.PAK.pakPkgListH
       Dim Results As SIS.PAK.pakPkgListH = pakPkgListHGetByID(SerialNo, PkgNo)
+      Return Results
+    End Function
+    Public Shared Function pakPkgPortHGetByID(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As SIS.PAK.pakPkgListH
+      Dim Results As SIS.PAK.pakPkgListH = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          Cmd.CommandText = "sppak_LG_PkgPortHSelectByID"
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SerialNo", SqlDbType.Int, SerialNo.ToString.Length, SerialNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PkgNo", SqlDbType.Int, PkgNo.ToString.Length, PkgNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          If Reader.Read() Then
+            Results = New SIS.PAK.pakPkgListH(Reader)
+          End If
+          Reader.Close()
+        End Using
+      End Using
+      Return Results
+    End Function
+    Public Shared Function UZ_pakPkgPortHSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As Int32) As List(Of SIS.PAK.pakPkgListH)
+      Dim Results As List(Of SIS.PAK.pakPkgListH) = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          If SearchState Then
+            Cmd.CommandText = "sppak_LG_PkgPortHSelectListSearch"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
+          Else
+            Cmd.CommandText = "sppak_LG_PkgPortHSelectListFilteres"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SerialNo", SqlDbType.Int, 10, IIf(SerialNo = Nothing, 0, SerialNo))
+          End If
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          _RecordCount = -1
+          Results = New List(Of SIS.PAK.pakPkgListH)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.PAK.pakPkgListH(Reader))
+          End While
+          Reader.Close()
+          _RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
       Return Results
     End Function
     Public Shared Function UZ_pakPkgListHSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As Int32) As List(Of SIS.PAK.pakPkgListH)
@@ -377,20 +537,20 @@ Namespace SIS.PAK
           End If
         End If
         '4. CC to Project Group
-        Dim Users As List(Of SIS.EITL.eitlProjectWiseUser) = SIS.EITL.eitlProjectWiseUser.GetByProjectID(oPO.ProjectID, "")
-        For Each usr As SIS.EITL.eitlProjectWiseUser In Users
-          Try
-            If usr.FK_EITL_ProjectWiseUser_UserID.EMailID <> "" Then
-              ad = New MailAddress(usr.FK_EITL_ProjectWiseUser_UserID.EMailID, usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
-              If Not .CC.Contains(ad) Then
-                .CC.Add(ad)
-              End If
-            Else
-              aErr.Add(usr.UserID & " " & usr.aspnet_Users1_UserFullName)
-            End If
-          Catch ex As Exception
-          End Try
-        Next
+        'Dim Users As List(Of SIS.EITL.eitlProjectWiseUser) = SIS.EITL.eitlProjectWiseUser.GetByProjectID(oPO.ProjectID, "")
+        'For Each usr As SIS.EITL.eitlProjectWiseUser In Users
+        '  Try
+        '    If usr.FK_EITL_ProjectWiseUser_UserID.EMailID <> "" Then
+        '      ad = New MailAddress(usr.FK_EITL_ProjectWiseUser_UserID.EMailID, usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
+        '      If Not .CC.Contains(ad) Then
+        '        .CC.Add(ad)
+        '      End If
+        '    Else
+        '      aErr.Add(usr.UserID & " " & usr.aspnet_Users1_UserFullName)
+        '    End If
+        '  Catch ex As Exception
+        '  End Try
+        'Next
         '5. 
         .Subject = "Packing List Submitted: " & oPO.PONumber & " / " & oPO.ProjectID
         If .To.Count <= 0 Then
@@ -477,5 +637,32 @@ Namespace SIS.PAK
       End With
       Return tmp
     End Function
+
+
+    Public Shared Function PakingListsReceivedAtPort(ByVal ProjectID As String, ByVal PortID As Integer) As List(Of SIS.PAK.pakPkgListH)
+      Dim Results As List(Of SIS.PAK.pakPkgListH) = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          Cmd.CommandText = "sppak_LG_PakingListsReceivedAtPort"
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PortID", SqlDbType.Int, -1, PortID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ProjectID", SqlDbType.NVarChar, 6, ProjectID)
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          _RecordCount = -1
+          Results = New List(Of SIS.PAK.pakPkgListH)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.PAK.pakPkgListH(Reader))
+          End While
+          Reader.Close()
+          _RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
+      Return Results
+    End Function
+
   End Class
 End Namespace

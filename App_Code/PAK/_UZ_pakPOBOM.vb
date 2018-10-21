@@ -354,5 +354,30 @@ Namespace SIS.PAK
       End Using
       Return Results
     End Function
+    Public Shared Function POBOMSInPackingList(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As List(Of SIS.PAK.pakPOBOM)
+      Dim Results As List(Of SIS.PAK.pakPOBOM) = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          Cmd.CommandText = "sppak_LG_POBOMSInPackingList"
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SerialNo", SqlDbType.Int, -1, SerialNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PkgNo", SqlDbType.Int, -1, PkgNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          _RecordCount = -1
+          Results = New List(Of SIS.PAK.pakPOBOM)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.PAK.pakPOBOM(Reader))
+          End While
+          Reader.Close()
+          _RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
+      Return Results
+    End Function
+
   End Class
 End Namespace

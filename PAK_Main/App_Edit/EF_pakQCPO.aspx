@@ -321,8 +321,9 @@
         <td style="text-align:center">
           <asp:UpdatePanel ID="UpdatePanel1" runat="server">
             <ContentTemplate>
+              <asp:HiddenField ID="IsUploaded" runat="server" ClientIDMode="Static" ></asp:HiddenField>
               <asp:FileUpload ID="F_FileUpload" runat="server" Width="250px" ToolTip="Browse QC List Template" />
-              <asp:Button ID="cmdTmplUpload" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="tmplUpload" CommandArgument='<%# Eval("PrimaryKey") %>' />
+              <asp:Button ID="cmdTmplUpload" Text="Upload" OnClientClick="$get('IsUploaded').value='YES';" runat="server" ToolTip="Click to upload & process template file." CommandName="tmplUpload" CommandArgument='<%# Eval("PrimaryKey") %>' />
             </ContentTemplate>
             <Triggers>
               <asp:PostBackTrigger ControlID="cmdTmplUpload" />
@@ -406,6 +407,23 @@
              <asp:Label ID="L_UOMTotalWeight" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("UOMTotalWeight") %>' Text='<%# Eval("PAK_Units4_Description") %>'></asp:Label>
           </ItemTemplate>
           <HeaderStyle Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Manual Request No">
+          <ItemTemplate>
+            <LGM:LC_qcmSRequests 
+              ID="F_QCRequestNo"
+              SelectedValue='<%# Bind("QCRequestNo") %>'
+              OrderBy='<%# Eval("PrimaryKey") %>'
+              DataTextField="DisplayField"
+              DataValueField="PrimaryKey"
+              IncludeDefault="true"
+              DefaultText="-- Select --"
+              Width="100px"
+              CssClass="myddl"
+              Runat="Server" />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="100px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Status" SortExpression="PAK_QCListStatus3_Description">
           <ItemTemplate>

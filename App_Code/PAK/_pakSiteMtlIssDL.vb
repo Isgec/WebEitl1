@@ -24,7 +24,7 @@ Namespace SIS.PAK
     Private _PAK_SiteItemMaster4_ItemDescription As String = ""
     Private _PAK_SiteLocations5_Description As String = ""
     Private _PAK_Units6_Description As String = ""
-    Private _FK_PAK_SiteIssueDLocation_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_SiteIssueDLocation_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_SiteIssueDLocation_IssueSrNo As SIS.PAK.pakSiteIssRecD = Nothing
     Private _FK_PAK_SiteIssueDLocation_IssueNo As SIS.PAK.pakSiteIssReqH = Nothing
     Private _FK_PAK_SiteIssueDLocation_SiteMarkNo As SIS.PAK.pakSiteItemMaster = Nothing
@@ -276,10 +276,10 @@ Namespace SIS.PAK
         End Set
       End Property
     End Class
-    Public ReadOnly Property FK_PAK_SiteIssueDLocation_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_SiteIssueDLocation_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_SiteIssueDLocation_ProjectID Is Nothing Then
-          _FK_PAK_SiteIssueDLocation_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_SiteIssueDLocation_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_SiteIssueDLocation_ProjectID
       End Get

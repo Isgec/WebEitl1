@@ -20,7 +20,7 @@ Namespace SIS.PAK
     Private _PAK_SiteIssueH2_RequesterRemarks As String = ""
     Private _PAK_SiteItemMaster3_ItemDescription As String = ""
     Private _PAK_Units4_Description As String = ""
-    Private _FK_PAK_SiteIssueD_ProjectID As SIS.EITL.eitlProjects = Nothing
+    Private _FK_PAK_SiteIssueD_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_SiteIssueD_IssueNo As SIS.PAK.pakSiteIssReqH = Nothing
     Private _FK_PAK_SiteIssueD_SiteMarkNo As SIS.PAK.pakSiteItemMaster = Nothing
     Private _FK_PAK_SiteIssueD_UOMQuantity As SIS.PAK.pakUnits = Nothing
@@ -75,11 +75,11 @@ Namespace SIS.PAK
         Return _UOMQuantity
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _UOMQuantity = ""
-         Else
-           _UOMQuantity = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _UOMQuantity = ""
+        Else
+          _UOMQuantity = value
+        End If
       End Set
     End Property
     Public Property QuantityRequired() As Decimal
@@ -103,11 +103,11 @@ Namespace SIS.PAK
         Return _IssuerRemarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _IssuerRemarks = ""
-         Else
-           _IssuerRemarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _IssuerRemarks = ""
+        Else
+          _IssuerRemarks = value
+        End If
       End Set
     End Property
     Public Property IssueNo() As Int32
@@ -123,11 +123,11 @@ Namespace SIS.PAK
         Return _Remarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _Remarks = ""
-         Else
-           _Remarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _Remarks = ""
+        Else
+          _Remarks = value
+        End If
       End Set
     End Property
     Public Property ProjectID() As String
@@ -151,11 +151,11 @@ Namespace SIS.PAK
         Return _PAK_SiteIssueH2_RequesterRemarks
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_SiteIssueH2_RequesterRemarks = ""
-         Else
-           _PAK_SiteIssueH2_RequesterRemarks = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_SiteIssueH2_RequesterRemarks = ""
+        Else
+          _PAK_SiteIssueH2_RequesterRemarks = value
+        End If
       End Set
     End Property
     Public Property PAK_SiteItemMaster3_ItemDescription() As String
@@ -163,11 +163,11 @@ Namespace SIS.PAK
         Return _PAK_SiteItemMaster3_ItemDescription
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_SiteItemMaster3_ItemDescription = ""
-         Else
-           _PAK_SiteItemMaster3_ItemDescription = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_SiteItemMaster3_ItemDescription = ""
+        Else
+          _PAK_SiteItemMaster3_ItemDescription = value
+        End If
       End Set
     End Property
     Public Property PAK_Units4_Description() As String
@@ -175,19 +175,19 @@ Namespace SIS.PAK
         Return _PAK_Units4_Description
       End Get
       Set(ByVal value As String)
-         If Convert.IsDBNull(Value) Then
-           _PAK_Units4_Description = ""
-         Else
-           _PAK_Units4_Description = value
-         End If
+        If Convert.IsDBNull(value) Then
+          _PAK_Units4_Description = ""
+        Else
+          _PAK_Units4_Description = value
+        End If
       End Set
     End Property
-    Public Readonly Property DisplayField() As String
+    Public ReadOnly Property DisplayField() As String
       Get
         Return "" & _SiteMarkNo.ToString.PadRight(30, " ")
       End Get
     End Property
-    Public Readonly Property PrimaryKey() As String
+    Public ReadOnly Property PrimaryKey() As String
       Get
         Return _ProjectID & "|" & _IssueNo & "|" & _IssueSrNo
       End Get
@@ -229,10 +229,10 @@ Namespace SIS.PAK
         End Set
       End Property
     End Class
-    Public ReadOnly Property FK_PAK_SiteIssueD_ProjectID() As SIS.EITL.eitlProjects
+    Public ReadOnly Property FK_PAK_SiteIssueD_ProjectID() As SIS.QCM.qcmProjects
       Get
         If _FK_PAK_SiteIssueD_ProjectID Is Nothing Then
-          _FK_PAK_SiteIssueD_ProjectID = SIS.EITL.eitlProjects.eitlProjectsGetByID(_ProjectID)
+          _FK_PAK_SiteIssueD_ProjectID = SIS.QCM.qcmProjects.qcmProjectsGetByID(_ProjectID)
         End If
         Return _FK_PAK_SiteIssueD_ProjectID
       End Get

@@ -36,6 +36,17 @@ Partial Class GF_pakSPO
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
       End Try
     End If
+    If e.CommandName.ToLower = "AcknowledgeWF".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakSPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        SIS.PAK.pakSPO.AcknowledgeWF(SerialNo)
+        GVpakSPO.DataBind()
+      Catch ex As Exception
+        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+        Dim script As String = String.Format("alert({0});", message)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+      End Try
+    End If
     If e.CommandName.ToLower = "rejectwf".ToLower Then
       Try
         Dim SerialNo As Int32 = GVpakSPO.DataKeys(e.CommandArgument).Values("SerialNo")
@@ -71,7 +82,7 @@ Partial Class GF_pakSPO
   <System.Web.Services.WebMethod()>
   <System.Web.Script.Services.ScriptMethod()>
   Public Shared Function ProjectIDCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
-    Return SIS.EITL.eitlProjects.SelecteitlProjectsAutoCompleteList(prefixText, count, contextKey)
+    Return SIS.QCM.qcmProjects.SelectqcmProjectsAutoCompleteList(prefixText, count, contextKey)
   End Function
   Protected Sub F_BuyerID_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles F_BuyerID.TextChanged
     Session("F_BuyerID") = F_BuyerID.Text
@@ -395,7 +406,7 @@ Partial Class GF_pakSPO
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String = "0|" & aVal(0)
     Dim ProjectID As String = CType(aVal(1), String)
-    Dim oVar As SIS.EITL.eitlProjects = SIS.EITL.eitlProjects.eitlProjectsGetByID(ProjectID)
+    Dim oVar As SIS.QCM.qcmProjects = SIS.QCM.qcmProjects.qcmProjectsGetByID(ProjectID)
     If oVar Is Nothing Then
       mRet = "1|" & aVal(0) & "|Record not found."
     Else

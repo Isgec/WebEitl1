@@ -122,6 +122,8 @@ Partial Class EF_pakSPO
     End If
   End Sub
   Protected Sub cmdFileUpload_Command(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.CommandEventArgs) Handles cmdFileUpload.Command
+    If CType(FVpakSPO.FindControl("IsUploaded"), HiddenField).Value <> "YES" Then Exit Sub
+    CType(FVpakSPO.FindControl("IsUploaded"), HiddenField).Value = ""
     Dim st As Long = HttpContext.Current.Server.ScriptTimeout
     HttpContext.Current.Server.ScriptTimeout = Integer.MaxValue
     Try

@@ -125,6 +125,40 @@ Namespace SIS.PAK
       '===========================================
       Return Results
     End Function
+    Public Shadows ReadOnly Property AcknowledgeWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = True
+        Try
+          If AcceptedBySupplier Then
+            mRet = False
+          End If
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public Shadows ReadOnly Property AcknowledgeWFEnable() As Boolean
+      Get
+        Dim mRet As Boolean = True
+        Try
+          mRet = GetEnable()
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public Shared Shadows Function AcknowledgeWF(ByVal SerialNo As Int32) As SIS.PAK.pakSPO
+      Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
+      Results.AcceptedBySupplier = True
+      Results.AcceptedBySupplierOn = Now
+      Results = SIS.PAK.pakPO.UpdateData(Results)
+      Try
+        SIS.CT.ctUpdates.CT_POAccepted(Results)
+      Catch ex As Exception
+        Throw New Exception(ex.Message)
+      End Try
+      Return Nothing
+    End Function
     Public Shared Shadows Function ApproveWF(ByVal SerialNo As Int32) As SIS.PAK.pakSPO
       Dim Results As SIS.PAK.pakSPO = pakSPOGetByID(SerialNo)
       Return Results

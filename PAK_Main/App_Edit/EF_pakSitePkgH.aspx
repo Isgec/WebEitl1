@@ -308,27 +308,8 @@
             CssClass = "mytxt"
             MaxLength="20"
             onfocus = "return this.select();"
+            onblur="return dc(this,4);"
             runat="server" />
-          <AJX:MaskedEditExtender 
-            ID = "MEETotalWeight"
-            runat = "server"
-            mask = "9999999999999999.9999"
-            AcceptNegative = "Left"
-            MaskType="Number"
-            MessageValidatorTip="true"
-            InputDirection="RightToLeft"
-            ErrorTooltipEnabled="true"
-            TargetControlID="F_TotalWeight" />
-          <AJX:MaskedEditValidator 
-            ID = "MEVTotalWeight"
-            runat = "server"
-            ControlToValidate = "F_TotalWeight"
-            ControlExtender = "MEETotalWeight"
-            EmptyValueBlurredText = "<div class='errorLG'>Required!</div>"
-            Display = "Dynamic"
-            EnableClientScript = "true"
-            IsValidEmpty = "True"
-            SetFocusOnError="true" />
         </td>
       </tr>
       <tr>
@@ -509,7 +490,7 @@
           <ItemTemplate>
             <asp:Label ID="LabelRecSrNo" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("RecSrNo") %>'></asp:Label>
           </ItemTemplate>
-          <ItemStyle CssClass="alignright" />
+          <ItemStyle CssClass="alignCenter" />
           <HeaderStyle CssClass="alignright" Width="40px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Item No" SortExpression="PAK_PkgListD6_PackingMark">
@@ -541,6 +522,7 @@
           <ItemTemplate>
              <asp:Label ID="L_UOMQuantity" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("UOMQuantity") %>' Text='<%# Eval("PAK_Units11_Description") %>'></asp:Label>
           </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Quantity" SortExpression="Quantity">
@@ -553,30 +535,8 @@
             ValidationGroup='<%# "Approve" & Container.DataItemIndex %>'
             MaxLength="20"
             onfocus = "return this.select();"
+            onblur="return dc(this,4);"
             runat="server" />
-          <AJX:MaskedEditExtender 
-            ID = "MEEQuantity"
-            runat = "server"
-            mask = "9999999999999999.9999"
-            AcceptNegative = "Left"
-            MaskType="Number"
-            MessageValidatorTip="true"
-            InputDirection="RightToLeft"
-            ErrorTooltipEnabled="true"
-            TargetControlID="F_Quantity" />
-          <AJX:MaskedEditValidator 
-            ID = "MEVQuantity"
-            runat = "server"
-            ControlToValidate = "F_Quantity"
-            ControlExtender = "MEEQuantity"
-            EmptyValueBlurredText = "<div class='errorLG'>Required!</div>"
-            Display = "Dynamic"
-            EnableClientScript = "true"
-            ValidationGroup = '<%# "Approve" & Container.DataItemIndex %>'
-            IsValidEmpty = "false"
-            MinimumValue = "0.01"
-            SetFocusOnError="true" />
-
           </ItemTemplate>
           <ItemStyle CssClass="alignright" />
           <HeaderStyle CssClass="alignright" Width="80px" />
@@ -610,6 +570,7 @@
           <ItemTemplate>
              <asp:Label ID="L_InventoryStatusID" runat="server" ForeColor='<%# Eval("ForeColor") %>' Title='<%# EVal("InventoryStatusID") %>' Text='<%# Eval("PAK_InventoryStatus4_Description") %>'></asp:Label>
           </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="ITEM Receive">

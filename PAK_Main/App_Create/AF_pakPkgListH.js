@@ -36,7 +36,7 @@ var script_pakPkgListH = {
       p.style.backgroundImage  = 'url(../../images/loader.gif)';
       p.style.backgroundRepeat= 'no-repeat';
       p.style.backgroundPosition = 'right';
-      sender._contextKey = '';
+      sender._contextKey = $get(Prefix+'SerialNo').value;
     },
     ACETransporterID_Populated: function(sender,e) {
       var p = sender.get_element();
@@ -57,7 +57,7 @@ var script_pakPkgListH = {
       p.style.backgroundImage  = 'url(../../images/loader.gif)';
       p.style.backgroundRepeat= 'no-repeat';
       p.style.backgroundPosition = 'right';
-      sender._contextKey = '';
+      sender._contextKey = $get(Prefix+'SerialNo').value;
     },
     ACEVRExecutionNo_Populated: function(sender,e) {
       var p = sender.get_element();
@@ -161,7 +161,8 @@ var script_pakPkgListH = {
       if(script_pakPkgListH.validated_FK_PAK_PkgListH_VRExecutionNo_main){
         var o_d = $get(p[1]+'_Display');
         try{o_d.innerHTML = p[2];}catch(ex){}
-      }
+        try{$get(p[1].replace('VRExecutionNo','TransporterID')).value = p[3];}catch(ex){}
+        }
       o.style.backgroundImage  = 'none';
       if(p[0]=='1'){
         o.value='';

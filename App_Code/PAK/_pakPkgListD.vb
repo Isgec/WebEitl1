@@ -45,6 +45,7 @@ Namespace SIS.PAK
     Private _FK_PAK_PkgListD_UOMPack As SIS.PAK.pakUnits = Nothing
     Public Property DocumentNo As String = ""
     Public Property DocumentRevision As String = ""
+    Public Property SourcePkgNo As String = ""
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -117,6 +118,7 @@ Namespace SIS.PAK
     End Property
     Public Property WeightPerUnit() As Decimal
       Get
+        If _WeightPerUnit <= 0 Then Return 0
         Return _WeightPerUnit
       End Get
       Set(ByVal value As Decimal)
@@ -422,7 +424,7 @@ Namespace SIS.PAK
     Public ReadOnly Property FK_PAK_PkgListD_PkgNo() As SIS.PAK.pakPkgListH
       Get
         If _FK_PAK_PkgListD_PkgNo Is Nothing Then
-          _FK_PAK_PkgListD_PkgNo = SIS.PAK.pakPkgListH.pakPkgListHGetByID(_SerialNo, _PkgNo)
+          _FK_PAK_PkgListD_PkgNo = SIS.PAK.pakPkgListH.pakPkgPortHGetByID(_SerialNo, _PkgNo)
         End If
         Return _FK_PAK_PkgListD_PkgNo
       End Get
@@ -622,6 +624,7 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PackingMark", SqlDbType.NVarChar, 51, IIf(Record.PackingMark = "", Convert.DBNull, Record.PackingMark))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentNo", SqlDbType.NVarChar, 51, IIf(Record.DocumentNo = "", Convert.DBNull, Record.DocumentNo))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentRevision", SqlDbType.NVarChar, 11, IIf(Record.DocumentRevision = "", Convert.DBNull, Record.DocumentRevision))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SourcePkgNo", SqlDbType.NVarChar, 11, IIf(Record.SourcePkgNo = "", Convert.DBNull, Record.SourcePkgNo))
           Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_SerialNo").Direction = ParameterDirection.Output
           Cmd.Parameters.Add("@Return_PkgNo", SqlDbType.Int, 11)
@@ -696,6 +699,7 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PackingMark",SqlDbType.NVarChar,51, Iif(Record.PackingMark= "" ,Convert.DBNull, Record.PackingMark))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentNo", SqlDbType.NVarChar, 51, IIf(Record.DocumentNo = "", Convert.DBNull, Record.DocumentNo))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentRevision", SqlDbType.NVarChar, 11, IIf(Record.DocumentRevision = "", Convert.DBNull, Record.DocumentRevision))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SourcePkgNo", SqlDbType.NVarChar, 11, IIf(Record.SourcePkgNo = "", Convert.DBNull, Record.SourcePkgNo))
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

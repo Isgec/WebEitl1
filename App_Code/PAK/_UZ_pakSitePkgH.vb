@@ -180,6 +180,11 @@ Namespace SIS.PAK
       Next
       If CompletelyReceived Then
         pkgH.ReceiveStatusID = siteReceiveStates.Received
+        Try
+          SIS.CT.ctUpdates.CT_ReceivedAtSite(pkgH)
+        Catch ex As Exception
+        End Try
+
       ElseIf CloseStatusFound Then
         pkgH.ReceiveStatusID = siteReceiveStates.PackagePending
       End If

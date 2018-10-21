@@ -107,10 +107,10 @@
           <asp:Label ID="L_QCRequestNo" runat="server" Text="Allotted Request No.:" />&nbsp;
         </td>
         <td>
-          <LGM:LC_qcmRequests 
+          <LGM:LC_qcmSRequests 
             ID="F_QCRequestNo"
             SelectedValue='<%# Bind("QCRequestNo") %>'
-            OrderBy='<%# Eval("FK_PAK_QCListH_SerialNo.SupplierID") %>'
+            OrderBy='<%# Eval("PrimaryKey") %>'
             DataTextField="DisplayField"
             DataValueField="PrimaryKey"
             IncludeDefault="true"
@@ -307,12 +307,18 @@
           </ItemTemplate>
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="Quantity" SortExpression="Quantity">
+        <asp:TemplateField HeaderText="Quantity Offered" SortExpression="Quantity">
           <ItemTemplate>
             <asp:Label ID="LabelQuantity" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("Quantity") %>'></asp:Label>
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle CssClass="alignCenter" Width="80px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Inspection Stage" SortExpression="QCM_InspectionStages8_Description">
+          <ItemTemplate>
+             <asp:Label ID="L_InspectionStageID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("InspectionStageID") %>' Text='<%# Eval("QCM_InspectionStages8_Description") %>'></asp:Label>
+          </ItemTemplate>
+          <HeaderStyle Width="100px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Quality Cleared Qty" SortExpression="QualityClearedQty">
           <ItemTemplate>

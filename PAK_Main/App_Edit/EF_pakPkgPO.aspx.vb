@@ -106,6 +106,16 @@ Partial Class EF_pakPkgPO
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
+    If e.CommandName.ToLower = "VRRequestWF".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim PkgNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("PkgNo")
+        SIS.PAK.pakPkgListH.VRRequestWF(SerialNo, PkgNo)
+        GVpakPkgListH.DataBind()
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
     If e.CommandName.ToLower = "rejectwf".ToLower Then
       Try
         Dim SerialNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("SerialNo")
@@ -133,10 +143,13 @@ Partial Class EF_pakPkgPO
     TBLpakPkgListH.AddUrl &= "?SerialNo=" & SerialNo
   End Sub
   Private st As Long = HttpContext.Current.Server.ScriptTimeout
-
+  Private AllowNegativeBalance As Boolean = False
   Private Sub FVpakPkgPO_ItemCommand(sender As Object, e As FormViewCommandEventArgs) Handles FVpakPkgPO.ItemCommand
+    If CType(FVpakPkgPO.FindControl("IsUploaded"), HiddenField).Value <> "YES" Then Exit Sub
     HttpContext.Current.Server.ScriptTimeout = Integer.MaxValue
+    AllowNegativeBalance = Convert.ToBoolean(ConfigurationManager.AppSettings("AllowNegativeBalance"))
     If e.CommandName.ToLower = "tmplupload" Then
+      CType(FVpakPkgPO.FindControl("IsUploaded"), HiddenField).Value = ""
       Try
         Dim aVal() As String = e.CommandArgument.ToString.Split("|".ToCharArray)
         Dim SerialNo As String = ""
@@ -251,7 +264,7 @@ Partial Class EF_pakPkgPO
                 tmpRemarks = wsD.Cells(I, 24).Text
 
                 If Not IsNumeric(tmpWeightPerUnit) Then
-                  tmpWeightPerUnit = "0.00"
+                  tmpWeightPerUnit = "1"
                 End If
 
                 If tmpPackUOM <> "" Then
@@ -278,10 +291,30 @@ Partial Class EF_pakPkgPO
                 End If
 
                 Dim Found As Boolean = True
+                Dim tmpPOBItem As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(tmpSerialNo, tmpBomNo, tmpItemNo)
+
+                If Not AllowNegativeBalance Then
+                  Dim OriginalQuantity As Decimal = 0
+                  Dim DespatchedQuantity As Decimal = 0
+                  If tmpPO.QCRequired Then
+                    OriginalQuantity = tmpPOBItem.QualityClearedQty
+                  Else
+                    OriginalQuantity = tmpPOBItem.Quantity
+                  End If
+                  If tmpPO.PortRequired Then
+                    DespatchedQuantity = tmpPOBItem.QuantityDespatchedToPort
+                  Else
+                    DespatchedQuantity = tmpPOBItem.QuantityDespatched
+                  End If
+                  If OriginalQuantity - DespatchedQuantity - tmpQuantity < 0 Then
+                    IsError = True
+                    ErrMsg = ErrMsg & IIf(ErrMsg = "", "", ", ") & tmpItemNo & "-ve Balance Not allowed"
+                    Continue For
+                  End If
+                End If
                 Dim tmpListD As SIS.PAK.pakPkgListD = Nothing
                 tmpListD = SIS.PAK.pakPkgListD.pakPkgListDGetByID(SerialNo, tmpPkgNo, tmpBomNo, tmpItemNo)
                 If tmpListD Is Nothing Then
-                  Dim tmpPOBItem As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(tmpSerialNo, tmpBomNo, tmpItemNo)
                   Found = False
                   tmpListD = New SIS.PAK.pakPkgListD
                   With tmpListD
@@ -297,7 +330,7 @@ Partial Class EF_pakPkgPO
                   End With
                 End If
                 With tmpListD
-                  .Quantity = IIf(tmpQuantity = "", 0, tmpQuantity)
+                  .Quantity = tmpQuantity
                   'Suppliered Entered Wt is Ignored
                   '.WeightPerUnit = IIf(Convert.ToDecimal(tmpWeightPerUnit) <= 0.00, .WeightPerUnit, tmpWeightPerUnit)
                   .DocumentNo = tmpDocumentNo

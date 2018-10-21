@@ -9,6 +9,7 @@ Namespace SIS.QCM
     Private Shared _RecordCount As Integer
     Private _ProjectID As String = ""
     Private _Description As String = ""
+    Public Property BusinessPartnerID As String = ""
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -225,6 +226,7 @@ Namespace SIS.QCM
       On Error Resume Next
       _ProjectID = Ctype(Reader("ProjectID"),String)
       _Description = Ctype(Reader("Description"),String)
+      BusinessPartnerID = CType(Reader("BusinessPartnerID"), String)
     End Sub
     Public Sub New()
     End Sub

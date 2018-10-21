@@ -71,7 +71,9 @@ Namespace SIS.PAK
       Get
         Dim mRet As Boolean = True
         Try
-          mRet = GetVisible()
+          If AcceptedBySupplier Then
+            mRet = False
+          End If
         Catch ex As Exception
         End Try
         Return mRet
@@ -135,8 +137,17 @@ Namespace SIS.PAK
     End Function
     Public Shared Shadows Function ApproveWF(ByVal SerialNo As Int32) As SIS.PAK.pakPkgPO
       Dim Results As SIS.PAK.pakPkgPO = pakPkgPOGetByID(SerialNo)
+      Results.AcceptedBySupplier = True
+      Results.AcceptedBySupplierOn = Now
+      Results = SIS.PAK.pakPkgPO.UpdateData(Results)
+      Try
+        SIS.CT.ctUpdates.CT_POAccepted(Results)
+      Catch ex As Exception
+        Throw New Exception(ex.Message)
+      End Try
       Return Results
     End Function
+
     Public Shared Shadows Function RejectWF(ByVal SerialNo As Int32) As SIS.PAK.pakPkgPO
       Dim Results As SIS.PAK.pakPkgPO = pakPkgPOGetByID(SerialNo)
       Return Results
