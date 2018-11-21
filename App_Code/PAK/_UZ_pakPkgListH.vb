@@ -147,7 +147,7 @@ Namespace SIS.PAK
       Get
         Dim mRet As Boolean = False
         Try
-          If StatusID = pakPkgStates.UnderReceiveAtSite Then
+          If StatusID = pakPkgStates.UnderReceiveAtSite Or StatusID = pakPkgStates.UnderReceiveAtPort Then
             mRet = IsAdmin
           End If
         Catch ex As Exception
@@ -157,7 +157,11 @@ Namespace SIS.PAK
     End Property
     Public Shared Function RejectWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32, ByVal UnProtected As Boolean) As SIS.PAK.pakPkgListH
       Dim Results As SIS.PAK.pakPkgListH = pakPkgListHGetByID(SerialNo, PkgNo)
-      If Results.StatusID <> pakPkgStates.UnderReceiveAtSite Then Return Results
+      Select Case Results.StatusID
+        Case pakPkgStates.UnderReceiveAtPort, pakPkgStates.UnderReceiveAtSite
+        Case Else
+          Return Results
+      End Select
       'Delete Packing List From ERP Detail & Header
       Dim ReceiptCreated As Boolean = False
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
@@ -206,12 +210,26 @@ Namespace SIS.PAK
       End Using
       'Revert Allready Despatched Quantity
       Dim PkgItems As List(Of SIS.PAK.pakPkgListD) = SIS.PAK.pakPkgListD.pakPkgListDSelectList(0, 99999, "", False, "", PkgNo, SerialNo)
-      For Each pkgItm As SIS.PAK.pakPkgListD In PkgItems
-        Dim bomItm As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(pkgItm.SerialNo, pkgItm.BOMNo, pkgItm.ItemNo)
-        bomItm.QuantityDespatched -= pkgItm.Quantity
-        bomItm.TotalWeightDespatched -= pkgItm.TotalWeight
+      'For Each pkgItm As SIS.PAK.pakPkgListD In PkgItems
+      '  Dim bomItm As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(pkgItm.SerialNo, pkgItm.BOMNo, pkgItm.ItemNo)
+      '  bomItm.QuantityDespatched -= pkgItm.Quantity
+      '  bomItm.TotalWeightDespatched -= pkgItm.TotalWeight
+      '  bomItm = SIS.PAK.pakPOBItems.UpdateData(bomItm)
+      'Next
+
+      For Each pkgD As SIS.PAK.pakPkgListD In PkgItems
+        'Update BOM Item Despached
+        Dim bomItm As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(pkgD.SerialNo, pkgD.BOMNo, pkgD.ItemNo)
+        If Results.FK_PAK_PkgListH_SerialNo.PortRequired Then
+          bomItm.QuantityDespatchedToPort -= pkgD.Quantity
+          bomItm.TotalWeightDespatchedToPort -= pkgD.TotalWeight
+        Else
+          bomItm.QuantityDespatched -= pkgD.Quantity
+          bomItm.TotalWeightDespatched -= pkgD.TotalWeight
+        End If
         bomItm = SIS.PAK.pakPOBItems.UpdateData(bomItm)
       Next
+
       'Update Paking List as Free
       Results.StatusID = pakPkgStates.Free
       Results = SIS.PAK.pakPkgListH.UpdateData(Results)

@@ -97,6 +97,7 @@ Partial Class EF_pakPkgPO
       End Try
     End If
     If e.CommandName.ToLower = "initiatewf".ToLower Then
+      'Despatch
       Try
         Dim SerialNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim PkgNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("PkgNo")
