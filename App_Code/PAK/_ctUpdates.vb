@@ -128,6 +128,43 @@ Namespace SIS.CT
         Next
       End If
     End Sub
+    Public Shared Sub CT_QCOfferedReturn(ByVal pp As SIS.PAK.pakQCListH)
+      Dim comp As String = "200"
+      Dim ppPO As SIS.PAK.pakPO = pp.FK_PAK_QCListH_SerialNo
+      Dim hndl As String = "CT_INSPECTIONCALLRAISED"
+      Dim Sql As String = ""
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Con.Open()
+        Sql = " delete ttpisg207" & comp
+        Sql &= " where t_bohd='" & hndl & "'"
+        Sql &= "   and t_cprj='" & pp.FK_PAK_QCListH_SerialNo.ProjectID & "'"
+        Sql &= "   and t_pono='" & pp.FK_PAK_QCListH_SerialNo.PONumber & "'"
+        Sql &= "   and t_mode= 2 "
+        If pp.QCRequestNo = "" Then
+          Sql &= " and t_indi=" & pp.QCLNo
+        Else
+          Sql &= " and t_indi=" & pp.QCRequestNo
+        End If
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Cmd.ExecuteNonQuery()
+        End Using
+        If pp.QCRequestNo <> "" Then
+          Sql = " delete ttpisg207" & comp
+          Sql &= " where t_bohd='CT_INSPECTIONBLACKCONDITION'"
+          Sql &= "   and t_cprj='" & pp.FK_PAK_QCListH_SerialNo.ProjectID & "'"
+          Sql &= "   and t_pono='" & pp.FK_PAK_QCListH_SerialNo.PONumber & "'"
+          Sql &= "   and t_mode= 2 "
+          Sql &= "   and t_indi=" & pp.QCRequestNo
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = Sql
+            Cmd.ExecuteNonQuery()
+          End Using
+        End If
+      End Using
+    End Sub
 
     Public Shared Sub CT_QCCleared(ByVal pp As SIS.PAK.pakQCListH)
       Dim ppPO As SIS.PAK.pakPO = pp.FK_PAK_QCListH_SerialNo
@@ -166,6 +203,27 @@ Namespace SIS.CT
       Next
     End Sub
 
+    Public Shared Sub CT_DespatchedReturn(ByVal pp As SIS.PAK.pakPkgListH)
+      Dim comp As String = "200"
+      Dim ppPO As SIS.PAK.pakPO = pp.FK_PAK_PkgListH_SerialNo
+      Dim hndl As String = "CT_MATERIALDISPATCHED"
+
+      Dim Sql As String = ""
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Con.Open()
+        Sql = " delete ttpisg207" & comp
+        Sql &= " where t_bohd='" & hndl & "'"
+        Sql &= "   and t_cprj='" & pp.FK_PAK_PkgListH_SerialNo.ProjectID & "'"
+        Sql &= "   and t_pono='" & pp.FK_PAK_PkgListH_SerialNo.PONumber & "'"
+        Sql &= "   and t_mode= 2 "
+        Sql &= "   and t_indi=" & pp.PkgNo
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Cmd.ExecuteNonQuery()
+        End Using
+      End Using
+    End Sub
     Public Shared Sub CT_Despatched(ByVal pp As SIS.PAK.pakPkgListH)
       Dim ppPO As SIS.PAK.pakPO = pp.FK_PAK_PkgListH_SerialNo
       Dim hndl As String = "CT_MATERIALDISPATCHED"
@@ -192,6 +250,9 @@ Namespace SIS.CT
           .t_cprj = pp.FK_PAK_PkgListH_SerialNo.ProjectID
           .t_sitm = pkgD.SubItem
         End With
+        SIS.TPISG.tpisg207.InsertData(tmp207)
+        'Update Same Progress
+        tmp207.t_bohd = "CT_RECEIPTPIIRN"
         SIS.TPISG.tpisg207.InsertData(tmp207)
       Next
     End Sub
@@ -258,6 +319,33 @@ Namespace SIS.CT
           Throw New Exception(ex.Message)
         End Try
       Next
+    End Sub
+
+    Public Shared Sub CT_ShippedReturn(ByVal pp As SIS.PAK.pakPkgListH)
+      Dim comp As String = "200"
+      Dim hndl As String = "CT_SHIPMENT"
+      Dim pkgDs As List(Of SIS.PAK.pakPKGListDIRef) = SIS.PAK.pakPKGListDIRef.GetDespatchedPKGPortDIref(pp.PkgNo)
+
+      Dim Sql As String = ""
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Con.Open()
+
+        For Each pkgD As SIS.PAK.pakPKGListDIRef In pkgDs
+          Dim pakPO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(pkgD.SerialNo)
+
+          Sql = " delete ttpisg207" & comp
+          Sql &= " where t_bohd='" & hndl & "'"
+          Sql &= "   and t_cprj='" & pakPO.ProjectID & "'"
+          Sql &= "   and t_pono='" & pakPO.PONumber & "'"
+          Sql &= "   and t_mode= 2 "
+          Sql &= "   and t_indi=" & pkgD.PKGNo
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = Sql
+            Cmd.ExecuteNonQuery()
+          End Using
+        Next
+      End Using
     End Sub
 
     Public Shared Sub CT_ReceivedAtSite(ByVal pp As SIS.PAK.pakSitePkgH)

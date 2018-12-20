@@ -150,6 +150,7 @@ Partial Class GF_pakIQCListH
       "  var F_CreatedBy_Display = $get('" & F_CreatedBy_Display.ClientID & "');" &
       "  var retval = e.get_value();" &
       "  var p = retval.split('|');" &
+      "  F_CreatedBy.value = e.get_value();" &
       "  F_CreatedBy_Display.innerHTML = e.get_text();" &
       "}" &
       "</script>"
@@ -231,6 +232,7 @@ Partial Class GF_pakIQCListH
       "  var F_ClearedBy_Display = $get('" & F_ClearedBy_Display.ClientID & "');" &
       "  var retval = e.get_value();" &
       "  var p = retval.split('|');" &
+      "  F_ClearedBy.value = e.get_value();" &
       "  F_ClearedBy_Display.innerHTML = e.get_text();" &
       "}" &
       "</script>"

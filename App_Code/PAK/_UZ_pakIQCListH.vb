@@ -170,6 +170,10 @@ Namespace SIS.PAK
         .Remarks = Remarks
       End With
       Results = SIS.PAK.pakIQCListH.UpdateData(Results)
+      Try
+        SIS.CT.ctUpdates.CT_QCOfferedReturn(Results)
+      Catch ex As Exception
+      End Try
       Return Results
     End Function
     Public Shared Function UZ_pakIQCListHSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As Int32, ByVal QCLNo As Int32, ByVal StatusID As Int32, ByVal ClearedBy As String, ByVal CreatedBy As String) As List(Of SIS.PAK.pakIQCListH)

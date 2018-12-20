@@ -4,7 +4,7 @@ Imports System.Data
 Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.EDI
-  <DataObject()> _
+  <DataObject()>
   Partial Public Class ediAFile
     Private Shared _RecordCount As Integer
     Private _t_drid As String = ""
@@ -90,7 +90,7 @@ Namespace SIS.EDI
         Return _t_aton
       End Get
       Set(ByVal value As String)
-         _t_aton = value
+        _t_aton = value
       End Set
     End Property
     Public Property t_Refcntd() As Int32
@@ -109,12 +109,12 @@ Namespace SIS.EDI
         _t_Refcntu = value
       End Set
     End Property
-    Public Readonly Property DisplayField() As String
+    Public ReadOnly Property DisplayField() As String
       Get
         Return ""
       End Get
     End Property
-    Public Readonly Property PrimaryKey() As String
+    Public ReadOnly Property PrimaryKey() As String
       Get
         Return _t_drid
       End Get
@@ -138,7 +138,7 @@ Namespace SIS.EDI
         End Set
       End Property
     End Class
-    <DataObjectMethod(DataObjectMethodType.Select)> _
+    <DataObjectMethod(DataObjectMethodType.Select)>
     Public Shared Function ediAFileGetNewRecord() As SIS.EDI.ediAFile
       Return New SIS.EDI.ediAFile()
     End Function
@@ -153,6 +153,22 @@ Namespace SIS.EDI
           If Reader.Read() Then
             Results = New SIS.EDI.ediAFile(Reader)
           End If
+          Reader.Close()
+        End Using
+      End Using
+      Return Results
+    End Function
+    Public Shared Function ediAMultiFilesGetByHandleIndex(ByVal t_hndl As String, ByVal t_indx As String) As List(Of SIS.EDI.ediAFile)
+      Dim Results As New List(Of SIS.EDI.ediAFile)
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = "Select * from ttcisg132200 where t_hndl='" & t_hndl & "' and t_indx like '" & t_indx & "%'"
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.EDI.ediAFile(Reader))
+          End While
           Reader.Close()
         End Using
       End Using

@@ -131,7 +131,7 @@
       </tr>
       <tr>
         <td class="alignright">
-          <b><asp:Label ID="L_CreatedBy" runat="server" Text="Created By :" /></b>
+          <b><asp:Label ID="L_CreatedBy" runat="server" Text="Supplier :" /></b>
         </td>
         <td>
           <asp:TextBox
@@ -207,7 +207,7 @@
       </tr>
       <tr>
         <td class="alignright">
-          <b><asp:Label ID="L_ClearedBy" runat="server" Text="Cleared By :" /></b>
+          <b><asp:Label ID="L_ClearedBy" runat="server" Text="Inspected By :" /></b>
         </td>
         <td>
           <asp:TextBox
@@ -322,7 +322,7 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle Width="40px" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="Offered By" SortExpression="aspnet_users1_UserFullName">
+        <asp:TemplateField HeaderText="Supplier" SortExpression="aspnet_users1_UserFullName">
           <ItemTemplate>
              <asp:Label ID="L_CreatedBy" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("CreatedBy") %>' Text='<%# Eval("aspnet_users1_UserFullName") %>'></asp:Label>
           </ItemTemplate>
