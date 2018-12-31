@@ -64,25 +64,25 @@ Namespace SIS.PAK
       Return _Result
     End Function
     Public Shared Function UZ_pakTCPOLDelete(ByVal Record As SIS.PAK.pakTCPOL) As Integer
-      Dim _Result as Integer = pakTCPOLDelete(Record)
+      Dim _Result As Integer = pakTCPOLDelete(Record)
       Return _Result
     End Function
     Public Shared Function SetDefaultValues(ByVal sender As System.Web.UI.WebControls.FormView, ByVal e As System.EventArgs) As System.Web.UI.WebControls.FormView
       With sender
         Try
-        CType(.FindControl("F_ItemNo"), TextBox).Text = 0
-        CType(.FindControl("F_ItemCode"), TextBox).Text = ""
-        CType(.FindControl("F_ItemDescription"), TextBox).Text = ""
-        CType(.FindControl("F_ItemQuantity"), TextBox).Text = 0
-        CType(.FindControl("F_ItemElement"), TextBox).Text = ""
-        CType(.FindControl("F_ItemElement_Display"), Label).Text = ""
-        CType(.FindControl("F_ItemStatusID"), TextBox).Text = ""
-        CType(.FindControl("F_ItemStatusID_Display"), Label).Text = ""
-        CType(.FindControl("F_SerialNo"), TextBox).Text = ""
-        CType(.FindControl("F_SerialNo_Display"), Label).Text = ""
-        CType(.FindControl("F_ItemAmount"), TextBox).Text = 0
-        CType(.FindControl("F_ItemUnit"), TextBox).Text = ""
-        CType(.FindControl("F_ItemPrice"), TextBox).Text = 0
+          CType(.FindControl("F_ItemNo"), TextBox).Text = 0
+          CType(.FindControl("F_ItemCode"), TextBox).Text = ""
+          CType(.FindControl("F_ItemDescription"), TextBox).Text = ""
+          CType(.FindControl("F_ItemQuantity"), TextBox).Text = 0
+          CType(.FindControl("F_ItemElement"), TextBox).Text = ""
+          CType(.FindControl("F_ItemElement_Display"), Label).Text = ""
+          CType(.FindControl("F_ItemStatusID"), TextBox).Text = ""
+          CType(.FindControl("F_ItemStatusID_Display"), Label).Text = ""
+          CType(.FindControl("F_SerialNo"), TextBox).Text = ""
+          CType(.FindControl("F_SerialNo_Display"), Label).Text = ""
+          CType(.FindControl("F_ItemAmount"), TextBox).Text = 0
+          CType(.FindControl("F_ItemUnit"), TextBox).Text = ""
+          CType(.FindControl("F_ItemPrice"), TextBox).Text = 0
         Catch ex As Exception
         End Try
       End With

@@ -236,11 +236,22 @@ Namespace SIS.PAK
             SIS.PAK.pakWBS.InsertData(oEle)
           End If
           Dim xPOL As SIS.PAK.pakTCPOL = SIS.PAK.pakERPPOLine.GetTCPOL(POL)
-          With xPOL
-            .SerialNo = po.SerialNo
-            .ItemStatusID = 1
-          End With
-          SIS.PAK.pakTCPOL.InsertData(xPOL)
+          Dim Found As Boolean = False
+          Dim tmpPOL As SIS.PAK.pakTCPOL = SIS.PAK.pakTCPOL.pakTCPOLGetByID(po.SerialNo, xPOL.ItemNo)
+          If tmpPOL IsNot Nothing Then Found = True
+          If Found Then
+            With xPOL
+              .SerialNo = po.SerialNo
+              .ItemStatusID = tmpPOL.ItemStatusID
+            End With
+            SIS.PAK.pakTCPOL.UpdateData(xPOL)
+          Else
+            With xPOL
+              .SerialNo = po.SerialNo
+              .ItemStatusID = 1
+            End With
+            SIS.PAK.pakTCPOL.InsertData(xPOL)
+          End If
         Next
         Return xPOLines
       End Function
