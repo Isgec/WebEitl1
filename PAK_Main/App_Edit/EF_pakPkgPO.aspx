@@ -368,18 +368,11 @@
           <ItemTemplate>
             <asp:ImageButton ID="cmdInitiateWF" ValidationGroup='<%# "Initiate" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("InitiateWFVisible") %>' Enabled='<%# EVal("InitiateWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Forward" SkinID="forward" OnClientClick='<%# "return Page_ClientValidate(""Initiate" & Container.DataItemIndex & """) && confirm(""Forward record ?"");" %>' CommandName="InitiateWF" CommandArgument='<%# Container.DataItemIndex %>' />
             <asp:CheckBox ID="F_UnProtected" runat="server" Visible='<%# Eval("RejectWFVisible") %>' ToolTip="Check to Un Protected [No Check for RECEIPT in ERP] Return to Vendor" />
-            <asp:ImageButton ID="cmdRejectWF" ValidationGroup='<%# "Reject" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("RejectWFVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Return to Vendor" SkinID="reject" OnClientClick='<%# "return Page_ClientValidate(""Reject" & Container.DataItemIndex & """) && confirm(""Delete packing list from ERP and return to supplier ?"");" %>' CommandName="RejectWF" CommandArgument='<%# Container.DataItemIndex %>' />
+            <asp:ImageButton ID="cmdRejectWF" ValidationGroup='<%# "Reject" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("GetBackVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Return to Vendor" SkinID="reject" OnClientClick='<%# "return Page_ClientValidate(""Reject" & Container.DataItemIndex & """) && confirm(""Do you want to get packing list back ?"");" %>' CommandName="RejectWF" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
-<%--        <asp:TemplateField HeaderText="Approve">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdApproveWF" ValidationGroup='<%# "Approve" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("ApproveWFVisible") %>' Enabled='<%# EVal("ApproveWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Approve" SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Approve" & Container.DataItemIndex & """) && confirm(""Approve record ?"");" %>' CommandName="ApproveWF" CommandArgument='<%# Container.DataItemIndex %>' />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>--%>
       </Columns>
       <EmptyDataTemplate>
         <asp:Label ID="LabelEmpty" runat="server" Font-Size="Small" ForeColor="Red" Text="No record found !!!"></asp:Label>

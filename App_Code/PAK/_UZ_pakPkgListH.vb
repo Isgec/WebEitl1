@@ -155,6 +155,18 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
+    Public ReadOnly Property GetBackVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          If StatusID = pakPkgStates.UnderReceiveAtSite Or StatusID = pakPkgStates.UnderReceiveAtPort Then
+            mRet = True
+          End If
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
     Public Shared Function RejectWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32, ByVal UnProtected As Boolean) As SIS.PAK.pakPkgListH
       Dim Results As SIS.PAK.pakPkgListH = pakPkgListHGetByID(SerialNo, PkgNo)
       Select Case Results.StatusID

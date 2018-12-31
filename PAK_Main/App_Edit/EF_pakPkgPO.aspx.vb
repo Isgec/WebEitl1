@@ -121,7 +121,12 @@ Partial Class EF_pakPkgPO
       Try
         Dim SerialNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim PkgNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("PkgNo")
-        Dim UnProtected As Boolean = CType(GVpakPkgListH.Rows(e.CommandArgument).FindControl("F_UnProtected"), CheckBox).Checked
+        Dim UnProtected As Boolean = False
+        Try
+          UnProtected = CType(GVpakPkgListH.Rows(e.CommandArgument).FindControl("F_UnProtected"), CheckBox).Checked
+        Catch ex As Exception
+          UnProtected = False
+        End Try
         SIS.PAK.pakPkgListH.RejectWF(SerialNo, PkgNo, UnProtected)
         GVpakPkgListH.DataBind()
       Catch ex As Exception
