@@ -266,7 +266,7 @@
         </asp:TemplateField>
         <asp:TemplateField HeaderText="PRINT">
           <ItemTemplate>
-            <asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick="return print_report(this);" />
+            <asp:ImageButton ID="cmdPrint" runat="server" AlternateText='<%# Eval("PrimaryKey") %>' ToolTip="Print PO" SkinID="print" OnClientClick='<%# Eval("GetPrintLink") %>' CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />

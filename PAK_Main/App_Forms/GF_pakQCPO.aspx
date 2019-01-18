@@ -159,6 +159,13 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="PRINT">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdPrint" runat="server" AlternateText='<%# Eval("PrimaryKey") %>' ToolTip="Print PO" SkinID="print" OnClientClick='<%# Eval("GetPrintLink") %>' CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="NOTE">
           <ItemTemplate>
             <asp:ImageButton ID="cmdNotes" runat="server" AlternateText='<%# Eval("PrimaryKey") %>' ToolTip="View/reply Notes" SkinID="notes" OnClientClick='<%# Eval("GetNotesLink") %>' CommandArgument='<%# Container.DataItemIndex %>' />

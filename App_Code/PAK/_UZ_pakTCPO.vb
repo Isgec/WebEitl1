@@ -5,6 +5,18 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.PAK
   Partial Public Class pakTCPO
+    Public ReadOnly Property GetPrintLink() As String
+      Get
+        Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
+        If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
+          UrlAuthority = "192.9.200.146"
+        End If
+        Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
+        mRet &= "/PurchaseOrderReceipt/PurchaseOrder?PO=" & PONumber & "&Revision=" & PORevision
+        mRet = "javascript:window.open('" & mRet & "', 'win" & PONumber & "', 'left=20,top=20,width=1100,height=600,toolbar=1,resizable=1,scrollbars=1,toolbar=no,status=no,menu=no, directories=no,titlebar=no,location=no,addressbar=no'); return false;"
+        Return mRet
+      End Get
+    End Property
     Public ReadOnly Property GetNotesLink() As String
       Get
         Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority

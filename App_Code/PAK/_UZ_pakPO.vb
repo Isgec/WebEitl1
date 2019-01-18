@@ -6,6 +6,19 @@ Imports System.ComponentModel
 
 Namespace SIS.PAK
   Partial Public Class pakPO
+    Public ReadOnly Property GetPrintLink() As String
+      Get
+        Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
+        If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
+          UrlAuthority = "192.9.200.146"
+        End If
+        Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
+        mRet &= "/PurchaseOrderReceipt/PurchaseOrder?PO=" & PONumber & "&Revision=" & PORevision
+        mRet = "javascript:window.open('" & mRet & "', 'win" & PONumber & "', 'left=20,top=20,width=1100,height=600,toolbar=1,resizable=1,scrollbars=1,toolbar=no,status=no,menu=no, directories=no,titlebar=no,location=no,addressbar=no'); return false;"
+        Return mRet
+      End Get
+    End Property
+
     Public ReadOnly Property GetNotesLink() As String
       Get
         Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority
@@ -270,7 +283,7 @@ Namespace SIS.PAK
           Dim Roles() As String = Web.Configuration.WebConfigurationManager.AppSettings("SupplierRoleID").ToString.Split(",".ToCharArray)
           Dim str As String = ""
           For Each role As String In Roles
-            Str = oWS.CreateWebAuthorization(23, owUsr.UserName, role)
+            str = oWS.CreateWebAuthorization(23, owUsr.UserName, role)
             If str <> String.Empty Then
               Exit For
             End If
@@ -315,18 +328,18 @@ Namespace SIS.PAK
           Else
             Cmd.CommandText = "sppak_LG_POSelectListFilteres"
             'Cmd.CommandText = "sppakPOSelectListFilteres"
-            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_POTypeID",SqlDbType.Int,10, IIf(POTypeID = Nothing, 0,POTypeID))
-            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SupplierID",SqlDbType.NVarChar,9, IIf(SupplierID Is Nothing, String.Empty,SupplierID))
-            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_ProjectID",SqlDbType.NVarChar,6, IIf(ProjectID Is Nothing, String.Empty,ProjectID))
-            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_BuyerID",SqlDbType.NVarChar,8, IIf(BuyerID Is Nothing, String.Empty,BuyerID))
-            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_POStatusID",SqlDbType.Int,10, IIf(POStatusID = Nothing, 0,POStatusID))
-            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_IssuedBy",SqlDbType.NVarChar,8, IIf(IssuedBy Is Nothing, String.Empty,IssuedBy))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_POTypeID", SqlDbType.Int, 10, IIf(POTypeID = Nothing, 0, POTypeID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SupplierID", SqlDbType.NVarChar, 9, IIf(SupplierID Is Nothing, String.Empty, SupplierID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_ProjectID", SqlDbType.NVarChar, 6, IIf(ProjectID Is Nothing, String.Empty, ProjectID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_BuyerID", SqlDbType.NVarChar, 8, IIf(BuyerID Is Nothing, String.Empty, BuyerID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_POStatusID", SqlDbType.Int, 10, IIf(POStatusID = Nothing, 0, POStatusID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_IssuedBy", SqlDbType.NVarChar, 8, IIf(IssuedBy Is Nothing, String.Empty, IssuedBy))
           End If
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NvarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DivisionID",SqlDbType.Int,10, Global.System.Web.HttpContext.Current.Session("DivisionID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DivisionID", SqlDbType.Int, 10, Global.System.Web.HttpContext.Current.Session("DivisionID"))
           Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
           Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
           _RecordCount = -1
@@ -356,7 +369,7 @@ Namespace SIS.PAK
       Return SIS.PAK.pakPO.UpdateData(_Rec)
     End Function
     Public Shared Function UZ_pakPODelete(ByVal Record As SIS.PAK.pakPO) As Integer
-      Dim _Result as Integer = pakPODelete(Record)
+      Dim _Result As Integer = pakPODelete(Record)
       Return _Result
     End Function
     Public Shared Function SetDefaultValues(ByVal sender As System.Web.UI.WebControls.FormView, ByVal e As System.EventArgs) As System.Web.UI.WebControls.FormView
