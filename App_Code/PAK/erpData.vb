@@ -219,6 +219,24 @@ Namespace SIS.PAK
                 'But there may despatches against them
                 'If NO Despatch found delete child Item
                 ' TO WRITE
+                '=============================
+                'Dim POBItems As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.UZ_pakPOBItemsSelectList(0, 99999, "", False, "", tmpPOBOM.BOMNo, tmpPOBOM.SerialNo)
+                'For Each pobi As SIS.PAK.pakPOBItems In POBItems
+                '  Dim biFound As Boolean = False
+                '  For Each POLC As SIS.PAK.pakERPPOLChild In xPOLChild
+                '    If pobi.ItemCode = POLC.t_item.Trim And pobi.ItemDescription = POLC.t_desc Then
+                '      biFound = True
+                '      Exit For
+                '    End If
+                '  Next
+                '  If Not biFound Then
+                '    If pobi.QuantityDespatched <= 0.00 Then
+                '      'Delete when there is no despatch
+                '      SIS.PAK.pakPOBItems.pakPOBItemsDelete(pobi)
+                '    End If
+                '  End If
+                'Next
+                '=====================================
               Next
           End Select
         Next
