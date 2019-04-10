@@ -261,10 +261,10 @@ Namespace SIS.PAK
         .IssuedOn = Now
       End With
       Results = SIS.PAK.pakPO.UpdateData(Results)
-      If Results.POTypeID = pakErpPOTypes.ISGECEngineered Then
-        'Create WebUser for supplier
-        ''WebLoginID
-        Dim LoginID As String = Results.SupplierID.Substring(1, 8).Trim
+      'If Results.POTypeID = pakErpPOTypes.ISGECEngineered Then
+      'Create WebUser for supplier
+      ''WebLoginID
+      Dim LoginID As String = Results.SupplierID.Substring(1, 8).Trim
         Dim owUsr As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(LoginID)
         If owUsr Is Nothing Then
           owUsr = New SIS.QCM.qcmUsers
@@ -295,7 +295,7 @@ Namespace SIS.PAK
             Next
           End If
         End If
-      End If
+      'End If
       'Send Issue E-Mail
       If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
         SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POIssued)
