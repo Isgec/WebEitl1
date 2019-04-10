@@ -261,7 +261,9 @@ Namespace SIS.PAK
         .IssuedOn = Now
       End With
       Results = SIS.PAK.pakPO.UpdateData(Results)
+      '===============================
       'If Results.POTypeID = pakErpPOTypes.ISGECEngineered Then
+      '==============================
       'Create WebUser for supplier
       ''WebLoginID
       Dim LoginID As String = Results.SupplierID.Substring(1, 8).Trim
