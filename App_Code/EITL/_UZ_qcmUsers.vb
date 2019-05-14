@@ -72,7 +72,7 @@ Namespace SIS.QCM
       Dim oUsr As MembershipUser = Membership.GetUser(oUser.UserName)
       Dim Password As String = ""
       If oUsr Is Nothing Then
-        Password = IO.Path.GetRandomFileName()
+        Password = oUser.UserName 'IO.Path.GetRandomFileName()
         oUsr = Membership.CreateUser(oUser.UserName, Password)
       End If
       Return Password
