@@ -324,7 +324,7 @@
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Supplier" SortExpression="VR_BusinessPartner9_BPName">
           <ItemTemplate>
-             <asp:Label ID="L_SupplierID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("SupplierID") %>' Text='<%# Eval("VR_BusinessPartner9_BPName") %>'></asp:Label>
+             <asp:Button ID="L_SupplierID" runat="server" ForeColor='<%# EVal("ForeColor") %>' BorderStyle="None" BackColor="Transparent" style="cursor:pointer;" Font-Underline="true" Title='<%# EVal("SupplierID") %>' Text='<%# Eval("VR_BusinessPartner9_BPName") %>' CommandName="lgEmailIDs" CommandArgument='<%# Container.DataItemIndex %>'></asp:Button>
           </ItemTemplate>
           <HeaderStyle Width="200px" />
         </asp:TemplateField>
@@ -338,7 +338,21 @@
           <ItemTemplate>
              <asp:Label ID="L_POStatusID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("POStatusID") %>' Text='<%# Eval("PAK_POStatus6_Description") %>'></asp:Label>
           </ItemTemplate>
-          <HeaderStyle Width="150px" />
+          <HeaderStyle Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="RESET PW">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdResetWF" ValidationGroup='<%# "Reset" & Container.DataItemIndex %>' CausesValidation="true" runat="server" AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Reset Supplier Password and Send E-Mail" SkinID="reset" OnClientClick='<%# "return Page_ClientValidate(""Reset" & Container.DataItemIndex & """) && confirm(""Reset Supplier Password to same as Login ID and send E-Mail ?"");" %>' CommandName="ResetWF" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="UPD">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdUpdateWF" ValidationGroup='<%# "Update" & Container.DataItemIndex %>' CausesValidation="true" runat="server" AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Update PO from ERP" SkinID="update" OnClientClick='<%# "return Page_ClientValidate(""Update" & Container.DataItemIndex & """) && confirm(""Update PO to Latest version in ERP ?"");" %>' CommandName="UpdateWF" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="BOM VRF">
           <ItemTemplate>
@@ -412,7 +426,42 @@
     <asp:AsyncPostBackTrigger ControlID="F_BuyerID" />
     <asp:AsyncPostBackTrigger ControlID="F_POTypeID" />
   </Triggers>
+
 </asp:UpdatePanel>
 </div>
 </div>
+  <asp:UpdatePanel runat="server">
+    <ContentTemplate>
+  <asp:Panel ID="pnl1" runat="server" Style="background-color:white;display: none;height:226px" Width='400px'   >
+    <asp:Panel ID="pnlHeader" runat="server" style="width:100%;height:33px;padding-top:8px;text-align:center;border-bottom:1pt solid lightgray;" >
+      <asp:Label ID="HeaderText" runat="server" Font-Size="16px" Font-Bold="true" Text='My Modal Text'></asp:Label>
+    </asp:Panel>
+    <asp:Panel ID="modalContent" runat="server" style="width:100%;height:136px;padding:4px;">
+      <asp:Label ID="L_EMailID" runat="server" Text="Update Supplier E-Mail IDs:" Font-Bold="true" Width="392px"></asp:Label>
+      <asp:TextBox ID="F_EMailIDs" runat="server" Width="386px" Height="100px" TextMode="MultiLine" onfocus="this.select();"></asp:TextBox>
+    </asp:Panel>
+    <asp:Panel ID="pnlFooter" runat="server" style="width:100%;height:33px;padding-top:8px;text-align:right;border-top:1pt solid lightgray;">
+      <asp:Label ID="L_PrimaryKey" runat="server" style="display:none;"></asp:Label>
+      <asp:Button ID="cmdOK" runat="server" Width="70px" Text="OK" style="text-align:center;margin-right:30px;" />
+      <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancle" style="text-align:center;margin-right:30px;" />
+    </asp:Panel>
+  </asp:Panel>
+<asp:Button ID="dummy" runat="server" style="display:none;" Text="show"></asp:Button>
+<AJX:ModalPopupExtender 
+  ID="mPopup" 
+  BehaviorID="myMPE1"
+  TargetControlID="dummy" 
+  BackgroundCssClass="modalBackground" 
+  CancelControlID="cmdCancel" 
+  OkControlID="cmdCancel" 
+  PopupControlID="pnl1" 
+  PopupDragHandleControlID="pnlHeader" 
+  DropShadow="true"
+  runat="server">
+</AJX:ModalPopupExtender>
+    </ContentTemplate>
+  <Triggers>
+    <asp:AsyncPostBackTrigger ControlID="cmdOK" EventName="Click" />
+  </Triggers>
+  </asp:UpdatePanel>
 </asp:Content>

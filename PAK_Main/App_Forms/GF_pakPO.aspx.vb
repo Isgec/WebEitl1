@@ -5,6 +5,8 @@ Imports OfficeOpenXml
 Imports System.Web.Script.Serialization
 Partial Class GF_pakPO
   Inherits SIS.SYS.GridBase
+  Private SerialNo As Integer = 0
+  Private ShowPopup As Boolean = False
   Protected Sub GVpakPO_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakPO.RowCommand
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
@@ -12,6 +14,46 @@ Partial Class GF_pakPO
         Dim RedirectUrl As String = TBLpakPO.EditUrl & "?SerialNo=" & SerialNo
         Response.Redirect(RedirectUrl)
       Catch ex As Exception
+      End Try
+    End If
+    If e.CommandName.ToLower = "UpdateWF".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+        Select Case PO.POTypeID
+          Case pakErpPOTypes.Package
+            SIS.PAK.erpData.erpPO.ImportFromERP("", PO.PONumber)
+          Case pakErpPOTypes.ISGECEngineered
+            SIS.PAK.erpData.erpPO.ImportFromERP("", PO.PONumber, False, True)
+          Case pakErpPOTypes.Boughtout
+            SIS.PAK.erpData.erpPO.ImportFromERP("", PO.PONumber, False, False, True)
+        End Select
+        GVpakPO.DataBind()
+      Catch ex As Exception
+        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+        Dim script As String = String.Format("alert({0});", message)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+      End Try
+    End If
+    If e.CommandName.ToLower = "ResetWF".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        SIS.PAK.Alerts.ResetAndSendPasswordToSupplier(SerialNo)
+        GVpakPO.DataBind()
+      Catch ex As Exception
+        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+        Dim script As String = String.Format("alert({0});", message)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+      End Try
+    End If
+    If e.CommandName.ToLower = "lgEMailIDs".ToLower Then
+      Try
+        SerialNo = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        ShowPopup = True
+      Catch ex As Exception
+        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+        Dim script As String = String.Format("alert({0});", message)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
       End Try
     End If
     If e.CommandName.ToLower = "initiatewf".ToLower Then
@@ -533,7 +575,6 @@ Partial Class GF_pakPO
     End Try
 
   End Sub
-
   Private Sub cmdIsgec_Click(sender As Object, e As EventArgs) Handles cmdIsgec.Click
     Try
       If F_PONumber.Text = "" Then Throw New Exception("PO Number is Blank.")
@@ -544,9 +585,7 @@ Partial Class GF_pakPO
       Dim script As String = String.Format("alert({0});", message)
       ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
     End Try
-
   End Sub
-
   Private Sub cmdBoughtout_Click(sender As Object, e As EventArgs) Handles cmdBoughtout.Click
     Try
       If F_PONumber.Text = "" Then Throw New Exception("PO Number is Blank.")
@@ -557,5 +596,26 @@ Partial Class GF_pakPO
       Dim script As String = String.Format("alert({0});", message)
       ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
     End Try
+  End Sub
+  Private Sub GF_pakPO_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
+    If ShowPopup Then
+      Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+      Dim Supplier As SIS.PAK.pakBusinessPartner = PO.FK_PAK_SupplierID
+      L_PrimaryKey.Text = Supplier.BPID
+      HeaderText.Text = Supplier.BPName
+      F_EMailIDs.Text = Supplier.EMailID
+      mPopup.Show()
+    End If
+  End Sub
+  Private Sub cmdOK_Click(sender As Object, e As EventArgs) Handles cmdOK.Click
+    Dim SupplierID As String = L_PrimaryKey.Text
+    If SupplierID <> "" Then
+      Dim EMailIDs As String = F_EMailIDs.Text
+      If EMailIDs <> "" Then
+        Dim BP As SIS.PAK.pakBusinessPartner = SIS.PAK.pakBusinessPartner.pakBusinessPartnerGetByID(SupplierID)
+        BP.EMailID = EMailIDs
+        SIS.PAK.pakBusinessPartner.UpdateData(BP)
+      End If
+    End If
   End Sub
 End Class

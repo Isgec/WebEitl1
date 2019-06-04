@@ -10,6 +10,94 @@ Imports System.Web.UI.WebControls
 Imports System.Text
 Namespace SIS.PAK
   Public Class Alerts
+    Public Shared Sub ResetAndSendPasswordToSupplier(ByVal SerialNo As Integer)
+      Dim oPO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+      Dim oClient As SmtpClient = New SmtpClient("192.9.200.214", 25)
+      oClient.Credentials = New Net.NetworkCredential("adskvaultadmin", "isgec@123")
+      Dim oMsg As System.Net.Mail.MailMessage = New System.Net.Mail.MailMessage()
+      With oMsg
+        Try
+          Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(",;".ToCharArray)
+          For Each tmp As String In aIDs
+            .To.Add(New MailAddress(tmp.Trim, tmp.Trim))
+          Next
+        Catch ex As Exception
+          .To.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
+        End Try
+        .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
+        .Subject = "Authorization Details to access PO Issued from ISGEC"
+        .IsBodyHtml = True
+
+
+        Dim oTbl As New Table
+        oTbl.GridLines = GridLines.Both
+        oTbl.Width = 900
+        oTbl.Style.Add("text-align", "left")
+        oTbl.Style.Add("font", "Tahoma")
+
+        Dim oCol As TableCell = Nothing
+        Dim oRow As TableRow = Nothing
+        '1.
+        oRow = New TableRow
+        oCol = New TableCell
+        oCol.Text = "Login Detail"
+        oCol.Style.Add("text-align", "center")
+        oCol.Font.Size = "14"
+        oRow.Cells.Add(oCol)
+        oTbl.Rows.Add(oRow)
+
+        oRow = New TableRow
+        oCol = New TableCell
+        Dim supplierID As String = oPO.SupplierID.Substring(1, 8)
+        SIS.QCM.qcmUsers.ChangePassword(supplierID, supplierID)
+        oCol.Text = "Dear Supplier, <br /><br /> Your password has been reset."
+        oCol.Text &= "<br /><b>URL:</b> http://cloud.isgec.co.in/WebEitl1"
+        oCol.Text &= "<br /><b>User ID:</b> " & supplierID
+        oCol.Text &= "<br /><b>Password:</b> " & supplierID
+        oCol.Style.Add("text-align", "left")
+        oCol.Font.Size = "10"
+        oRow.Cells.Add(oCol)
+        oTbl.Rows.Add(oRow)
+
+
+        Dim sb As StringBuilder = New StringBuilder()
+        Dim sw As IO.StringWriter = New IO.StringWriter(sb)
+        Dim writer As HtmlTextWriter = New HtmlTextWriter(sw)
+        Try
+          oTbl.RenderControl(writer)
+        Catch ex As Exception
+        End Try
+        Dim Header As String = ""
+        Header = Header & "<html xmlns=""http://www.w3.org/1999/xhtml"">"
+        Header = Header & "<head>"
+        Header = Header & "<title></title>"
+        Header = Header & "<style>"
+        Header = Header & "body{margin: 10px auto auto 60px;}"
+        Header = Header & ".tblHd, .tblHd td{font-size: 12px;font-weight: bold;height: 30px !important;background-color:lightgray;}"
+        Header = Header & "table{"
+        Header = Header & "border: solid 1pt black;"
+        Header = Header & "border-collapse:collapse;"
+        Header = Header & "font-family: Tahoma;}"
+
+        Header = Header & "td{padding-left: 4px;"
+        Header = Header & "border: solid 1pt black;"
+        Header = Header & "font-family: Tahoma;"
+        Header = Header & "font-size: 9px;"
+        Header = Header & "vertical-align:top;}"
+
+        Header = Header & "</style>"
+        Header = Header & "</head>"
+        Header = Header & "<body>"
+        Header = Header & sb.ToString
+        Header = Header & "</body></html>"
+        .Body = Header
+      End With
+      Try
+        oClient.Send(oMsg)
+      Catch ex As Exception
+      End Try
+    End Sub
+
     Public Shared Function TCAlert(ByVal PONo As Integer, ByVal AlertEvent As pakTCAlertEvents, Optional ByVal ItemNo As Integer = 0, Optional ByVal UploadNo As Integer = 0) As Boolean
       Dim oPO As SIS.PAK.pakTCPO = Nothing
       Dim oItm As SIS.PAK.pakTCPOL = Nothing
