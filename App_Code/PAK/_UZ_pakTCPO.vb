@@ -48,7 +48,7 @@ Namespace SIS.PAK
               End If
             End If
             Select Case erpStatus
-              Case "4"
+              Case "4", "6"
                 NewStatus = pakTCUploadStates.CommentSubmitted
               Case "5"
                 NewStatus = pakTCUploadStates.TechnicallyCleared

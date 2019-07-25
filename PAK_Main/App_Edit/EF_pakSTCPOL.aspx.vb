@@ -143,9 +143,9 @@ Partial Class EF_pakSTCPOL
       .SerialNo = SerialNo
       .ItemNo = ItemNo
       .UploadNo = UploadNo
-      .DocumentID = "Vendor Document"
+      .DocumentID = "VENDOR DOCUMENT"
       .DocumentDescription = "Uploaded By Vendor"
-      .DocumentRev = "XX"
+      .DocumentRev = "00"
       .FileName = "NA"
       .DiskFileName = "NA"
       .ERPDocSerialNo = 1

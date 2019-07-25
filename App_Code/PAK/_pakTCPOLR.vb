@@ -418,7 +418,7 @@ Namespace SIS.PAK
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "sppakTCPOLRInsert"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentCategoryID",SqlDbType.Int,11, Iif(Record.DocumentCategoryID= "" ,Convert.DBNull, Record.DocumentCategoryID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentCategoryID", SqlDbType.Int, 11, IIf(Record.DocumentCategoryID = "", 1, Record.DocumentCategoryID))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn",SqlDbType.DateTime,21, Iif(Record.CreatedOn= "" ,Convert.DBNull, Record.CreatedOn))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceiptNo",SqlDbType.NVarChar,10, Record.ReceiptNo)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RevisionNo",SqlDbType.NVarChar,21, Record.RevisionNo)
