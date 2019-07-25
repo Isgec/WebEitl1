@@ -4,6 +4,7 @@
 ''' Note that you have to choose a network-drive-letter (e.g.: X:)
 ''' </summary>
 ''' <remarks>It's just a little bit of code, there are no error handlers. A CMD is needed. Maybe later I'll build up this dll.</remarks>
+''' Note
 Public Class ConnectToNetworkFunctions
 
   ''' <summary>
