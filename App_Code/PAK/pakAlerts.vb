@@ -130,8 +130,8 @@ Namespace SIS.PAK
                 .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .From = New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID, oPO.FK_PAK_PO_IssuedBy.UserFullName)
-                .CC.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID, oPO.FK_PAK_PO_IssuedBy.UserFullName))
+                .From = New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID.Trim, oPO.FK_PAK_PO_IssuedBy.UserFullName)
+                .CC.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID.Trim, oPO.FK_PAK_PO_IssuedBy.UserFullName))
               End If
               'CC to Buyer
               If oPO.FK_PAK_PO_BuyerID.EMailID = String.Empty Then
@@ -139,7 +139,7 @@ Namespace SIS.PAK
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
                 If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
-                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID.Trim, oPO.FK_PAK_PO_BuyerID.UserFullName))
                 End If
               End If
               'Default CC Include
@@ -156,9 +156,9 @@ Namespace SIS.PAK
               aErr.Add(oPO.SupplierID & " " & oPO.FK_PAK_SupplierID.BPName)
               .To.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
             Else
-              Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(",".ToCharArray)
+              Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(";,".ToCharArray)
               For Each tmp As String In aIDs
-                .To.Add(New MailAddress(tmp, tmp))
+                .To.Add(New MailAddress(tmp.Trim, tmp.Trim))
               Next
             End If
             'End of Supplier ID
@@ -179,8 +179,8 @@ Namespace SIS.PAK
                 .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .From = New MailAddress(oPO.FK_PAK_SupplierID.EMailID, oPO.FK_PAK_SupplierID.BPName)
-                .CC.Add(New MailAddress(oPO.FK_PAK_SupplierID.EMailID, oPO.FK_PAK_SupplierID.BPName))
+                .From = New MailAddress(oPO.FK_PAK_SupplierID.EMailID.Trim, oPO.FK_PAK_SupplierID.BPName)
+                .CC.Add(New MailAddress(oPO.FK_PAK_SupplierID.EMailID.Trim, oPO.FK_PAK_SupplierID.BPName))
               End If
               'End of Supplier ID
             Catch ex As Exception
@@ -194,7 +194,7 @@ Namespace SIS.PAK
                 aErr.Add(oPO.IssuedBy & " " & oPO.FK_PAK_PO_IssuedBy.UserFullName)
                 .To.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .To.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID, oPO.FK_PAK_PO_IssuedBy.UserFullName))
+                .To.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID.Trim, oPO.FK_PAK_PO_IssuedBy.UserFullName))
               End If
               'Include Buyer
               If oPO.FK_PAK_PO_BuyerID.EMailID = String.Empty Then
@@ -202,7 +202,7 @@ Namespace SIS.PAK
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
                 If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
-                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID.Trim, oPO.FK_PAK_PO_BuyerID.UserFullName))
                 End If
               End If
             Catch ex As Exception
@@ -233,12 +233,14 @@ Namespace SIS.PAK
               eunt = "EU220"
             Case "P501"
               eunt = "EU240"
+            Case "P250"
+              eunt = "EU250"
           End Select
 
           Dim Users As List(Of SIS.PAK.erpData.erpEnggGroup) = SIS.PAK.erpData.erpEnggGroup.GetFromERP(eunt, oPO.ProjectID)
           For Each usr As SIS.PAK.erpData.erpEnggGroup In Users
             Try
-              Dim ad As MailAddress = New MailAddress(usr.EMailID, usr.EmpName)
+              Dim ad As MailAddress = New MailAddress(usr.EMailID.Trim, usr.EmpName)
               If Not .CC.Contains(ad) Then
                 .CC.Add(ad)
               End If
@@ -361,9 +363,9 @@ Namespace SIS.PAK
       Dim oMsg As System.Net.Mail.MailMessage = New System.Net.Mail.MailMessage()
       With oMsg
         Try
-          Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(",".ToCharArray)
+          Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(";,".ToCharArray)
           For Each tmp As String In aIDs
-            .To.Add(New MailAddress(tmp, tmp))
+            .To.Add(New MailAddress(tmp.Trim, tmp.Trim))
           Next
 
         Catch ex As Exception
@@ -455,8 +457,8 @@ Namespace SIS.PAK
                 .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .From = New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID, oPO.FK_PAK_PO_IssuedBy.UserFullName)
-                .CC.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID, oPO.FK_PAK_PO_IssuedBy.UserFullName))
+                .From = New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID.Trim, oPO.FK_PAK_PO_IssuedBy.UserFullName)
+                .CC.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID.Trim, oPO.FK_PAK_PO_IssuedBy.UserFullName))
               End If
               'CC to Buyer
               If oPO.FK_PAK_PO_BuyerID.EMailID = String.Empty Then
@@ -464,7 +466,7 @@ Namespace SIS.PAK
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
                 If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
-                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID.Trim, oPO.FK_PAK_PO_BuyerID.UserFullName))
                 End If
               End If
               'Default CC Include
@@ -480,9 +482,9 @@ Namespace SIS.PAK
               aErr.Add(oPO.SupplierID & " " & oPO.FK_PAK_SupplierID.BPName)
               .To.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
             Else
-              Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(",".ToCharArray)
+              Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(";,".ToCharArray)
               For Each tmp As String In aIDs
-                .To.Add(New MailAddress(tmp, "<" & tmp & ">"))
+                .To.Add(New MailAddress(tmp.Trim, "<" & tmp.Trim & ">"))
               Next
             End If
             'End of Supplier ID
@@ -505,8 +507,8 @@ Namespace SIS.PAK
                 .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .From = New MailAddress(oPO.FK_PAK_SupplierID.EMailID, oPO.FK_PAK_SupplierID.BPName)
-                .CC.Add(New MailAddress(oPO.FK_PAK_SupplierID.EMailID, oPO.FK_PAK_SupplierID.BPName))
+                .From = New MailAddress(oPO.FK_PAK_SupplierID.EMailID.Trim, oPO.FK_PAK_SupplierID.BPName)
+                .CC.Add(New MailAddress(oPO.FK_PAK_SupplierID.EMailID.Trim, oPO.FK_PAK_SupplierID.BPName))
               End If
               'End of Supplier ID
             Catch ex As Exception
@@ -520,7 +522,7 @@ Namespace SIS.PAK
                 aErr.Add(oPO.IssuedBy & " " & oPO.FK_PAK_PO_IssuedBy.UserFullName)
                 .To.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .To.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID, oPO.FK_PAK_PO_IssuedBy.UserFullName))
+                .To.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID.Trim, oPO.FK_PAK_PO_IssuedBy.UserFullName))
               End If
               'Include Buyer
               If oPO.FK_PAK_PO_BuyerID.EMailID = String.Empty Then
@@ -528,7 +530,7 @@ Namespace SIS.PAK
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
                 If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
-                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID, oPO.FK_PAK_PO_BuyerID.UserFullName))
+                  .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID.Trim, oPO.FK_PAK_PO_BuyerID.UserFullName))
                 End If
               End If
             Catch ex As Exception
@@ -551,7 +553,7 @@ Namespace SIS.PAK
         Dim Users As List(Of SIS.EITL.eitlProjectWiseUser) = SIS.EITL.eitlProjectWiseUser.GetByProjectID(oPO.ProjectID, "")
         For Each usr As SIS.EITL.eitlProjectWiseUser In Users
           Try
-            Dim ad As MailAddress = New MailAddress(usr.FK_EITL_ProjectWiseUser_UserID.EMailID, usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
+            Dim ad As MailAddress = New MailAddress(usr.FK_EITL_ProjectWiseUser_UserID.EMailID.Trim, usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
             If Not .CC.Contains(ad) Then
               .CC.Add(ad)
             End If

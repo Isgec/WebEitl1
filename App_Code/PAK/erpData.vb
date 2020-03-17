@@ -410,7 +410,7 @@ Namespace SIS.PAK
         Sql &= "  where apo.t_work = 3 "
         Sql &= "  and apo.t_vrsn = (select max(tmp.t_vrsn) from ttdmsl400200 tmp where tmp.t_orno=apo.t_orno) "
         If PODivision <> "0" Then
-          Sql &= "  and substring(apo.t_orno+'ZZ',2,1) = '" & PODivision & "'"
+          'Sql &= "  and substring(apo.t_orno+'ZZ',2,1) = '" & PODivision & "'"
         End If
         If ProjectID <> String.Empty Then
           Sql &= "  and lpo.t_cprj = '" & ProjectID & "'"
@@ -427,7 +427,9 @@ Namespace SIS.PAK
             Con.Open()
             Dim Reader As SqlDataReader = Cmd.ExecuteReader()
             While (Reader.Read())
-              Results.Add(New SIS.PAK.pakPO(Reader))
+              Dim x As New SIS.PAK.pakPO(Reader)
+              x.DivisionID = PODivision
+              Results.Add(x)
             End While
             Reader.Close()
           End Using

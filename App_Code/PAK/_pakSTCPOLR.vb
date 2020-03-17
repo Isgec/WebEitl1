@@ -94,7 +94,7 @@ Namespace SIS.PAK
     Public Shared Function pakSTCPOLRUpdate(ByVal Record As SIS.PAK.pakSTCPOLR) As SIS.PAK.pakSTCPOLR
       Dim _Rec As SIS.PAK.pakSTCPOLR = SIS.PAK.pakSTCPOLR.pakSTCPOLRGetByID(Record.SerialNo, Record.ItemNo, Record.UploadNo)
       With _Rec
-        .DocumentCategoryID = Record.DocumentCategoryID
+        '.DocumentCategoryID = Record.DocumentCategoryID
         .UploadRemarks = Record.UploadRemarks
         .UploadStatusID = Record.UploadStatusID
         .RevisionNo = Record.RevisionNo

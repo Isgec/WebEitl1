@@ -118,34 +118,34 @@
                         runat="server" />
                     </td>
                   </tr>
-                  <%--      <tr>
-        <td class="alignright">
-          <asp:Label ID="L_ItemPrice" runat="server" Text="Price :" />&nbsp;
-        </td>
-        <td>
-          <asp:TextBox ID="F_ItemPrice"
-            Text='<%# Bind("ItemPrice") %>'
-            ToolTip="Value of Price."
-            Enabled = "False"
-            Width="176px"
-            CssClass = "dmytxt"
-            style="text-align: right"
-            runat="server" />
-        </td>
-        <td class="alignright">
-          <asp:Label ID="L_ItemAmount" runat="server" Text="Amount :" />&nbsp;
-        </td>
-        <td>
-          <asp:TextBox ID="F_ItemAmount"
-            Text='<%# Bind("ItemAmount") %>'
-            ToolTip="Value of Amount."
-            Enabled = "False"
-            Width="176px"
-            CssClass = "dmytxt"
-            style="text-align: right"
-            runat="server" />
-        </td>
-      </tr>--%>
+                  <%--<tr>
+                    <td class="alignright">
+                      <asp:Label ID="L_ItemPrice" runat="server" Text="Price :" />&nbsp;
+                    </td>
+                    <td>
+                      <asp:TextBox ID="F_ItemPrice"
+                        Text='<%# Bind("ItemPrice") %>'
+                        ToolTip="Value of Price."
+                        Enabled = "False"
+                        Width="176px"
+                        CssClass = "dmytxt"
+                        style="text-align: right"
+                        runat="server" />
+                    </td>
+                    <td class="alignright">
+                      <asp:Label ID="L_ItemAmount" runat="server" Text="Amount :" />&nbsp;
+                    </td>
+                    <td>
+                      <asp:TextBox ID="F_ItemAmount"
+                        Text='<%# Bind("ItemAmount") %>'
+                        ToolTip="Value of Amount."
+                        Enabled = "False"
+                        Width="176px"
+                        CssClass = "dmytxt"
+                        style="text-align: right"
+                        runat="server" />
+                    </td>
+                  </tr>--%>
                   <tr>
                     <td class="alignright">
                       <asp:Label ID="L_ItemElement" runat="server" Text="Element :" />&nbsp;
@@ -196,40 +196,40 @@
                 <div class="pagedata">
                   <asp:UpdatePanel ID="UPNLpakSTCPOLR" runat="server">
                     <ContentTemplate>
-                      <%--    <table>
-      <tr>
-        <td style="display:none">
-          <asp:Label runat="server" Font-Bold="true" ForeColor="BlueViolet" style="margin: 10px 10px auto 10px" Text="Step 2: Upload document template file." ></asp:Label>
-        </td>
-        <td>
-          <asp:Label ID="Label1" runat="server" Font-Bold="true" ForeColor="BlueViolet" style="margin: 10px 10px auto 10px" Text="Upload / attach document file(s)." ></asp:Label>
-        </td>
-      </tr>
-      <tr>
-        <td style="text-align:center;display:none">
-          <asp:UpdatePanel ID="UpdatePanel1" runat="server">
-            <ContentTemplate>
-              <asp:FileUpload ID="F_FileUpload" runat="server" Width="150px" ToolTip="Browse Item Template" />
-              <asp:Button ID="cmdFileUpload" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="tmplUpload" CommandArgument='<%# Eval("PrimaryKey") %>' />
-            </ContentTemplate>
-            <Triggers>
-              <asp:PostBackTrigger ControlID="cmdFileUpload" />
-            </Triggers>
-          </asp:UpdatePanel>
-        </td>
-        <td style="text-align:center">
-          <asp:UpdatePanel ID="UpdatePanelBulk" runat="server">
-            <ContentTemplate>
-              <input type="file" id="F_FileUploadBulk" name="files[]" multiple="multiple" style="width: 250px" title="Browse Document Files" />
-              <asp:Button ID="cmdFileUploadBulk" Text="Upload" runat="server" ToolTip="Click to upload document files." CommandName="filesUpload" CommandArgument='<%# Eval("PrimaryKey") %>' OnClientClick="showProcessingMPV();" />
-            </ContentTemplate>
-            <Triggers>
-              <asp:PostBackTrigger ControlID="cmdFileUploadBulk" />
-            </Triggers>
-          </asp:UpdatePanel>
-        </td>
-      </tr>
-    </table>--%>
+                      <%--<table>
+                        <tr>
+                          <td style="display:none">
+                            <asp:Label runat="server" Font-Bold="true" ForeColor="BlueViolet" style="margin: 10px 10px auto 10px" Text="Step 2: Upload document template file." ></asp:Label>
+                          </td>
+                          <td>
+                            <asp:Label ID="Label1" runat="server" Font-Bold="true" ForeColor="BlueViolet" style="margin: 10px 10px auto 10px" Text="Upload / attach document file(s)." ></asp:Label>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="text-align:center;display:none">
+                            <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                              <ContentTemplate>
+                                <asp:FileUpload ID="F_FileUpload" runat="server" Width="150px" ToolTip="Browse Item Template" />
+                                <asp:Button ID="cmdFileUpload" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="tmplUpload" CommandArgument='<%# Eval("PrimaryKey") %>' />
+                              </ContentTemplate>
+                              <Triggers>
+                                <asp:PostBackTrigger ControlID="cmdFileUpload" />
+                              </Triggers>
+                            </asp:UpdatePanel>
+                          </td>
+                          <td style="text-align:center">
+                            <asp:UpdatePanel ID="UpdatePanelBulk" runat="server">
+                              <ContentTemplate>
+                                <input type="file" id="F_FileUploadBulk" name="files[]" multiple="multiple" style="width: 250px" title="Browse Document Files" />
+                                <asp:Button ID="cmdFileUploadBulk" Text="Upload" runat="server" ToolTip="Click to upload document files." CommandName="filesUpload" CommandArgument='<%# Eval("PrimaryKey") %>' OnClientClick="showProcessingMPV();" />
+                              </ContentTemplate>
+                              <Triggers>
+                                <asp:PostBackTrigger ControlID="cmdFileUploadBulk" />
+                              </Triggers>
+                            </asp:UpdatePanel>
+                          </td>
+                        </tr>
+                      </table>--%>
                       <table width="100%">
                         <tr>
                           <td class="sis_formview">
@@ -267,13 +267,13 @@
                                   <ItemStyle CssClass="alignCenter" />
                                   <HeaderStyle HorizontalAlign="Center" Width="30px" />
                                 </asp:TemplateField>
-                                <%--        <asp:TemplateField HeaderText="Get Tmpl.">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdDownload" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Download Template File." SkinID="download" OnClientClick='<%# Eval("GetDownloadLink") %>' />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>--%>
+                                <%--<asp:TemplateField HeaderText="Get Tmpl.">
+                                  <ItemTemplate>
+                                    <asp:ImageButton ID="cmdDownload" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Download Template File." SkinID="download" OnClientClick='<%# Eval("GetDownloadLink") %>' />
+                                  </ItemTemplate>
+                                  <ItemStyle CssClass="alignCenter" />
+                                  <HeaderStyle HorizontalAlign="Center" Width="30px" />
+                                </asp:TemplateField>--%>
                                 <asp:TemplateField HeaderText="Upload No" SortExpression="UploadNo">
                                   <ItemTemplate>
                                     <asp:Label ID="LabelUploadNo" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("UploadNo") %>'></asp:Label>
@@ -281,9 +281,15 @@
                                   <ItemStyle CssClass="alignCenter" />
                                   <HeaderStyle CssClass="alignCenter" Width="40px" />
                                 </asp:TemplateField>
-                                <asp:TemplateField HeaderText="Document Category" SortExpression="PAK_POLineRecCategory4_Description">
+<%--                                <asp:TemplateField HeaderText="Document Category" SortExpression="PAK_POLineRecCategory4_Description">
                                   <ItemTemplate>
                                     <asp:Label ID="L_DocumentCategoryID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("DocumentCategoryID") %>' Text='<%# Eval("PAK_POLineRecCategory4_Description") %>'></asp:Label>
+                                  </ItemTemplate>
+                                  <HeaderStyle Width="100px" />
+                                </asp:TemplateField>--%>
+                                <asp:TemplateField HeaderText="Upload Remarks" SortExpression="UploadRemarks">
+                                  <ItemTemplate>
+                                    <asp:Label ID="L_UploadRemarks" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("UploadRemarks") %>' Text='<%# Eval("UploadRemarks") %>'></asp:Label>
                                   </ItemTemplate>
                                   <HeaderStyle Width="100px" />
                                 </asp:TemplateField>
@@ -311,7 +317,7 @@
                                 <asp:TemplateField HeaderText="Status" SortExpression="PAK_POLineRecStatus5_Description">
                                   <ItemTemplate>
                                     <asp:Label ID="L_UploadStatusID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("UploadStatusID") %>' Text='<%# Eval("PAK_POLineRecStatus5_Description") %>'></asp:Label>
-<%--                                    <asp:Label ID="Label1" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title="Download ISGEC Comments from attached documents." Text='<%# Eval("ShowERPStatus") %>'></asp:Label>--%>
+                                    <%--<asp:Label ID="Label1" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title="Download ISGEC Comments from attached documents." Text='<%# Eval("ShowERPStatus") %>'></asp:Label>--%>
                                   </ItemTemplate>
                                   <HeaderStyle Width="100px" />
                                 </asp:TemplateField>

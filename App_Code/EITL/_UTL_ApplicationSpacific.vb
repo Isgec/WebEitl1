@@ -15,7 +15,8 @@ Namespace SIS.SYS.Utilities
         HttpContext.Current.Session("IsSupplier") = True
         Return 0
       End If
-      Dim Results As String = ""
+      Dim Division As String = ""
+      Dim Department As String = ""
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
@@ -25,13 +26,14 @@ Namespace SIS.SYS.Utilities
           Con.Open()
           Dim Reader As SqlDataReader = Cmd.ExecuteReader()
           If Reader.Read() Then
-            Results = IIf(IsDBNull(Reader("C_DivisionID")), "", Reader("C_DivisionID"))
+            Division = IIf(IsDBNull(Reader("C_DivisionID")), "", Reader("C_DivisionID"))
+            Department = IIf(IsDBNull(Reader("C_DepartmentID")), "", Reader("C_DepartmentID"))
           End If
           Reader.Close()
         End Using
       End Using
       Dim mRet As Integer = 0
-      Select Case Results.ToUpper
+      Select Case Division.ToUpper
         Case "APCE"
           mRet = 4
         Case "BOILER", "BOI", "BOILE"
@@ -42,6 +44,10 @@ Namespace SIS.SYS.Utilities
           mRet = 5
         Case "SMD"
           mRet = 2
+      End Select
+      Select Case Department.ToUpper.Substring(0, 3)
+        Case "FGD"
+          mRet = 6
       End Select
       Return mRet
     End Function

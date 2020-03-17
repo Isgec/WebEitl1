@@ -14,7 +14,9 @@ Partial Class EF_ediWSTmtlH
   End Sub
 
   Private Sub EF_ediWTmtlH_PreInit(sender As Object, e As EventArgs) Handles Me.PreInit
-    SIS.SYS.Utilities.SessionManager.InitializeEnvironment("0340")
+    If HttpContext.Current.Session("LoginID") Is Nothing Then
+      SIS.SYS.Utilities.SessionManager.InitializeEnvironment("")
+    End If
   End Sub
 
 End Class
