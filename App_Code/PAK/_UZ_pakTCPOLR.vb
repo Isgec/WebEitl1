@@ -100,5 +100,53 @@ Namespace SIS.PAK
       End With
       Return sender
     End Function
+    Public Property PONumber As String = ""
+    Public Property ProjectID As String = ""
+    Public Property SupplierID As String = ""
+    Public Property BPName As String = ""
+    Public Property ProjectName As String = ""
+    Public Property ItemCode As String = ""
+    Public Property ItemDescription As String = ""
+
+    <DataObjectMethod(DataObjectMethodType.Select)>
+    Public Shared Function pakDisplayReceipt(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SupplierID As String, ByVal ProjectID As String, ByVal UploadStatusID As Int32) As List(Of SIS.PAK.pakTCPOLR)
+      Dim Results As List(Of SIS.PAK.pakTCPOLR) = Nothing
+      If OrderBy = "" Then OrderBy = "UploadNo DESC"
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          If SearchState Then
+            Cmd.CommandText = "sppak_LG_DisplayReceiptSearch"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
+          Else
+            Cmd.CommandText = "sppak_LG_DisplayReceiptFilteres"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SupplierID", SqlDbType.NVarChar, 9, IIf(SupplierID Is Nothing, String.Empty, SupplierID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_ProjectID", SqlDbType.NVarChar, 6, IIf(ProjectID Is Nothing, String.Empty, ProjectID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_UploadStatusID", SqlDbType.Int, 10, IIf(UploadStatusID = Nothing, 0, UploadStatusID))
+          End If
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DivisionID", SqlDbType.Int, 10, Global.System.Web.HttpContext.Current.Session("DivisionID"))
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          _RecordCount = -1
+          Results = New List(Of SIS.PAK.pakTCPOLR)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.PAK.pakTCPOLR(Reader))
+          End While
+          Reader.Close()
+          _RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
+      Return Results
+    End Function
+    Public Shared Function pakDisplayReceiptCount(ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SupplierID As String, ByVal ProjectID As String, ByVal UploadStatusID As Int32) As Integer
+      Return _RecordCount
+    End Function
+
   End Class
 End Namespace

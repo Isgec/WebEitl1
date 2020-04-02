@@ -1,7 +1,41 @@
 Imports System.Web.Script.Serialization
 Partial Class GF_pakTCPO
   Inherits SIS.SYS.GridBase
+  Private SerialNo As Integer = 0
+  Private ShowPopup As Boolean = False
+  Private Sub GF_pakTCPO_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
+    If ShowPopup Then
+      Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+      Dim Supplier As SIS.PAK.pakBusinessPartner = PO.FK_PAK_SupplierID
+      L_PrimaryKey.Text = Supplier.BPID
+      HeaderText.Text = Supplier.BPName
+      F_EMailIDs.Text = Supplier.EMailID
+      mPopup.Show()
+    End If
+  End Sub
+  Private Sub cmdOK_Click(sender As Object, e As EventArgs) Handles cmdOK.Click
+    Dim SupplierID As String = L_PrimaryKey.Text
+    If SupplierID <> "" Then
+      Dim EMailIDs As String = F_EMailIDs.Text
+      If EMailIDs <> "" Then
+        Dim BP As SIS.PAK.pakBusinessPartner = SIS.PAK.pakBusinessPartner.pakBusinessPartnerGetByID(SupplierID)
+        BP.EMailID = EMailIDs
+        SIS.PAK.pakBusinessPartner.UpdateData(BP)
+      End If
+    End If
+  End Sub
+
   Protected Sub GVpakTCPO_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakTCPO.RowCommand
+    If e.CommandName.ToLower = "lgEMailIDs".ToLower Then
+      Try
+        SerialNo = GVpakTCPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        ShowPopup = True
+      Catch ex As Exception
+        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+        Dim script As String = String.Format("alert({0});", message)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+      End Try
+    End If
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
         Dim SerialNo As Int32 = GVpakTCPO.DataKeys(e.CommandArgument).Values("SerialNo")

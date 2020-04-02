@@ -281,13 +281,13 @@
           <ItemStyle CssClass="alignCenter" />
         <HeaderStyle CssClass="alignCenter" Width="50px" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="PO Description" SortExpression="PODescription">
+<%--        <asp:TemplateField HeaderText="PO Description" SortExpression="PODescription">
           <ItemTemplate>
             <asp:Label ID="LabelPODescription" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("PODescription") %>'></asp:Label>
           </ItemTemplate>
           <ItemStyle CssClass="" />
         <HeaderStyle CssClass="" Width="100px" />
-        </asp:TemplateField>
+        </asp:TemplateField>--%>
         <asp:TemplateField HeaderText="PO Date" SortExpression="PODate">
           <ItemTemplate>
             <asp:Label ID="LabelPODate" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("PODate") %>'></asp:Label>
@@ -295,17 +295,28 @@
           <ItemStyle CssClass="alignCenter" />
         <HeaderStyle CssClass="alignCenter" Width="90px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="<div style='display:flex; flex-direction:column;'><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:royalblue;color:white;'>Items</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:gold;'>Receipts</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:crimson;color:white;'>Comments</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:limegreen;'>Cleared</div></div>" >
+          <ItemTemplate>
+            <div style="display:flex; flex-direction:row;">
+              <div class='btn-danger' title="Items" style='font-weight:bold;padding:5px;border-radius:10px;background-color:royalblue;color:white;'><%# Eval("GetItems") %></div>
+              <div class='btn-warning' title="IDMS Receipts" style='font-weight:bold;padding:5px;border-radius:10px;background-color:gold;'><%# Eval("GetReceipts") %></div>
+              <div class='btn-primary' title="Comment Submitted" style='font-weight:bold;padding:5px;border-radius:10px;background-color:crimson;color:white;'><%# Eval("GetComments") %></div>
+              <div class='btn-success' title="Technically Cleared" style='font-weight:bold;padding:5px;border-radius:10px;background-color:limegreen;'><%# Eval("GetCleared") %></div>
+            </div>
+          </ItemTemplate>
+          <HeaderStyle Width="60px" Font-Size="8px"/>
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="Supplier" SortExpression="VR_BusinessPartner9_BPName">
           <ItemTemplate>
              <asp:Label ID="L_SupplierID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("SupplierID") %>' Text='<%# Eval("VR_BusinessPartner9_BPName") %>'></asp:Label>
           </ItemTemplate>
-          <HeaderStyle Width="100px" />
+          <HeaderStyle Width="200px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Project" SortExpression="IDM_Projects4_Description">
           <ItemTemplate>
              <asp:Label ID="L_ProjectID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("ProjectID") %>' Text='<%# Eval("IDM_Projects4_Description") %>'></asp:Label>
           </ItemTemplate>
-          <HeaderStyle Width="100px" />
+          <HeaderStyle Width="200px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Status" SortExpression="PAK_POStatus6_Description">
           <ItemTemplate>
@@ -327,7 +338,7 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>--%>
-        <asp:TemplateField>
+<%--        <asp:TemplateField>
           <ItemTemplate>
              <asp:Label ID="L_U" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title="Uploaded by supplier" Text='<%# Eval("CountUploadedBySupplier") %>'></asp:Label>
           </ItemTemplate>
@@ -338,7 +349,7 @@
              <asp:Label ID="L_R" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title="Responede By Isgec" Text='<%# Eval("CountRespondedByIsgec") %>'></asp:Label>
           </ItemTemplate>
           <HeaderStyle Width="20px" />
-        </asp:TemplateField>
+        </asp:TemplateField>--%>
       </Columns>
       <EmptyDataTemplate>
         <asp:Label ID="LabelEmpty" runat="server" Font-Size="Small" ForeColor="Red" Text="No record found !!!"></asp:Label>

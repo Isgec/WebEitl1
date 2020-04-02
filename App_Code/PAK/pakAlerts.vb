@@ -179,8 +179,15 @@ Namespace SIS.PAK
                 .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .From = New MailAddress(oPO.FK_PAK_SupplierID.EMailID.Trim, oPO.FK_PAK_SupplierID.BPName)
-                .CC.Add(New MailAddress(oPO.FK_PAK_SupplierID.EMailID.Trim, oPO.FK_PAK_SupplierID.BPName))
+                Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(",;".ToCharArray)
+                Dim First As Boolean = True
+                For Each eid As String In aIDs
+                  If First Then
+                    .From = New MailAddress(eid.Trim, oPO.FK_PAK_SupplierID.BPName)
+                    First = False
+                  End If
+                  .CC.Add(New MailAddress(eid.Trim, eid.Trim))
+                Next
               End If
               'End of Supplier ID
             Catch ex As Exception

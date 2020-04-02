@@ -298,7 +298,7 @@ Namespace SIS.PAK
       End Try
       '7. Send TC Alert E-Mail
       Try
-        SIS.PAK.Alerts.TCAlert(SerialNo, pakAlertEvents.DocumentsDespatched, ItemNo, UploadNo)
+        SIS.PAK.Alerts.TCAlert(SerialNo, pakTCAlertEvents.DocumentsSubmitted, ItemNo, UploadNo)
       Catch ex As Exception
       End Try
       Return tmpRec

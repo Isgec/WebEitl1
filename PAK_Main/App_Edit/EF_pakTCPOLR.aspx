@@ -220,6 +220,17 @@
         <span style="color: #ff0033">Loading...</span>
       </ProgressTemplate>
     </asp:UpdateProgress>
+          <script type="text/javascript">
+            var pcnt = 0;
+            function show_attach(o) {
+              pcnt = pcnt + 1;
+              var nam = 'wTask' + pcnt;
+              var url = o.getAttribute('CommandValue');
+              //alert(url);
+              window.open(url, nam, 'left=20,top=20,width=1100,height=600,toolbar=1,resizable=1,scrollbars=1');
+              return false;
+            }
+          </script>
     <asp:GridView ID="GVpakTCPOLRD" SkinID="gv_silver" runat="server" DataSourceID="ODSpakTCPOLRD" DataKeyNames="SerialNo,ItemNo,UploadNo,DocSerialNo">
       <Columns>
         <asp:TemplateField HeaderText="EDIT">
@@ -231,7 +242,7 @@
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Open Attachment">
           <ItemTemplate>
-            <asp:ImageButton ID="cmdDownload" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Download Template File." SkinID="download" OnClientClick='<%# Eval("GetDownloadLink") %>' />
+            <asp:ImageButton ID="cmdDownload" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Download Template File." SkinID="download" OnClientClick="return show_attach(this);" CommandValue='<%# Eval("GetAttachLink") %>' />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />

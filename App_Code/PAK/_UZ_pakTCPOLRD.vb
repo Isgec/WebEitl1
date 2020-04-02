@@ -10,6 +10,26 @@ Namespace SIS.PAK
         Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Downloads/filedownload.aspx?stcpolrd=" & PrimaryKey & "', 'win" & DocSerialNo & "', 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1'); return false;"
       End Get
     End Property
+    Public ReadOnly Property GetAttachLink() As String
+      Get
+        Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
+        If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
+          UrlAuthority = "192.9.200.146"
+        End If
+        Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
+        mRet &= "/Attachment/Attachment.aspx?AthHandle=J_IDMSPOSTORDERREC"
+        Dim Index As String = SerialNo & "_" & ItemNo & "_" & UploadNo & "_" & DocSerialNo
+        Dim User As String = HttpContext.Current.Session("LoginID")
+        'User = 1
+        Dim canEdit As String = "n"
+        If Editable Then
+          canEdit = "y"
+        End If
+        mRet &= "&Index=" & Index & "&AttachedBy=" & User & "&ed=" & canEdit
+        Return mRet
+      End Get
+    End Property
+
     Public Function GetColor() As System.Drawing.Color
       Dim mRet As System.Drawing.Color = Drawing.Color.Blue
       If DiskFileName = "" Then

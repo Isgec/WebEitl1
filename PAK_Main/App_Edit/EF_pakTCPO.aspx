@@ -289,6 +289,16 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="80px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="<div style='display:flex; flex-direction:column;'><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:gold;'>Receipts</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:crimson;color:white;'>Comments</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:limegreen;'>Cleared</div></div>" >
+          <ItemTemplate>
+            <div style="display:flex; flex-direction:row;">
+              <div class='btn-warning' title="IDMS Receipts" style='font-weight:bold;padding:5px;border-radius:10px;background-color:gold;'><%# Eval("GetReceipts") %></div>
+              <div class='btn-primary' title="Comment Submitted" style='font-weight:bold;padding:5px;border-radius:10px;background-color:crimson;color:white;'><%# Eval("GetComments") %></div>
+              <div class='btn-success' title="Technically Cleared" style='font-weight:bold;padding:5px;border-radius:10px;background-color:limegreen;'><%# Eval("GetCleared") %></div>
+            </div>
+          </ItemTemplate>
+          <HeaderStyle Width="60px" Font-Size="8px"/>
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="Item Code" SortExpression="ItemCode">
           <ItemTemplate>
             <asp:Label ID="LabelItemCode" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("ItemCode") %>'></asp:Label>

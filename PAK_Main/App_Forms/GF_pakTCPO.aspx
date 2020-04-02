@@ -299,13 +299,13 @@
           <ItemStyle CssClass="alignCenter" />
         <HeaderStyle CssClass="alignCenter" Width="50px" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="PO Description" SortExpression="PODescription">
+<%--        <asp:TemplateField HeaderText="PO Description" SortExpression="PODescription">
           <ItemTemplate>
             <asp:Label ID="LabelPODescription" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("PODescription") %>'></asp:Label>
           </ItemTemplate>
           <ItemStyle CssClass="" />
         <HeaderStyle CssClass="" Width="100px" />
-        </asp:TemplateField>
+        </asp:TemplateField>--%>
         <asp:TemplateField HeaderText="PO Date" SortExpression="PODate">
           <ItemTemplate>
             <asp:Label ID="LabelPODate" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("PODate") %>'></asp:Label>
@@ -313,9 +313,20 @@
           <ItemStyle CssClass="alignCenter" />
         <HeaderStyle CssClass="alignCenter" Width="90px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="<div style='display:flex; flex-direction:column;'><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:royalblue;color:white;'>Items</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:gold;'>Receipts</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:crimson;color:white;'>Comments</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:limegreen;'>Cleared</div></div>" >
+          <ItemTemplate>
+            <div style="display:flex; flex-direction:row;">
+              <div class='btn-danger' title="Items" style='font-weight:bold;padding:5px;border-radius:10px;background-color:royalblue;color:white;'><%# Eval("GetItems") %></div>
+              <div class='btn-warning' title="IDMS Receipts" style='font-weight:bold;padding:5px;border-radius:10px;background-color:gold;'><%# Eval("GetReceipts") %></div>
+              <div class='btn-primary' title="Comment Submitted" style='font-weight:bold;padding:5px;border-radius:10px;background-color:crimson;color:white;'><%# Eval("GetComments") %></div>
+              <div class='btn-success' title="Technically Cleared" style='font-weight:bold;padding:5px;border-radius:10px;background-color:limegreen;'><%# Eval("GetCleared") %></div>
+            </div>
+          </ItemTemplate>
+          <HeaderStyle Width="60px" Font-Size="8px"/>
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="Supplier" SortExpression="VR_BusinessPartner9_BPName">
           <ItemTemplate>
-             <asp:Label ID="L_SupplierID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("SupplierID") %>' Text='<%# Eval("VR_BusinessPartner9_BPName") %>'></asp:Label>
+             <asp:Button ID="L_SupplierID" runat="server" ForeColor='<%# Eval("ForeColor") %>' BorderStyle="None" BackColor="Transparent" style="cursor:pointer;" Font-Underline="true" Title='<%# EVal("SupplierID") %>' Text='<%# Eval("VR_BusinessPartner9_BPName") %>' CommandName="lgEmailIDs" CommandArgument='<%# Container.DataItemIndex %>'></asp:Button>
           </ItemTemplate>
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
@@ -385,4 +396,39 @@
 </asp:UpdatePanel>
 </div>
 </div>
+  <asp:UpdatePanel runat="server">
+    <ContentTemplate>
+  <asp:Panel ID="pnl1" runat="server" Style="background-color:white;display: none;height:226px" Width='400px'   >
+    <asp:Panel ID="pnlHeader" runat="server" style="width:100%;height:33px;padding-top:8px;text-align:center;border-bottom:1pt solid lightgray;" >
+      <asp:Label ID="HeaderText" runat="server" Font-Size="16px" Font-Bold="true" Text='My Modal Text'></asp:Label>
+    </asp:Panel>
+    <asp:Panel ID="modalContent" runat="server" style="width:100%;height:136px;padding:4px;">
+      <asp:Label ID="L_EMailID" runat="server" Text="Update Supplier E-Mail IDs:" Font-Bold="true" Width="392px"></asp:Label>
+      <asp:TextBox ID="F_EMailIDs" runat="server" Width="386px" Height="100px" TextMode="MultiLine" onfocus="this.select();"></asp:TextBox>
+    </asp:Panel>
+    <asp:Panel ID="pnlFooter" runat="server" style="width:100%;height:33px;padding-top:8px;text-align:right;border-top:1pt solid lightgray;">
+      <asp:Label ID="L_PrimaryKey" runat="server" style="display:none;"></asp:Label>
+      <asp:Button ID="cmdOK" runat="server" Width="70px" Text="OK" style="text-align:center;margin-right:30px;" />
+      <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancle" style="text-align:center;margin-right:30px;" />
+    </asp:Panel>
+  </asp:Panel>
+<asp:Button ID="dummy" runat="server" style="display:none;" Text="show"></asp:Button>
+<AJX:ModalPopupExtender 
+  ID="mPopup" 
+  BehaviorID="myMPE1"
+  TargetControlID="dummy" 
+  BackgroundCssClass="modalBackground" 
+  CancelControlID="cmdCancel" 
+  OkControlID="cmdCancel" 
+  PopupControlID="pnl1" 
+  PopupDragHandleControlID="pnlHeader" 
+  DropShadow="true"
+  runat="server">
+</AJX:ModalPopupExtender>
+    </ContentTemplate>
+  <Triggers>
+    <asp:AsyncPostBackTrigger ControlID="cmdOK" EventName="Click" />
+  </Triggers>
+  </asp:UpdatePanel>
+
 </asp:Content>

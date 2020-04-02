@@ -36,7 +36,7 @@ Namespace SIS.SYS.Utilities
       Select Case Division.ToUpper
         Case "APCE"
           mRet = 4
-        Case "BOILER", "BOI", "BOILE"
+        Case "BOILER", "BOI", "BOILE", "ESP"
           mRet = 1
         Case "EPC"
           mRet = 3
@@ -45,10 +45,13 @@ Namespace SIS.SYS.Utilities
         Case "SMD"
           mRet = 2
       End Select
-      Select Case Department.ToUpper.Substring(0, 3)
-        Case "FGD"
-          mRet = 6
-      End Select
+      Try
+        Select Case Department.ToUpper.Substring(0, 3)
+          Case "FGD"
+            mRet = 6
+        End Select
+      Catch ex As Exception
+      End Try
       Return mRet
     End Function
     Public Shared Sub ApplicationReports(ByVal Context As HttpContext)

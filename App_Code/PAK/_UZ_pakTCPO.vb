@@ -5,6 +5,62 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.PAK
   Partial Public Class pakTCPO
+    Public ReadOnly Property GetItems As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Con.Open()
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = "select isnull(count(*),0) from PAK_POLine where SerialNo=" & SerialNo
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property GetReceipts As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Con.Open()
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = "select isnull(count(*),0) from PAK_POLineRec where SerialNo=" & SerialNo
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property GetComments As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Con.Open()
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = "select isnull(count(*),0) from PAK_POLineRec where SerialNo=" & SerialNo & " and uploadStatusid = 3 "
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property GetCleared As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Con.Open()
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = "select isnull(count(*),0) from PAK_POLineRec where SerialNo=" & SerialNo & " and uploadStatusid = 4 "
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
     Public ReadOnly Property GetPrintLink() As String
       Get
         Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
