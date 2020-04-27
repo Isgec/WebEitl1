@@ -1,5 +1,6 @@
 ﻿Imports System.Data.SqlClient
 Imports System.Data
+Imports ejiVault
 Namespace SIS.SYS.Utilities
 	Public Class ApplicationSpacific
     Public Shared Sub Initialize()
@@ -9,6 +10,11 @@ Namespace SIS.SYS.Utilities
         .Session("DivisionID") = GetDivision(HttpContext.Current.Session("LoginID"))
         .Session("IsSupplier") = False
       End With
+      EJI.DBCommon.BaaNLive = Convert.ToBoolean(ConfigurationManager.AppSettings("BaaNLive"))
+      EJI.DBCommon.JoomlaLive = Convert.ToBoolean(ConfigurationManager.AppSettings("JoomlaLive"))
+      EJI.DBCommon.ERPCompany = ConfigurationManager.AppSettings("ERPCompany")
+      EJI.DBCommon.IsLocalISGECVault = Convert.ToBoolean(ConfigurationManager.AppSettings("IsLocalISGECVault"))
+      EJI.DBCommon.ISGECVaultIP = ConfigurationManager.AppSettings("ISGECVaultIP")
     End Sub
     Public Shared Function GetDivision(ByVal CardNo As String) As Integer
       If CardNo.StartsWith("UP") AndAlso CardNo.Length >= 7 Then

@@ -4,7 +4,7 @@ Imports System.Data
 Imports System.Data.SqlClient
 Imports System.ComponentModel
 Imports System.Net
-
+Imports ejiVault
 Namespace SIS.PAK
   Partial Public Class pakSTCPOLR
     Private _FK_PAK_POLineRec_pakERPRecH As SIS.PAK.pakERPRecH = Nothing
@@ -319,26 +319,12 @@ Namespace SIS.PAK
       Dim Comp As String = "200"
       Dim AthHandleS As String = "J_IDMSPOSTORDERREC"
       Dim AthHandleT As String = "IDMSRECEIPTS_" & Comp
+      Dim CreatedBy As String = HttpContext.Current.Session("LoginID")
+      'Check and delete befor re-copy
+      EJI.ediAFile.DeleteDataByHandleIndex(AthHandleT, IndexT)
+      'Then Copy
+      EJI.ediAFile.FileCopy(AthHandleS, IndexS, AthHandleT, IndexT, CreatedBy)
 
-      Dim fileS As List(Of SIS.EDI.ediAFile) = SIS.EDI.ediAFile.ediAMultiFilesGetByHandleIndex(AthHandleS, IndexS)
-
-      If fileS.Count > 0 Then
-        'Check and delete befor re-copy
-        Dim fileT As List(Of SIS.EDI.ediAFile) = SIS.EDI.ediAFile.ediAMultiFilesGetByHandleIndex(AthHandleT, IndexT)
-        If fileT.Count > 0 Then
-          For Each ft As SIS.EDI.ediAFile In fileT
-            SIS.EDI.ediAFile.ediAFileDelete(ft)
-          Next
-        End If
-        'now copy
-        For Each fs As SIS.EDI.ediAFile In fileS
-          With fs
-            .t_hndl = AthHandleT
-            .t_indx = IndexT
-          End With
-          SIS.EDI.ediAFile.InsertData(fs)
-        Next
-      End If
     End Sub
     Private Shared Sub CopyAttachment_old(ByVal IndexS As String, ByVal IndexT As String)
       Dim xUrl As String = SIS.PAK.pakSTCPOLR.GetCopyLink()

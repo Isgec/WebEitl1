@@ -8,6 +8,8 @@ Namespace SIS.SYS.SQLDatabase
     Public Shared Property BaaNLive As Boolean = False
     Public Shared Property JoomlaLive As Boolean = False
     Public Shared Function GetBaaNConnectionString() As String
+      BaaNLive = Convert.ToBoolean(ConfigurationManager.AppSettings("BaaNLive"))
+
       If BaaNLive Then
         Return "Data Source=192.9.200.129;Initial Catalog=inforerpdb;Integrated Security=False;User Instance=False;Persist Security Info=True;User ID=lalit;Password=scorpions"
       Else
@@ -15,6 +17,7 @@ Namespace SIS.SYS.SQLDatabase
       End If
     End Function
     Public Shared Function GetConnectionString() As String
+      JoomlaLive = Convert.ToBoolean(ConfigurationManager.AppSettings("JoomlaLive"))
       If JoomlaLive Then
         Return "Data Source=192.9.200.150;Initial Catalog=IJTPerks;Integrated Security=False;User Instance=False;Persist Security Info=True;User ID=sa;Password=isgec12345"
       Else
