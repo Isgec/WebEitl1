@@ -244,7 +244,7 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle CssClass="alignCenter" Width="40px" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="PO Number" SortExpression="PONumber">
+        <asp:TemplateField HeaderText="PO No" SortExpression="PONumber">
           <ItemTemplate>
             <asp:Label ID="LabelPONumber" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("PONumber") %>'></asp:Label>
           </ItemTemplate>
@@ -265,6 +265,15 @@
           <ItemStyle CssClass="alignCenter" />
         <HeaderStyle CssClass="alignCenter" Width="90px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="<div style='display:flex; flex-direction:column;'><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:crimson;color:white;'>To ACK</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:limegreen;'>Get ACK</div></div>" >
+          <ItemTemplate>
+            <div style="display:flex; flex-direction:row;justify-content:center;">
+              <div class='btn-primary' title="You have to ACK." style='font-weight:bold;padding:5px;border-radius:10px;background-color:crimson;color:white;'><%# Eval("ToAckCount") %></div>
+              <div class='btn-success' title="You have to get ACK." style='font-weight:bold;padding:5px;border-radius:10px;background-color:limegreen;'><%# Eval("GetAckCount") %></div>
+            </div>
+          </ItemTemplate>
+          <HeaderStyle Width="60px" Font-Size="8px"/>
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="Supplier" SortExpression="VR_BusinessPartner9_BPName">
           <ItemTemplate>
              <asp:Label ID="L_SupplierID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("SupplierID") %>' Text='<%# Eval("VR_BusinessPartner9_BPName") %>'></asp:Label>
@@ -283,6 +292,21 @@
           </ItemTemplate>
           <HeaderStyle Width="100px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="FWD">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdSubmitWF" runat="server" Visible='<%# Eval("SubmitWFVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Submit for BOM verification." SkinID="forward" OnClientClick="return confirm('Submit for BOM verification ?');" CommandName="SubmitWF" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="FRZ">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdFreezeWF" runat="server" Visible='<%# Eval("FreezeWFVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Freeze PO BOM." SkinID="lock" OnClientClick="return confirm('Freeze BOM and enable PO for QC and Despatch ?');" CommandName="FreezeWF" CommandArgument='<%# Container.DataItemIndex %>' />
+            <asp:ImageButton ID="cmdUnFreezeWF" runat="server" Visible='<%# Eval("UnFreezeWFVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Un Freeze PO BOM." SkinID="unfreez" OnClientClick="return confirm('Un Freeze BOM and enable PO BOM for modification ?');" CommandName="UnFreezeWF" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
       </Columns>
       <EmptyDataTemplate>
         <asp:Label ID="LabelEmpty" runat="server" Font-Size="Small" ForeColor="Red" Text="No record found !!!"></asp:Label>
@@ -293,7 +317,7 @@
       runat = "server"
       DataObjectTypeName = "SIS.PAK.pakPO"
       OldValuesParameterFormatString = "original_{0}"
-      SelectMethod = "UZ_pakPOSelectList"
+      SelectMethod = "UZ_PackagePOSelectList"
       TypeName = "SIS.PAK.pakPO"
       SelectCountMethod = "pakPOSelectCount"
       SortParameterName="OrderBy" EnablePaging="True">

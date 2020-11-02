@@ -7,19 +7,8 @@ Partial Class AF_pakPOBIDocuments
   Protected Sub TBLpakPOBIDocuments_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles TBLpakPOBIDocuments.Init
     SetToolBar = TBLpakPOBIDocuments
   End Sub
-  Protected Sub ODSpakPOBIDocuments_Inserted(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.ObjectDataSourceStatusEventArgs) Handles ODSpakPOBIDocuments.Inserted
-    If e.Exception Is Nothing Then
-      Dim oDC As SIS.PAK.pakPOBIDocuments = CType(e.ReturnValue,SIS.PAK.pakPOBIDocuments)
-      Dim tmpURL As String = "?tmp=1"
-      tmpURL &= "&SerialNo=" & oDC.SerialNo
-      tmpURL &= "&BOMNo=" & oDC.BOMNo
-      tmpURL &= "&ItemNo=" & oDC.ItemNo
-      tmpURL &= "&DocNo=" & oDC.DocNo
-      TBLpakPOBIDocuments.AfterInsertURL &= tmpURL 
-    End If
-  End Sub
   Protected Sub FVpakPOBIDocuments_DataBound(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVpakPOBIDocuments.DataBound
-    SIS.PAK.pakPOBIDocuments.SetDefaultValues(sender, e) 
+    SIS.PAK.pakPOBIDocuments.SetDefaultValues(sender, e)
   End Sub
   Protected Sub FVpakPOBIDocuments_PreRender(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVpakPOBIDocuments.PreRender
     Dim oF_SerialNo_Display As Label  = FVpakPOBIDocuments.FindControl("F_SerialNo_Display")

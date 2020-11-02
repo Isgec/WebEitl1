@@ -59,8 +59,9 @@ Partial Class EF_pakPOBIEngg
     SetToolBar = TBLpakPOBItems
   End Sub
   Protected Sub FVpakPOBItems_PreRender(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVpakPOBItems.PreRender
-    TBLpakPOBItems.EnableSave = Editable
-    TBLpakPOBItems.EnableDelete = Deleteable
+    'Any update will through popup window
+    TBLpakPOBItems.EnableSave = False 'Editable
+    TBLpakPOBItems.EnableDelete = False 'Deleteable
     TBLpakPOBIDocuments.EnableAdd = Editable
 
     CType(FVpakPOBItems.FindControl("Opt1"), HtmlTableRow).Visible = Bottom

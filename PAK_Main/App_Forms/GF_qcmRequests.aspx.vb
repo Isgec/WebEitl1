@@ -17,6 +17,11 @@ Partial Class GF_qcmRequests
       Catch ex As Exception
       End Try
     End If
+    '===============
+    If 1 = 1 Then
+      Exit Sub
+    End If
+    '===============
     If e.CommandName.ToLower = "lgfwd".ToLower Then
       Try
         Dim RequestID As Int32 = GVqcmRequests.DataKeys(e.CommandArgument).Values("RequestID")
@@ -204,6 +209,11 @@ Partial Class GF_qcmRequests
   End Function
 
   Private Sub TBLqcmRequests_AddClicked(sender As Object, e As ImageClickEventArgs) Handles TBLqcmRequests.AddClicked
+    'To Desable
+    If 1 = 1 Then
+      Exit Sub
+    End If
+    '==========
     Try
       Dim SupplierID As String = "S" & HttpContext.Current.Session("LoginID")
       Dim tmpLast As SIS.QCM.qcmRequests = Nothing
@@ -264,8 +274,8 @@ Partial Class GF_qcmRequests
       Response.Redirect(RedirectUrl)
     Catch ex As Exception
       Dim message As String = New JavaScriptSerializer().Serialize(ex.Message)
-    Dim script As String = String.Format("alert({0});", message)
-    ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+      Dim script As String = String.Format("alert({0});", message)
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
     End Try
 
   End Sub

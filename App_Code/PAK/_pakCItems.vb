@@ -96,12 +96,14 @@ Namespace SIS.PAK
         .DocumentNo = Record.DocumentNo
       End With
       _Rec = SIS.PAK.pakCItems.InsertData(_Rec)
-      Dim tmpP As SIS.PAK.pakCItems = SIS.PAK.pakCItems.pakCItemsGetByID(_Rec.ParentItemNo, _Rec.ParentItemNo)
-      If tmpP IsNot Nothing Then
-        If Not tmpP.Root Then
-          tmpP.Middle = True
-          tmpP.Bottom = False
-          tmpP = UpdateData(tmpP)
+      If Not _Rec.Root Then
+        Dim tmpP As SIS.PAK.pakCItems = SIS.PAK.pakCItems.pakCItemsGetByID(_Rec.ParentItemNo, _Rec.ParentItemNo)
+        If tmpP IsNot Nothing Then
+          If Not tmpP.Root Then
+            tmpP.Middle = True
+            tmpP.Bottom = False
+            tmpP = UpdateData(tmpP)
+          End If
         End If
       End If
       Return _Rec

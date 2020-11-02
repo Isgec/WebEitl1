@@ -22,11 +22,11 @@ Partial Class GF_pakPO
         Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
         Select Case PO.POTypeID
           Case pakErpPOTypes.Package
-            SIS.PAK.erpData.erpPO.ImportFromERP("", PO.PONumber)
+            SIS.PAK.erpData.erpPO.ImportFromERP(PO.PONumber, False, False, False)
           Case pakErpPOTypes.ISGECEngineered
-            SIS.PAK.erpData.erpPO.ImportFromERP("", PO.PONumber, False, True)
+            SIS.PAK.erpData.erpPO.ImportFromERP(PO.PONumber, False, True, False)
           Case pakErpPOTypes.Boughtout
-            SIS.PAK.erpData.erpPO.ImportFromERP("", PO.PONumber, False, False, True)
+            SIS.PAK.erpData.erpPO.ImportFromERP(PO.PONumber, False, False, True)
         End Select
         GVpakPO.DataBind()
       Catch ex As Exception
@@ -57,6 +57,7 @@ Partial Class GF_pakPO
       End Try
     End If
     If e.CommandName.ToLower = "initiatewf".ToLower Then
+      'PO Issue
       Try
         Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
         SIS.PAK.pakPO.InitiateWF(SerialNo)
@@ -67,31 +68,16 @@ Partial Class GF_pakPO
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
       End Try
     End If
-    If e.CommandName.ToLower = "approvewf".ToLower Then
+    If e.CommandName.ToLower = "DeleteWF".ToLower Then
+      'PO Issue
       Try
         Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
-        SIS.PAK.pakPO.ApproveWF(SerialNo)
+        SIS.PAK.pakPO.DeleteWF(SerialNo)
         GVpakPO.DataBind()
       Catch ex As Exception
         Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
         Dim script As String = String.Format("alert({0});", message)
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
-      End Try
-    End If
-    If e.CommandName.ToLower = "rejectwf".ToLower Then
-      Try
-        Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
-        SIS.PAK.pakPO.RejectWF(SerialNo)
-        GVpakPO.DataBind()
-      Catch ex As Exception
-      End Try
-    End If
-    If e.CommandName.ToLower = "completewf".ToLower Then
-      Try
-        Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
-        SIS.PAK.pakPO.CompleteWF(SerialNo)
-        GVpakPO.DataBind()
-      Catch ex As Exception
       End Try
     End If
   End Sub
@@ -562,23 +548,33 @@ Partial Class GF_pakPO
     End If
     Return mRet
   End Function
-
+  Private Sub ImportPOForTC()
+    Try
+      Dim po As SIS.PAK.pakPO = SIS.PAK.erpData.erpPO.ImportFromERP(F_PONumber.Text, True, False, False)
+      SIS.PAK.erpData.erpPO.ImportPOLineFromERP(po)
+    Catch ex As Exception
+      Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+      Dim script As String = String.Format("alert({0});", message)
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+    End Try
+  End Sub
   Private Sub cmdImport_Click(sender As Object, e As EventArgs) Handles cmdImport.Click
     Try
       If F_PONumber.Text = "" Then Throw New Exception("PO Number is Blank.")
-      SIS.PAK.erpData.erpPO.ImportFromERP("", F_PONumber.Text)
+      Dim RevertConf As Boolean = chkRevertConfig.Checked
+      SIS.PAK.erpData.erpPO.ImportFromERP(F_PONumber.Text, False, False, False, RevertConf)
       GVpakPO.DataBind()
     Catch ex As Exception
       Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
       Dim script As String = String.Format("alert({0});", message)
       ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
     End Try
-
+    ImportPOForTC()
   End Sub
   Private Sub cmdIsgec_Click(sender As Object, e As EventArgs) Handles cmdIsgec.Click
     Try
       If F_PONumber.Text = "" Then Throw New Exception("PO Number is Blank.")
-      SIS.PAK.erpData.erpPO.ImportFromERP("", F_PONumber.Text, False, True)
+      SIS.PAK.erpData.erpPO.ImportFromERP(F_PONumber.Text, False, True, False)
       GVpakPO.DataBind()
     Catch ex As Exception
       Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
@@ -589,7 +585,7 @@ Partial Class GF_pakPO
   Private Sub cmdBoughtout_Click(sender As Object, e As EventArgs) Handles cmdBoughtout.Click
     Try
       If F_PONumber.Text = "" Then Throw New Exception("PO Number is Blank.")
-      SIS.PAK.erpData.erpPO.ImportFromERP("", F_PONumber.Text, False, False, True)
+      SIS.PAK.erpData.erpPO.ImportFromERP(F_PONumber.Text, False, False, True)
       GVpakPO.DataBind()
     Catch ex As Exception
       Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())

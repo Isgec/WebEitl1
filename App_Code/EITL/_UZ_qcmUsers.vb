@@ -24,7 +24,7 @@ Namespace SIS.QCM
     End Function
     Public Shared Function GetUserID(ByVal UserName As String) As Guid
       Dim _Result As Guid = Nothing
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString)
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString)
         Using Cmd As SqlCommand = Con.CreateCommand()
           Dim mSql As String = "SELECT TOP 1 [aspnet_Users].[UserID] FROM [aspnet_Users] WHERE [aspnet_Users].[UserName] = '" & UserName & "'"
           Cmd.CommandType = System.Data.CommandType.Text
@@ -40,7 +40,7 @@ Namespace SIS.QCM
       If UserID.ToString = String.Empty Then
         Return False
       End If
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString)
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString)
         Using Cmd As SqlCommand = Con.CreateCommand()
           Dim mSql As String = "UPDATE aspnet_Membership SET Password='3DrEKbtItX/00J/1GLEvpX1PdnA=', PasswordSalt='J9WC17LFQxkVD1NpH1V3Ow==' WHERE UserID='" & Convert.ToString(UserID) & "'"
           Cmd.CommandType = System.Data.CommandType.Text
@@ -79,7 +79,7 @@ Namespace SIS.QCM
     End Function
     Public Shared Function UpdateData(ByVal Record As SIS.QCM.qcmUsers) As Int32
       Dim _Result As Integer = 0
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spVR_LG_UsersUpdate"

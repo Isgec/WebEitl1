@@ -1,5 +1,34 @@
 <%@ Page Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="EF_pakSitePkgH.aspx.vb" Inherits="EF_pakSitePkgH" title="Edit: Received Packing List" %>
 <asp:Content ID="CPHpakSitePkgH" ContentPlaceHolderID="cph1" Runat="Server">
+    <style type="text/css">
+      .lg_tb_n{
+        border:1pt solid silver;
+        background-color:gainsboro;
+        color:gray;
+      }
+      lg_tb_n:hover{
+        background-color:white;
+        color:black;
+      }
+      .lg_pb_w, 
+      .lg_pb_p{
+        border-radius:5px;
+        padding:2px;
+        color:darkgray;
+        background-color:gainsboro;
+        border: 1pt solid silver;
+        width:100%;
+      }
+      .lg_pb_w:hover{
+        color:white;
+        background-color:crimson;
+      }
+      .lg_pb_p:hover{
+        color:white;
+        background-color:royalblue;
+      }
+    </style>
+
 <div id="div1" class="ui-widget-content page">
 <div id="div2" class="caption">
     <asp:Label ID="LabelpakSitePkgH" runat="server" Text="&nbsp;Edit: Received Packing List"></asp:Label>
@@ -421,6 +450,49 @@
             Runat="Server" />
         </td>
       </tr>
+      <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
+      <tr>
+        <td class="alignright">
+          <asp:Label ID="L_SupplierBillNo" runat="server" Text="Supplier Bill No :" />
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillNo"
+            Text='<%# Bind("SupplierBillNo") %>'
+            CssClass = "dmytxt"
+            Enabled = "False"
+            Width="300px"
+            runat="server" />
+        </td>
+        <td class="alignright">
+          <asp:Label ID="L_SupplierBillDate" runat="server" Text="Supplier Bill Date :" />
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillDate"
+            Text='<%# Bind("SupplierBillDate") %>'
+            Width="168px"
+            CssClass = "dmytxt"
+            Enabled = "False"
+            runat="server" />
+        </td>
+      </tr>
+      <tr>
+        <td class="alignright">
+          <asp:Label ID="L_SupplierBillAmount" runat="server" Text="Supplier Bill Amount :" />&nbsp;
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillAmount"
+            Text='<%# Bind("SupplierBillAmount") %>'
+            style="text-align: right"
+            Width="168px"
+            CssClass = "dmytxt"
+            Enabled = "False"
+            runat="server" />
+        </td>
+        <td class="alignright">
+        </td>
+        <td>
+      </tr>
+      <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
       <tr>
         <td class="alignright">
           <asp:Label ID="L_CreatedOn" runat="server" Text="Created On :" />&nbsp;
@@ -453,7 +525,9 @@
             Runat="Server" />
         </td>
       </tr>
-      <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
+      <tr><td colspan="3" style="border-top: solid 1pt LightGrey;" ></td><td>
+        <asp:Button ID="cmdLorryReceipt" runat="server" CssClass="lg_pb_p" Text="Create / Update MRN in Site Receipt Module" OnClientClick="return confirm('Create MRN ?');" OnClick="cmdLorryReceipt_Click" CommandName="cmdLorryReceipt" CommandArgument='<%# Eval("PrimaryKey")  %>' />
+      </td></tr>
     </table>
   </div>
 <fieldset class="ui-widget-content page">
@@ -606,6 +680,7 @@
   </ContentTemplate>
   <Triggers>
     <asp:AsyncPostBackTrigger ControlID="GVpakSitePkgD" EventName="PageIndexChanged" />
+    <asp:AsyncPostBackTrigger ControlID="FVpakSitePkgH" EventName="ItemCommand" />
   </Triggers>
 </asp:UpdatePanel>
 </div>

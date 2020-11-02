@@ -161,7 +161,8 @@ Partial Class EF_pakSitePkgH
     Dim aVal() As String = value.Split(",".ToCharArray)
     Dim mRet As String="0|" & aVal(0)
     Dim ProjectID As String = CType(aVal(1),String)
-    Dim MRNNo As Int32 = CType(aVal(2),Int32)
+    Dim MRNNo As String = CType(aVal(2), String)
+    If Not IsNumeric(MRNNo) OrElse MRNNo = "" Then MRNNo = "0"
     Dim oVar As SIS.PAK.pakLorryReceipts = SIS.PAK.pakLorryReceipts.pakLorryReceiptsGetByID(ProjectID,MRNNo)
     If oVar Is Nothing Then
       mRet = "1|" & aVal(0) & "|Record not found." 
@@ -171,4 +172,7 @@ Partial Class EF_pakSitePkgH
     Return mRet
   End Function
 
+  Protected Sub cmdLorryReceipt_Click(sender As Object, e As EventArgs)
+    Dim x As String = ""
+  End Sub
 End Class

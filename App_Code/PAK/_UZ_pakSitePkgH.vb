@@ -5,6 +5,11 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.PAK
   Partial Public Class pakSitePkgH
+    Public Shadows ReadOnly Property GetSiteMrnPrintLink() As String
+      Get
+        Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Downloads/SiteMrn.aspx?SiteRec=" & PrimaryKey & "', 'win" & RecNo & "', 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1'); return false;"
+      End Get
+    End Property
     Public Function GetColor() As System.Drawing.Color
       Dim mRet As System.Drawing.Color = Drawing.Color.Black
       Select Case ReceiveStatusID

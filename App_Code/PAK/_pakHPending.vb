@@ -7,6 +7,17 @@ Namespace SIS.PAK
   <DataObject()> _
   Partial Public Class pakHPending
     Inherits SIS.PAK.pakPkgListH
+    Public Shadows ReadOnly Property ForeColor() As System.Drawing.Color
+      Get
+        Dim mRet As System.Drawing.Color = Drawing.Color.Blue
+        Try
+          mRet = GetColor()
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+
     <DataObjectMethod(DataObjectMethodType.Select)> _
     Public Shared Function pakHPendingGetNewRecord() As SIS.PAK.pakHPending
       Return New SIS.PAK.pakHPending()

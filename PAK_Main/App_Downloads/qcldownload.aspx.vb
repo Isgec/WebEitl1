@@ -71,6 +71,8 @@ Partial Class qcldownload
         .Cells(3, 3).Value = BOMNo
         .Cells(4, 3).Value = tmpPO.PONumber
         .Cells(5, 3).Value = tmpPO.VR_BusinessPartner9_BPName
+        .Cells(4, 10).Value = tmpPO.ProjectID
+        .Cells(5, 10).Value = tmpPO.IDM_Projects4_Description
       End With
 
       r = 9
@@ -91,6 +93,8 @@ Partial Class qcldownload
           .Cells(r, c).Value = tmp.FK_PAK_QCListD_ItemNo.ItemCode
           c += 1
           .Cells(r, c).Value = tmp.FK_PAK_QCListD_ItemNo.Prefix & tmp.FK_PAK_QCListD_ItemNo.ItemDescription
+          c += 1
+          .Cells(r, c).Value = tmp.FK_PAK_QCListD_ItemNo.PAK_Documents4_cmba
           c += 1
           .Cells(r, c).Value = "*"
           c += 1

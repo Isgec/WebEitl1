@@ -26,12 +26,16 @@ Public Enum pakItemStates
   CreatedBySupplier = 2
   VerifiedByISGEC = 3
   VerifiedbySupplier = 4
-  ChangeRequiredByISGEC = 5
-  ChangeRequiredBySupplier = 6
+  DeleteRequiredByISGEC = 5
+  DeleteRequiredBySupplier = 6
   AcceptedbyISGEC = 7
   AcceptedbySupplier = 8
   FreezedbyISGEC = 9
-  FreezedbySupplier = 10
+  UnfreezedByISGEC = 10
+  ChangedByIsgec = 11
+  ChangedBySupplier = 12
+  UndeleteByIsgec = 13
+  UndeleteBySupplier = 14
 End Enum
 Public Enum pakTCPOStates
   Free = 1
@@ -106,4 +110,5 @@ Public Enum pakQCStates
   UnderQualityInspection = 3
   QCCompleted = 4
   PackingListCreated = 5
+  QCClosed = 6
 End Enum

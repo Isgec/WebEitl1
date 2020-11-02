@@ -58,8 +58,8 @@ Namespace SIS.PAK
           .WeightPerUnit = ERPPOLChild.t_wght
         End If
         'Create or Get DocumentNO
-        Dim tmpDoc As List(Of SIS.PAK.pakDocuments) = SIS.PAK.pakDocuments.pakDocumentsSelectByDocID(ERPPOLChild.t_docn)
-        If tmpDoc.Count <= 0 Then
+        Dim tmpDoc As SIS.PAK.pakDocuments = SIS.PAK.pakDocuments.pakDocumentsSelectByDocRevID(ERPPOLChild.t_docn, ERPPOLChild.t_revi)
+        If tmpDoc Is Nothing Then
           Dim tmpD = New SIS.PAK.pakDocuments
           With tmpD
             .DocumentID = ERPPOLChild.t_docn
@@ -72,17 +72,16 @@ Namespace SIS.PAK
           tmpD = SIS.PAK.pakDocuments.InsertData(tmpD)
           .DocumentNo = tmpD.DocumentNo
         Else
-          For Each tmpD As SIS.PAK.pakDocuments In tmpDoc
-            With tmpD
-              .DocumentID = ERPPOLChild.t_docn
-              .DocumentRevision = ERPPOLChild.t_revi
-              .Description = ERPPOLChild.DocumentDescription
-              .ExternalDocument = False
-              .DisskFile = ""
-              .Filename = ""
-            End With
-            tmpD = SIS.PAK.pakDocuments.UpdateData(tmpD)
-          Next
+          With tmpDoc
+            .DocumentID = ERPPOLChild.t_docn
+            .DocumentRevision = ERPPOLChild.t_revi
+            .Description = ERPPOLChild.DocumentDescription
+            .ExternalDocument = False
+            .DisskFile = ""
+            .Filename = ""
+          End With
+          tmpDoc = SIS.PAK.pakDocuments.UpdateData(tmpDoc)
+          .DocumentNo = tmpDoc.DocumentNo
         End If
         .ParentItemNo = POBOM.ItemNo
         .StatusID = pakItemStates.FreezedbyISGEC

@@ -71,6 +71,18 @@
             Runat="Server" />
         </td>
       </tr>
+      <tr>
+        <td class="alignright">
+          <b><asp:Label ID="Label1" runat="server" Text="Show Received:" /></b>
+        </td>
+        <td>
+          <asp:CheckBox
+            ID = "F_ReceivedAtPort"
+            CssClass = "mychk"
+            AutoPostBack="true"
+            Runat="Server" />
+        </td>
+      </tr>
     </table>
     </asp:Panel>
     <AJX:CollapsiblePanelExtender ID="cpe1" runat="Server" TargetControlID="pnlD" ExpandControlID="pnlH" CollapseControlID="pnlH" Collapsed="True" TextLabelID="lblH" ImageControlID="imgH" ExpandedText="(Hide Filters...)" CollapsedText="(Show Filters...)" ExpandedImage="~/images/ua.png" CollapsedImage="~/images/da.png" SuppressPostBack="true" />
@@ -83,12 +95,19 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="PRINT">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdPrint" runat="server" AlternateText='<%# Eval("PrimaryKey") %>' Visible='<%# EVal("PrintPortMRNVisible") %>' ToolTip="Print Port MRN" SkinID="print" OnClientClick='<%# Eval("GetPrintPortMrnLink") %>' CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="Pkg. No" SortExpression="PkgNo">
           <ItemTemplate>
             <asp:Label ID="LabelPkgNo" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("PkgNo") %>'></asp:Label>
           </ItemTemplate>
-          <ItemStyle CssClass="alignright" />
-          <HeaderStyle CssClass="alignright" Width="40px" />
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle CssClass="alignCenter" Width="40px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Supplier Ref. No" SortExpression="SupplierRefNo">
           <ItemTemplate>
@@ -115,8 +134,8 @@
           <ItemTemplate>
             <asp:Label ID="LabelCreatedOn" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("CreatedOn") %>'></asp:Label>
           </ItemTemplate>
-          <ItemStyle CssClass="" />
-        <HeaderStyle CssClass="" Width="90px" />
+          <ItemStyle CssClass="alignCenter" />
+        <HeaderStyle CssClass="alignCenter" Width="90px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Status" SortExpression="PAK_PkgStatus6_Description">
           <ItemTemplate>
@@ -147,6 +166,7 @@
       SortParameterName="OrderBy" EnablePaging="True">
       <SelectParameters >
         <asp:ControlParameter ControlID="F_SerialNo" PropertyName="Text" Name="SerialNo" Type="Int32" Size="10" />
+        <asp:ControlParameter ControlID="F_ReceivedAtPort" PropertyName="Checked" Name="ReceivedAtPort" Type="Boolean"  />
         <asp:Parameter Name="SearchState" Type="Boolean" Direction="Input" DefaultValue="false" />
         <asp:Parameter Name="SearchText" Type="String" Direction="Input" DefaultValue="" />
       </SelectParameters>
@@ -157,6 +177,7 @@
   <Triggers>
     <asp:AsyncPostBackTrigger ControlID="GVpakHPending" EventName="PageIndexChanged" />
     <asp:AsyncPostBackTrigger ControlID="F_SerialNo" />
+    <asp:AsyncPostBackTrigger ControlID="F_ReceivedAtPort" EventName="CheckedChanged" />
   </Triggers>
 </asp:UpdatePanel>
 </div>

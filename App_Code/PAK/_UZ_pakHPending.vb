@@ -5,6 +5,26 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.PAK
   Partial Public Class pakHPending
+    Public Shadows ReadOnly Property GetPrintPortMrnLink() As String
+      Get
+        Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Downloads/PortMrn.aspx?PortPkg=" & PrimaryKey & "', 'win" & PkgNo & "', 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1'); return false;"
+      End Get
+    End Property
+    Public Shadows Function GetColor() As System.Drawing.Color
+      Dim mRet As System.Drawing.Color = Drawing.Color.Black
+      Select Case StatusID
+        Case pakPkgStates.UnderReceiveAtSite
+          mRet = Drawing.Color.Black
+        Case pakPkgStates.ReceivedAtSite
+          mRet = Drawing.Color.Green
+        Case pakPkgStates.UnderReceiveAtPort
+          mRet = Drawing.Color.DarkGoldenrod
+        Case pakPkgStates.ReceivedAtPort
+          mRet = Drawing.Color.Green
+      End Select
+      Return mRet
+    End Function
+
     Public Shadows Function GetEditable() As Boolean
       Dim mRet As Boolean = False
       Return mRet
@@ -33,11 +53,31 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
+    Public Shadows ReadOnly Property PrintPortMRNVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          mRet = (StatusID = pakPkgStates.ReceivedAtPort)
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
     Public Shadows ReadOnly Property ApproveWFVisible() As Boolean
       Get
-        Dim mRet As Boolean = True
+        Dim mRet As Boolean = False
         Try
-          mRet = GetVisible()
+          mRet = (StatusID = pakPkgStates.UnderReceiveAtPort)
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public Shadows ReadOnly Property ApproveWFSiteVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          mRet = (StatusID = pakPkgStates.UnderReceiveAtSite)
         Catch ex As Exception
         End Try
         Return mRet
@@ -124,38 +164,6 @@ Namespace SIS.PAK
           Else
             Cmd.CommandText = "sppak_LG_HPendingSelectListFilteres"
             'Cmd.CommandText = "sppakHPendingSelectListFilteres"
-            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SerialNo",SqlDbType.Int,10, IIf(SerialNo = Nothing, 0,SerialNo))
-          End If
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NvarChar, 9, HttpContext.Current.Session("LoginID"))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
-          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
-          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
-          RecordCount = -1
-          Results = New List(Of SIS.PAK.pakHPending)()
-          Con.Open()
-          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
-          While (Reader.Read())
-            Results.Add(New SIS.PAK.pakHPending(Reader))
-          End While
-          Reader.Close()
-          RecordCount = Cmd.Parameters("@RecordCount").Value
-        End Using
-      End Using
-      Return Results
-    End Function
-    Public Shared Function UZ_pakHPendingAtPortSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As Int32) As List(Of SIS.PAK.pakHPending)
-      Dim Results As List(Of SIS.PAK.pakHPending) = Nothing
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
-        Using Cmd As SqlCommand = Con.CreateCommand()
-          Cmd.CommandType = CommandType.StoredProcedure
-          'Project ID Belongs to SiteUserProjects and PackageStatus is Despatched
-          If SearchState Then
-            Cmd.CommandText = "sppak_LG_HPendingAtPortSelectListSearch"
-            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
-          Else
-            Cmd.CommandText = "sppak_LG_HPendingAtPortSelectListFilteres"
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SerialNo", SqlDbType.Int, 10, IIf(SerialNo = Nothing, 0, SerialNo))
           End If
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
@@ -177,6 +185,43 @@ Namespace SIS.PAK
       End Using
       Return Results
     End Function
+    Public Shared Function UZ_pakHPendingAtPortSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As Int32, ReceivedAtPort As Boolean) As List(Of SIS.PAK.pakHPending)
+      Dim Results As List(Of SIS.PAK.pakHPending) = Nothing
+      If OrderBy = "" Then If ReceivedAtPort Then OrderBy = "ReceivedAtPortOn DESC" Else OrderBy = "CreatedOn DESC"
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          'Project ID Belongs to SiteUserProjects and PackageStatus is Despatched
+          If SearchState Then
+            Cmd.CommandText = "sppak_LG_HPendingAtPortSelectListSearch"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
+          Else
+            Cmd.CommandText = "sppak_LG_HPendingAtPortSelectListFilteres"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SerialNo", SqlDbType.Int, 10, IIf(SerialNo = Nothing, 0, SerialNo))
+          End If
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedAtPort", SqlDbType.Bit, 3, ReceivedAtPort)
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          RecordCount = -1
+          Results = New List(Of SIS.PAK.pakHPending)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.PAK.pakHPending(Reader))
+          End While
+          Reader.Close()
+          RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
+      Return Results
+    End Function
+    Public Shared Function pakHPendingSelectCount(ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As Int32, ReceivedAtPort As Boolean) As Integer
+      Return RecordCount
+    End Function
     Public Shared Function UZ_pakHPendingUpdate(ByVal Record As SIS.PAK.pakHPending) As SIS.PAK.pakHPending
       Dim _Result As SIS.PAK.pakHPending = pakHPendingUpdate(Record)
       Return _Result
@@ -195,6 +240,9 @@ Namespace SIS.PAK
         Catch ex As Exception
         End Try
         .SupplierRefNo = pkgH.SupplierRefNo
+        .SupplierBillAmount = pkgH.SupplierBillAmount
+        .SupplierBillDate = pkgH.SupplierBillDate
+        .SupplierBillNo = pkgH.SupplierBillNo
         .TransporterID = pkgH.TransporterID
         .TransporterName = pkgH.TransporterName
         .VehicleNo = pkgH.VehicleNo

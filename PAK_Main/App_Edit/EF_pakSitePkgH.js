@@ -36,7 +36,9 @@ var script_pakSitePkgH = {
       p.style.backgroundImage  = 'url(../../images/loader.gif)';
       p.style.backgroundRepeat= 'no-repeat';
       p.style.backgroundPosition = 'right';
-      sender._contextKey = '';
+      var ProjectID = $get(Prefix + 'ProjectID');
+      var RecNo = $get(Prefix + 'RecNo');
+      sender._contextKey = ProjectID.value+'|'+RecNo.value;
     },
     ACEMRNNo_Populated: function(sender,e) {
       var p = sender.get_element();

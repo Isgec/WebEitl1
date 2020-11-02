@@ -326,7 +326,7 @@
                       <table width="100%">
                         <tr>
                           <td>
-                            <asp:Panel ID="Panel1" runat="server" Visible='<%# DUListVisible %>' class="file_upload" Style="width: auto; margin: 10px 10px 10px 10px; padding: 10px 10px 10px 10px">
+                            <asp:Panel ID="Panel1" runat="server" Visible='<%# UploadVisible %>' class="file_upload" Style="width: auto; margin: 10px 10px 10px 10px; padding: 10px 10px 10px 10px">
                               <table>
                                 <tr>
                                   <td colspan="4">
@@ -363,17 +363,6 @@
                                 <span style="color: #ff0033">Loading...</span>
                               </ProgressTemplate>
                             </asp:UpdateProgress>
-                            <script type="text/javascript">
-                              var pcnt = 0;
-                              function print_report(o) {
-                                pcnt = pcnt + 1;
-                                var nam = 'wTask' + pcnt;
-                                var url = self.location.href.replace('App_Edit/EF_', 'App_Print/RP_');
-                                url = url + '&pk=' + o.alt;
-                                window.open(url, nam, 'left=20,top=20,width=1100,height=600,toolbar=1,resizable=1,scrollbars=1');
-                                return false;
-                              }
-                            </script>
                             <asp:GridView ID="GVpakPOBOM" SkinID="gv_silver" runat="server" DataSourceID="ODSpakPOBOM" DataKeyNames="SerialNo,BOMNo">
                               <Columns>
                                 <asp:TemplateField HeaderText="EDIT">
@@ -385,7 +374,7 @@
                                 </asp:TemplateField>
                                 <asp:TemplateField HeaderText="PRINT">
                                   <ItemTemplate>
-                                    <asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick="return print_report(this);" />
+                                    <asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick='<%# Eval("GetPrintBOMLink") %>' />
                                   </ItemTemplate>
                                   <ItemStyle CssClass="alignCenter" />
                                   <HeaderStyle HorizontalAlign="Center" Width="30px" />
@@ -599,6 +588,257 @@
           <asp:QueryStringParameter DefaultValue="0" QueryStringField="SerialNo" Name="SerialNo" Type="Int32" />
         </SelectParameters>
       </asp:ObjectDataSource>
+<%--QC List--%>
+<fieldset class="ui-widget-content page">
+<legend>
+    <asp:Label ID="LabelpakQCListH" runat="server" Text="&nbsp;List: Quality Clearance"></asp:Label>
+</legend>
+<div class="pagedata">
+<asp:UpdatePanel ID="UPNLpakQCListH" runat="server">
+  <ContentTemplate>
+    <table width="100%"><tr><td class="sis_formview"> 
+    <LGM:ToolBar0 
+      ID = "TBLpakQCListH"
+      ToolType = "lgNMGrid"
+      EditUrl = "~/PAK_Main/App_Edit/EF_pakQCListH.aspx"
+      EnableExit = "false"
+      EnableAdd ="false"
+      ValidationGroup = "pakQCListH"
+      runat = "server" />
+    <asp:UpdateProgress ID="UPGSpakQCListH" runat="server" AssociatedUpdatePanelID="UPNLpakQCListH" DisplayAfter="100">
+      <ProgressTemplate>
+        <span style="color: #ff0033">Loading...</span>
+      </ProgressTemplate>
+    </asp:UpdateProgress>
+    <asp:GridView ID="GVpakQCListH" SkinID="gv_silver" runat="server" DataSourceID="ODSpakQCListH" DataKeyNames="SerialNo,QCLNo">
+      <Columns>
+        <asp:TemplateField HeaderText="EDIT">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdEditPage" ValidationGroup="Edit" runat="server" Visible='<%# Eval("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText="Edit" ToolTip="Edit the record." SkinID="Edit" CommandName="lgEdit" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="PRINT">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# Eval("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick='<%# Eval("GetPrintLink") %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="QC List No" SortExpression="QCLNo">
+          <ItemTemplate>
+            <asp:Label ID="LabelQCLNo" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("QCLNo") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle CssClass="alignCenter" Width="40px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Description" SortExpression="SupplierRef">
+          <ItemTemplate>
+            <asp:Label ID="LabelSupplierRef" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("SupplierRef") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+        <HeaderStyle CssClass="alignCenter" Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Offered Weight" SortExpression="TotalWeight">
+          <ItemTemplate>
+            <asp:Label ID="LabelTotalWeight" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("TotalWeight") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle CssClass="alignCenter" Width="80px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="UOM" SortExpression="PAK_Units4_Description">
+          <ItemTemplate>
+             <asp:Label ID="L_UOMTotalWeight" runat="server" ForeColor='<%# Eval("ForeColor") %>' Title='<%# EVal("UOMTotalWeight") %>' Text='<%# Eval("PAK_Units4_Description") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Manual Request No">
+          <ItemTemplate>
+             <asp:Label ID="L_QCRequestNo" runat="server" ForeColor='<%# Eval("ForeColor") %>' Title='<%# EVal("QCRequestNo") %>' Text='<%# Eval("QCRequestNo") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Status" SortExpression="PAK_QCListStatus3_Description">
+          <ItemTemplate>
+             <asp:Label ID="L_StatusID" runat="server" ForeColor='<%# Eval("ForeColor") %>' Title='<%# EVal("StatusID") %>' Text='<%# Eval("PAK_QCListStatus3_Description") %>'></asp:Label>
+          </ItemTemplate>
+          <HeaderStyle Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Cleared By" SortExpression="aspnet_users5_UserFullName">
+          <ItemTemplate>
+             <asp:Label ID="L_ClearedBy" runat="server" ForeColor='<%# Eval("ForeColor") %>' Title='<%# EVal("ClearedBy") %>' Text='<%# Eval("aspnet_users5_UserFullName") %>'></asp:Label>
+          </ItemTemplate>
+          <HeaderStyle Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Cleared On" SortExpression="ClearedOn">
+          <ItemTemplate>
+            <asp:Label ID="LabelClearedOn" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("ClearedOn") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+        <HeaderStyle CssClass="alignCenter" Width="90px" />
+        </asp:TemplateField>
+      </Columns>
+      <EmptyDataTemplate>
+        <asp:Label ID="LabelEmpty" runat="server" Font-Size="Small" ForeColor="Red" Text="No record found !!!"></asp:Label>
+      </EmptyDataTemplate>
+    </asp:GridView>
+    <asp:ObjectDataSource 
+      ID = "ODSpakQCListH"
+      runat = "server"
+      DataObjectTypeName = "SIS.PAK.pakQCListH"
+      OldValuesParameterFormatString = "original_{0}"
+      SelectMethod = "pakQCListHSelectList"
+      TypeName = "SIS.PAK.pakQCListH"
+      SelectCountMethod = "pakQCListHSelectCount"
+      SortParameterName="OrderBy" EnablePaging="True">
+      <SelectParameters >
+        <asp:QueryStringParameter QueryStringField="SerialNo" Name="SerialNo" Type="Int32" Size="10" />
+        <asp:Parameter Name="SearchState" Type="Boolean" Direction="Input" DefaultValue="false" />
+        <asp:Parameter Name="SearchText" Type="String" Direction="Input" DefaultValue="" />
+      </SelectParameters>
+    </asp:ObjectDataSource>
+    <br />
+  </td></tr></table>
+  </ContentTemplate>
+  <Triggers>
+    <asp:AsyncPostBackTrigger ControlID="GVpakQCListH" EventName="PageIndexChanged" />
+  </Triggers>
+</asp:UpdatePanel>
+</div>
+</fieldset>
+
+<fieldset class="ui-widget-content page">
+<legend>
+    <asp:Label ID="LabelpakPkgListH" runat="server" Text="&nbsp;List: Packing List"></asp:Label>
+</legend>
+<div class="pagedata">
+<asp:UpdatePanel ID="UPNLpakPkgListH" runat="server">
+  <ContentTemplate>
+    <script type="text/javascript">
+      var pcnt = 0;
+      function print_pkg_report(o) {
+        pcnt = pcnt + 1;
+        var nam = 'wTask' + pcnt;
+        var url = self.location.href.replace('App_Edit/EF_pakPO','App_Print/RP_pakPkgPO');
+        url = url + '&pkg=' + o.alt;
+        window.open(url, nam, 'left=20,top=20,width=110,height=60,toolbar=1,resizable=1,scrollbars=1');
+        return false;
+      }
+    </script>
+    <table width="100%"><tr><td class="sis_formview"> 
+    <LGM:ToolBar0 
+      ID = "TBLpakPkgListH"
+      ToolType = "lgNMGrid"
+      EditUrl = "~/PAK_Main/App_Edit/EF_pakPkgListH.aspx"
+      EnableExit = "false"
+      EnableAdd ="false"
+      ValidationGroup = "pakPkgListH"
+      runat = "server" />
+    <asp:UpdateProgress ID="UPGSpakPkgListH" runat="server" AssociatedUpdatePanelID="UPNLpakPkgListH" DisplayAfter="100">
+      <ProgressTemplate>
+        <span style="color: #ff0033">Loading...</span>
+      </ProgressTemplate>
+    </asp:UpdateProgress>
+    <asp:GridView ID="GVpakPkgListH" SkinID="gv_silver" runat="server" DataSourceID="ODSpakPkgListH" DataKeyNames="SerialNo,PkgNo">
+      <Columns>
+        <asp:TemplateField HeaderText="EDIT">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdEditPage" ValidationGroup="Edit" runat="server" Visible='<%# Eval("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText="Edit" ToolTip="Edit the record." SkinID="Edit" CommandName="lgEdit" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="PRINT">
+          <ItemTemplate>
+            <asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# Eval("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick="return print_pkg_report(this);" />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Pkg. No" SortExpression="PkgNo">
+          <ItemTemplate>
+            <asp:Label ID="LabelPkgNo" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("PkgNo") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="40px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Supplier Ref. No" SortExpression="SupplierRefNo">
+          <ItemTemplate>
+            <asp:Label ID="LabelSupplierRefNo" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("SupplierRefNo") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Total Weight" SortExpression="TotalWeight">
+          <ItemTemplate>
+            <asp:Label ID="LabelTotalWeight" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("TotalWeight") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="80px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Transporter Name" SortExpression="TransporterName">
+          <ItemTemplate>
+            <asp:Label ID="LabelTransporterName" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("TransporterName") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="" />
+        <HeaderStyle CssClass="" Width="200px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Created On" SortExpression="CreatedOn">
+          <ItemTemplate>
+            <asp:Label ID="LabelCreatedOn" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("CreatedOn") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="90px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Status" SortExpression="PAK_PkgStatus6_Description">
+          <ItemTemplate>
+             <asp:Label ID="L_StatusID" runat="server" ForeColor='<%# Eval("ForeColor") %>' Title='<%# EVal("StatusID") %>' Text='<%# Eval("PAK_PkgStatus6_Description") %>'></asp:Label>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="100px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="RETURN">
+          <ItemTemplate>
+            <asp:CheckBox ID="F_UnProtected" runat="server" Visible='<%# Eval("RejectWFVisible") %>' ToolTip="Check to Un Protected [No Check for RECEIPT in ERP] Return to Vendor" />
+            <asp:ImageButton ID="cmdRejectWF" ValidationGroup='<%# "Reject" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("GetBackVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Return to Vendor" SkinID="reject" OnClientClick='<%# "return Page_ClientValidate(""Reject" & Container.DataItemIndex & """) && confirm(""Do you want to get packing list back ?"");" %>' CommandName="RejectWF" CommandArgument='<%# Container.DataItemIndex %>' />
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
+      </Columns>
+      <EmptyDataTemplate>
+        <asp:Label ID="LabelEmpty" runat="server" Font-Size="Small" ForeColor="Red" Text="No record found !!!"></asp:Label>
+      </EmptyDataTemplate>
+    </asp:GridView>
+    <asp:ObjectDataSource 
+      ID = "ODSpakPkgListH"
+      runat = "server"
+      DataObjectTypeName = "SIS.PAK.pakPkgListH"
+      OldValuesParameterFormatString = "original_{0}"
+      SelectMethod = "UZ_pakPkgListHSelectList"
+      TypeName = "SIS.PAK.pakPkgListH"
+      SelectCountMethod = "pakPkgListHSelectCount"
+      SortParameterName="OrderBy" EnablePaging="True">
+      <SelectParameters >
+        <asp:QueryStringParameter QueryStringField="SerialNo" Name="SerialNo" Type="Int32" Size="10" />
+        <asp:Parameter Name="SearchState" Type="Boolean" Direction="Input" DefaultValue="false" />
+        <asp:Parameter Name="SearchText" Type="String" Direction="Input" DefaultValue="" />
+      </SelectParameters>
+    </asp:ObjectDataSource>
+    <br />
+  </td></tr></table>
+  </ContentTemplate>
+  <Triggers>
+    <asp:AsyncPostBackTrigger ControlID="GVpakPkgListH" EventName="PageIndexChanged" />
+  </Triggers>
+</asp:UpdatePanel>
+</div>
+</fieldset>
+
+
     </div>
   </div>
 </asp:Content>

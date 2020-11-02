@@ -72,9 +72,9 @@ Partial Class EF_pakPOBOM
   Protected Sub GVpakPOBItems_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakPOBItems.RowCommand
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("SerialNo")  
-        Dim BOMNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("BOMNo")  
-        Dim ItemNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("ItemNo")  
+        Dim SerialNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim BOMNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("BOMNo")
+        Dim ItemNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("ItemNo")
         Dim RedirectUrl As String = TBLpakPOBItems.EditUrl & "?SerialNo=" & SerialNo & "&BOMNo=" & BOMNo & "&ItemNo=" & ItemNo
         Response.Redirect(RedirectUrl)
       Catch ex As Exception
@@ -95,42 +95,24 @@ Partial Class EF_pakPOBOM
       Catch ex As Exception
       End Try
     End If
-    If e.CommandName.ToLower = "initiatewf".ToLower Then
-      Try
-        Dim SerialNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("SerialNo")  
-        Dim BOMNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("BOMNo")  
-        Dim ItemNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("ItemNo")  
-        SIS.PAK.pakPOBItems.InitiateWF(SerialNo, BOMNo, ItemNo)
-        GVpakPOBItems.DataBind()
-      Catch ex As Exception
-      End Try
-    End If
     If e.CommandName.ToLower = "approvewf".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("SerialNo")  
-        Dim BOMNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("BOMNo")  
-        Dim ItemNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("ItemNo")  
-        SIS.PAK.pakPOBItems.ApproveWF(SerialNo, BOMNo, ItemNo)
+        Dim SerialNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim BOMNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("BOMNo")
+        Dim ItemNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("ItemNo")
+        'Disabled as It is to be removed
+        'SIS.PAK.pakPOBItems.ApproveWF(SerialNo, BOMNo, ItemNo)
         GVpakPOBItems.DataBind()
       Catch ex As Exception
       End Try
     End If
     If e.CommandName.ToLower = "rejectwf".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("SerialNo")  
-        Dim BOMNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("BOMNo")  
-        Dim ItemNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("ItemNo")  
-        SIS.PAK.pakPOBItems.RejectWF(SerialNo, BOMNo, ItemNo)
-        GVpakPOBItems.DataBind()
-      Catch ex As Exception
-      End Try
-    End If
-    If e.CommandName.ToLower = "completewf".ToLower Then
-      Try
-        Dim SerialNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("SerialNo")  
-        Dim BOMNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("BOMNo")  
-        Dim ItemNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("ItemNo")  
-        SIS.PAK.pakPOBItems.CompleteWF(SerialNo, BOMNo, ItemNo)
+        Dim SerialNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim BOMNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("BOMNo")
+        Dim ItemNo As Int32 = GVpakPOBItems.DataKeys(e.CommandArgument).Values("ItemNo")
+        'Disabled as It is to be removed
+        'SIS.PAK.pakPOBItems.RejectWF(SerialNo, BOMNo, ItemNo)
         GVpakPOBItems.DataBind()
       Catch ex As Exception
       End Try

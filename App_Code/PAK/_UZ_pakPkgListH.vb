@@ -294,7 +294,7 @@ Namespace SIS.PAK
     Public Shared Function InitiateWF(ByVal SerialNo As Int32, ByVal PkgNo As Int32) As SIS.PAK.pakPkgListH
       Dim Results As SIS.PAK.pakPkgListH = pakPkgListHGetByID(SerialNo, PkgNo)
       If Results.GRNo = "" Or Results.GRDate = "" Then
-        Throw New Exception("GR No / GR Date is blank Cannot despatch.")
+        Throw New Exception("GR No / GR Date is blank Cannot despatch. Pl. enter despatch details.")
       End If
       Dim pkgDs As List(Of SIS.PAK.pakPkgListD) = SIS.PAK.pakPkgListD.pakPkgListDSelectList(0, 99999, "", False, "", PkgNo, SerialNo)
       If pkgDs.Count <= 0 Then
@@ -642,7 +642,9 @@ Namespace SIS.PAK
         .Body = Header
       End With
       Try
-        oClient.Send(oMsg)
+        If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+          oClient.Send(oMsg)
+        End If
       Catch ex As Exception
       End Try
     End Sub

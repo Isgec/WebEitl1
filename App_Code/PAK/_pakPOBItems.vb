@@ -68,6 +68,7 @@ Namespace SIS.PAK
     Public Property TotalWeight As Decimal = 0
     Public Property QualityClearedQty As Decimal = 0
     Public Property QualityClearedQtyStage As Decimal = 0
+    Public Property DeletedInERP As Boolean = False
     Private _aspnet_Users1_UserFullName As String = ""
     Private _aspnet_Users2_UserFullName As String = ""
     Private _PAK_Divisions3_Description As String = ""
@@ -1050,6 +1051,7 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeightDespatchedToPort", SqlDbType.Decimal, 21, Record.TotalWeightDespatchedToPort)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QualityClearedQtyStage", SqlDbType.Decimal, 21, Record.QualityClearedQtyStage)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeight", SqlDbType.Decimal, 21, Record.TotalWeight)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DeletedInERP", SqlDbType.Bit, 3, Record.DeletedInERP)
           Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_SerialNo").Direction = ParameterDirection.Output
           Cmd.Parameters.Add("@Return_BOMNo", SqlDbType.Int, 11)
@@ -1194,6 +1196,7 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeightDespatchedToPort", SqlDbType.Decimal, 21, Record.TotalWeightDespatchedToPort)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@QualityClearedQtyStage", SqlDbType.Decimal, 21, Record.QualityClearedQtyStage)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalWeight", SqlDbType.Decimal, 21, Record.TotalWeight)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DeletedInERP", SqlDbType.Bit, 3, Record.DeletedInERP)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1
@@ -1204,16 +1207,26 @@ Namespace SIS.PAK
       End Using
       Return Record
     End Function
-    <DataObjectMethod(DataObjectMethodType.Delete, True)> _
+    <DataObjectMethod(DataObjectMethodType.Delete, True)>
     Public Shared Function pakPOBItemsDelete(ByVal Record As SIS.PAK.pakPOBItems) As Int32
-      Dim _Result as Integer = 0
+      '===================================
+      'Check QC or Despatch, If Not found then only can initiate or delete
+      If Record.QualityClearedQty > 0 Or Record.QualityClearedQtyStage > 0 Or Record.QuantityDespatched > 0 Or Record.QuantityDespatchedToPort > 0 Then
+        Throw New Exception("There are QC or Despatch in Item [tree from here], CAN Not perform Delete. You may try to delete individual Item.")
+      End If
+      Dim docs As List(Of SIS.PAK.pakPOBIDocuments) = SIS.PAK.pakPOBIDocuments.UZ_pakPOBIDocumentsSelectList(0, 9999, "", False, "", Record.SerialNo, Record.BOMNo, Record.ItemNo)
+      For Each doc As SIS.PAK.pakPOBIDocuments In docs
+        SIS.PAK.pakPOBIDocuments.UZ_pakPOBIDocumentsDelete(doc)
+      Next
+      '===================================
+      Dim _Result As Integer = 0
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "sppakPOBItemsDelete"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_SerialNo",SqlDbType.Int,Record.SerialNo.ToString.Length, Record.SerialNo)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_BOMNo",SqlDbType.Int,Record.BOMNo.ToString.Length, Record.BOMNo)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_ItemNo",SqlDbType.Int,Record.ItemNo.ToString.Length, Record.ItemNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_SerialNo", SqlDbType.Int, Record.SerialNo.ToString.Length, Record.SerialNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_BOMNo", SqlDbType.Int, Record.BOMNo.ToString.Length, Record.BOMNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_ItemNo", SqlDbType.Int, Record.ItemNo.ToString.Length, Record.ItemNo)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1
@@ -1222,9 +1235,37 @@ Namespace SIS.PAK
           _RecordCount = Cmd.Parameters("@RowCount").Value
         End Using
       End Using
+      If Not Record.Root Then
+        Dim tmpP As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(Record.SerialNo, Record.BOMNo, Record.ParentItemNo)
+        If tmpP IsNot Nothing Then
+          If Not tmpP.Root Then
+            Dim tmpPs As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(Record.SerialNo, Record.BOMNo, Record.ParentItemNo, "")
+            If tmpPs.Count <= 0 Then
+              tmpP.Middle = False
+              tmpP.Bottom = True
+              tmpP = UpdateData(tmpP)
+            End If
+          End If
+        End If
+      End If
       Return _RecordCount
     End Function
-'    Autocomplete Method
+    <DataObjectMethod(DataObjectMethodType.Delete, True)>
+    Public Shared Function pakPOBItemsDeleteRecursive(Results As SIS.PAK.pakPOBItems) As SIS.PAK.pakPOBItems
+      RecursiveDelete(Results)
+      Return Results
+    End Function
+    Private Shared Sub RecursiveDelete(ByVal pItm As SIS.PAK.pakPOBItems)
+      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, pItm.ItemNo, "")
+      If Items.Count > 0 Then
+        For Each Itm As SIS.PAK.pakPOBItems In Items
+          RecursiveDelete(Itm)
+        Next
+      End If
+      SIS.PAK.pakPOBItems.pakPOBItemsDelete(pItm)
+    End Sub
+
+    '    Autocomplete Method
     Public Shared Function SelectpakPOBItemsAutoCompleteList(ByVal Prefix As String, ByVal count As Integer, ByVal contextKey As String) As String()
       Dim Results As List(Of String) = Nothing
       Dim aVal() As String = contextKey.Split("|".ToCharArray)

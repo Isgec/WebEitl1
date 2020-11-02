@@ -93,7 +93,9 @@ Namespace SIS.PAK
         .Body = Header
       End With
       Try
-        oClient.Send(oMsg)
+        If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+          oClient.Send(oMsg)
+        End If
       Catch ex As Exception
       End Try
     End Sub
@@ -228,21 +230,21 @@ Namespace SIS.PAK
 
         If AlertEvent = pakTCAlertEvents.DocumentsSubmitted Then
           'Add Project wise Alert Group in CC
-          Dim eunt As String = ""
-          Select Case oPO.PONumber.Substring(0, 4)
-            Case "P101"
-              eunt = "EU200"
-            Case "P201"
-              eunt = "EU230"
-            Case "P301"
-              eunt = "EU210"
-            Case "P401"
-              eunt = "EU220"
-            Case "P501"
-              eunt = "EU240"
-            Case "P250"
-              eunt = "EU250"
-          End Select
+          Dim eunt As String = SIS.PAK.erpData.erpProject.GetEnterpriseUnit(oPO.ProjectID)
+          'Select Case oPO.PONumber.Substring(0, 4)
+          '  Case "P101"
+          '    eunt = "EU200"
+          '  Case "P201"
+          '    eunt = "EU230"
+          '  Case "P301"
+          '    eunt = "EU210"
+          '  Case "P401"
+          '    eunt = "EU220"
+          '  Case "P501"
+          '    eunt = "EU240"
+          '  Case "P250"
+          '    eunt = "EU250"
+          'End Select
 
           Dim Users As List(Of SIS.PAK.erpData.erpEnggGroup) = SIS.PAK.erpData.erpEnggGroup.GetFromERP(eunt, oPO.ProjectID)
           For Each usr As SIS.PAK.erpData.erpEnggGroup In Users
@@ -357,7 +359,9 @@ Namespace SIS.PAK
         .Body = Header
       End With
       Try
-        oClient.Send(oMsg)
+        If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+          oClient.Send(oMsg)
+        End If
       Catch ex As Exception
       End Try
       Return True
@@ -428,7 +432,9 @@ Namespace SIS.PAK
         End If
       End With
       Try
-        oClient.Send(oMsg)
+        If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+          oClient.Send(oMsg)
+        End If
       Catch ex As Exception
       End Try
     End Sub
@@ -659,7 +665,9 @@ Namespace SIS.PAK
         .Body = Header
       End With
       Try
-        oClient.Send(oMsg)
+        If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+          oClient.Send(oMsg)
+        End If
       Catch ex As Exception
       End Try
       Return True

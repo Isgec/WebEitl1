@@ -16,6 +16,29 @@ Partial Class EF_pakPOItem
       ViewState.Add("Editable", value)
     End Set
   End Property
+  Public Property UploadVisible() As Boolean
+    Get
+      If ViewState("UploadVisible") IsNot Nothing Then
+        Return CType(ViewState("UploadVisible"), Boolean)
+      End If
+      Return True
+    End Get
+    Set(ByVal value As Boolean)
+      ViewState.Add("UploadVisible", value)
+    End Set
+  End Property
+  Public Property DUListVisible() As Boolean
+    Get
+      If ViewState("DUListVisible") IsNot Nothing Then
+        Return CType(ViewState("DUListVisible"), Boolean)
+      End If
+      Return True
+    End Get
+    Set(ByVal value As Boolean)
+      ViewState.Add("DUListVisible", value)
+    End Set
+  End Property
+
   Public Property Deleteable() As Boolean
     Get
       If ViewState("Deleteable") IsNot Nothing Then
@@ -43,6 +66,23 @@ Partial Class EF_pakPOItem
     Editable = tmp.Editable
     Deleteable = tmp.Deleteable
     PrimaryKey = tmp.PrimaryKey
+    DUListVisible = False
+    UploadVisible = False
+    If tmp.UsePackageMaster Then
+      If tmp.POStatusID = pakPOStates.Free Then
+        DUListVisible = True
+      ElseIf tmp.POStatusID = pakPOStates.UnderISGECApproval AndAlso Not tmp.IsSupplier Then
+        UploadVisible = True
+      ElseIf tmp.POStatusID = pakPOStates.UnderSupplierVerification AndAlso tmp.IsSupplier Then
+        UploadVisible = True
+      End If
+    Else
+      If tmp.POStatusID = pakPOStates.UnderISGECApproval AndAlso Not tmp.IsSupplier Then
+        UploadVisible = True
+      ElseIf tmp.POStatusID = pakPOStates.UnderSupplierVerification AndAlso tmp.IsSupplier Then
+        UploadVisible = True
+      End If
+    End If
   End Sub
   Protected Sub FVpakPO_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVpakPO.Init
     DataClassName = "EpakPO"
@@ -52,10 +92,8 @@ Partial Class EF_pakPOItem
     SetToolBar = TBLpakPO
   End Sub
   Protected Sub FVpakPO_PreRender(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVpakPO.PreRender
-    TBLpakPO.EnableSave = Editable
+    TBLpakPO.EnableSave = False
     TBLpakPO.EnableDelete = Deleteable
-    Dim ctl As HtmlControl = FVpakPO.FindControl("fsUnlinked")
-    ctl.Visible = Editable
     Dim mStr As String = ""
     Dim oTR As IO.StreamReader = New IO.StreamReader(HttpContext.Current.Server.MapPath("~/PAK_Main/App_Edit") & "/EF_pakPO.js")
     mStr = oTR.ReadToEnd
@@ -187,6 +225,10 @@ Partial Class EF_pakPOItem
               End Try
               If wsD Is Nothing Then
                 errMsg.Text = "XL File does not have DATA sheet, Invalid MS-EXCEL file."
+                HttpContext.Current.Server.ScriptTimeout = st
+                Dim message As String = New JavaScriptSerializer().Serialize(errMsg.Text)
+                Dim script As String = String.Format("alert({0});", message)
+                ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
                 xlP.Dispose()
                 Exit Sub
               End If
@@ -198,57 +240,245 @@ Partial Class EF_pakPOItem
               Dim tmpPO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
               If POStatusID <> tmpPO.POStatusID Then
                 errMsg.Text = "PO Status does not match with uploaded file."
+                HttpContext.Current.Server.ScriptTimeout = st
+                Dim message As String = New JavaScriptSerializer().Serialize(errMsg.Text)
+                Dim script As String = String.Format("alert({0});", message)
+                ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
                 xlP.Dispose()
                 Exit Sub
               End If
+              If POStatusID = pakPOStates.UnderSupplierVerification Then
+                If Not tmpPO.IsSupplier Then
+                  errMsg.Text = "File can be uploaded by Supplier Login."
+                  HttpContext.Current.Server.ScriptTimeout = st
+                  Dim message As String = New JavaScriptSerializer().Serialize(errMsg.Text)
+                  Dim script As String = String.Format("alert({0});", message)
+                  ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+                  xlP.Dispose()
+                  Exit Sub
+                End If
+              End If
+              If POStatusID = pakPOStates.UnderISGECApproval Then
+                If tmpPO.IsSupplier Then
+                  errMsg.Text = "File can be uploaded by ISGEC."
+                  HttpContext.Current.Server.ScriptTimeout = st
+                  Dim message As String = New JavaScriptSerializer().Serialize(errMsg.Text)
+                  Dim script As String = String.Format("alert({0});", message)
+                  ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+                  xlP.Dispose()
+                  Exit Sub
+                End If
+              End If
+
               Dim tmpBOM As SIS.PAK.pakPOBOM = SIS.PAK.pakPOBOM.pakPOBOMGetByID(SerialNo, BOMNo)
               Dim tmpBItem As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(SerialNo, BOMNo, PItemNo)
 
               Dim ItemNo As String = ""
+              Dim ParentRecordCode As String = ""
+              Dim ItemCode As String = ""
               Dim ItemDesc As String = ""
+              Dim UOMQty As String = ""
+              Dim Qty As String = ""
+              Dim UOMWt As String = ""
+              Dim Wt As String = ""
+              Dim Remarks As String = ""
+              Dim q As Decimal = 0
+              Dim w As Decimal = 0
               For I As Integer = 9 To 99000
                 ItemNo = wsD.Cells(I, 1).Text
-                If ItemNo = String.Empty Then Exit For
-                Dim tmp As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
-                If tmp Is Nothing Then Continue For
-                With tmp
-                  .ElementID = wsD.Cells(I, 2).Text
-                  If .ElementID <> String.Empty Then
-                    Dim tmpEle As SIS.PAK.pakElements = SIS.PAK.pakElements.pakElementsGetByID(.ElementID)
-                    If tmp Is Nothing Then
-                      .ElementID = ""
-                      wsD.Cells(I, 2).AddComment("Element ID NOT Found.", "Error")
-                    End If
-                  End If
-                  .ItemCode = wsD.Cells(I, 3).Text
-                  .ItemDescription = wsD.Cells(I, 4).Text
-                  Dim sUnit As String = wsD.Cells(I, 5).Text
-                  Dim vUnit As String = ""
-                  If sUnit <> "" Then
-                    Dim tmpUnit As SIS.PAK.pakUnits = SIS.PAK.pakUnits.pakUnitsGetByDescription(sUnit)
-                    If tmpUnit IsNot Nothing Then
-                      vUnit = tmpUnit.UnitID
-                    End If
-                  End If
-                  .UOMQuantity = vUnit
-                  .Quantity = IIf(wsD.Cells(I, 6).Text = "", 0, wsD.Cells(I, 6).Text)
-                  sUnit = wsD.Cells(I, 7).Text
-                  vUnit = ""
-                  If sUnit <> "" Then
-                    Dim tmpUnit As SIS.PAK.pakUnits = SIS.PAK.pakUnits.pakUnitsGetByDescription(sUnit)
-                    If tmpUnit IsNot Nothing Then
-                      vUnit = tmpUnit.UnitID
-                    End If
-                  End If
-                  .UOMWeight = vUnit
-                  .WeightPerUnit = IIf(wsD.Cells(I, 8).Text = "", 0, wsD.Cells(I, 8).Text)
-                  .ISGECRemarks = wsD.Cells(I, 11).Text
-                End With
+                If ItemNo = "EOR" Then Exit For
+                'Read Rest of the data
+                ParentRecordCode = wsD.Cells(I, 2).Text
+                ItemCode = wsD.Cells(I, 3).Text
+                ItemDesc = wsD.Cells(I, 4).Text
+                UOMQty = wsD.Cells(I, 5).Text
+                Qty = wsD.Cells(I, 6).Text
+                UOMWt = wsD.Cells(I, 7).Text
+                Wt = wsD.Cells(I, 8).Text
+                Remarks = wsD.Cells(I, 9).Text
+                'Setup Safe Values
                 Try
-                  tmp = SIS.PAK.pakPOBItems.UpdateData(tmp)
+                  q = Convert.ToDecimal(Qty)
                 Catch ex As Exception
-                  wsD.Cells(I, 3).AddComment(ex.Message, "Error")
+                  q = 0
                 End Try
+                Try
+                  w = Convert.ToDecimal(Wt)
+                Catch ex As Exception
+                  w = 0
+                End Try
+                If UOMQty <> "" Then
+                  Dim tmpUnit As SIS.PAK.pakUnits = SIS.PAK.pakUnits.pakUnitsGetByDescription(UOMQty)
+                  If tmpUnit IsNot Nothing Then
+                    UOMQty = tmpUnit.UnitID
+                  Else
+                    UOMQty = 8 'Nos
+                  End If
+                Else
+                  UOMQty = 8 'Nos
+                End If
+                If UOMWt <> "" Then
+                  Dim tmpUnit As SIS.PAK.pakUnits = SIS.PAK.pakUnits.pakUnitsGetByDescription(UOMWt)
+                  If tmpUnit IsNot Nothing Then
+                    UOMWt = tmpUnit.UnitID
+                  Else
+                    UOMWt = 6 'Kg
+                  End If
+                Else
+                  UOMWt = 6 'Kg
+                End If
+                If ItemNo <> String.Empty Then
+                  'Existing Item
+                  Dim tmp As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
+                  If tmp Is Nothing Then Continue For
+                  If tmp.DeletedInERP Then Continue For
+                  If tmp.AcceptWFVisible Then Continue For
+                  Select Case tmp.StatusID
+                    Case pakItemStates.FreezedbyISGEC
+                      Continue For
+                    Case pakItemStates.DeleteRequiredByISGEC, pakItemStates.DeleteRequiredBySupplier
+                      Continue For
+                  End Select
+                  'Identify what is to be performed Modify or Delete or No Change
+                  Dim IsDeleted As Boolean = False
+                  Dim IsModified As Boolean = False
+                  If ItemDesc = "" Then
+                    IsDeleted = True
+                  Else
+                    If tmpPO.POStatusID = pakPOStates.UnderSupplierVerification Then If ItemCode <> tmp.SupplierItemCode Then IsModified = True
+                    If tmpPO.POStatusID = pakPOStates.UnderISGECApproval Then If ItemCode <> tmp.ItemCode Then IsModified = True
+                    If ItemDesc <> tmp.ItemDescription Then IsModified = True
+                    If tmp.Bottom Then
+                      If Convert.ToInt32(UOMQty) <> tmp.UOMQuantity Then IsModified = True
+                      If q <> tmp.Quantity Then IsModified = True
+                      If Convert.ToInt32(UOMWt) <> tmp.UOMWeight Then IsModified = True
+                      If w <> tmp.WeightPerUnit Then IsModified = True
+                    End If
+                    If tmpPO.POStatusID = pakPOStates.UnderSupplierVerification Then If Remarks <> tmp.SupplierRemarks Then IsModified = True
+                    If tmpPO.POStatusID = pakPOStates.UnderISGECApproval Then If Remarks <> tmp.ISGECRemarks Then IsModified = True
+                  End If
+                  If Not IsDeleted AndAlso Not IsModified Then Continue For
+                  If IsModified Then
+                    If tmpPO.QCRequired Then
+                      If q < tmp.QualityClearedQty Then
+                        Qty = tmp.QualityClearedQty
+                      End If
+                    Else
+                      If tmpPO.PortRequired Then
+                        If q < tmp.QuantityDespatchedToPort Then
+                          q = tmp.QuantityDespatchedToPort
+                        End If
+                      Else
+                        If q < tmp.QuantityDespatched Then
+                          q = tmp.QuantityDespatched
+                        End If
+                      End If
+                    End If
+                    With tmp
+                      .Changed = False
+                      .ChangedBySupplier = False
+                      .Accepted = False
+                      .AcceptedBySupplier = False
+                      .AcceptedBy = HttpContext.Current.Session("LoginID")
+                      .AcceptedOn = Now
+                      If tmp.IsSupplier Then
+                        If .StatusID <> pakItemStates.CreatedBySupplier Then .StatusID = pakItemStates.ChangedBySupplier
+                        .SupplierItemCode = ItemCode
+                        .SupplierRemarks = Remarks
+                        .ChangedBySupplier = True
+                      Else
+                        If .StatusID <> pakItemStates.CreatedByISGEC Then .StatusID = pakItemStates.ChangedByIsgec
+                        .ItemCode = ItemCode
+                        .ISGECRemarks = Remarks
+                        .Changed = True
+                      End If
+                      .ItemDescription = ItemDesc
+                      .UOMQuantity = UOMQty
+                      .Quantity = q
+                      .UOMWeight = UOMWt
+                      .WeightPerUnit = w
+                      .TotalWeight = SIS.PAK.pakPO.GetTotalWeight(.Quantity, .WeightPerUnit, .UOMQuantity, .UOMWeight)
+                    End With
+                    tmp = SIS.PAK.pakPOBItems.UpdateData(tmp)
+                  ElseIf IsDeleted Then
+                    If SIS.PAK.pakPOBItems.CanBeDeleted(tmp) Then
+                      SIS.PAK.pakPOBItems.DeleteWF(tmp.SerialNo, tmp.BOMNo, tmp.ItemNo)
+                    End If
+                  End If
+                Else
+                  '===========
+                  'New Item
+                  '===========
+                  Dim pItm As SIS.PAK.pakPOBItems = Nothing
+                  If ParentRecordCode <> "" Then
+                    Try
+                      pItm = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(SerialNo, BOMNo, ParentRecordCode)
+                    Catch ex As Exception
+                    End Try
+                    If pItm Is Nothing Then
+                      If tmpPO.POStatusID = pakPOStates.UnderSupplierVerification Then
+                        pItm = SIS.PAK.pakPOBItems.pakPOBItemsGetBySupplierItemCode(SerialNo, BOMNo, ParentRecordCode)
+                      Else
+                        pItm = SIS.PAK.pakPOBItems.pakPOBItemsGetByItemCode(SerialNo, BOMNo, ParentRecordCode)
+                      End If
+                    End If
+                    If pItm IsNot Nothing Then
+                      'Parent Item Qty. Should be zero
+                      If pItm.Quantity > 0 Then
+                        pItm = Nothing
+                      End If
+                    End If
+                  End If
+                  If pItm Is Nothing Then
+                    pItm = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(SerialNo, BOMNo, tmpBOM.ItemNo)
+                  End If
+                  Dim tmp As New SIS.PAK.pakPOBItems
+                  With tmp
+                    .SerialNo = SerialNo
+                    .BOMNo = BOMNo
+                    If tmpPO.IsSupplier Then
+                      .CreatedBySupplier = True
+                      .StatusID = pakItemStates.CreatedBySupplier
+                      .ChangedBySupplier = True
+                      .SupplierItemCode = ItemCode
+                      .SupplierRemarks = Remarks
+                    Else
+                      .Free = True
+                      .StatusID = pakItemStates.CreatedByISGEC
+                      .Changed = True
+                      .ItemCode = ItemCode
+                      .ISGECRemarks = Remarks
+                    End If
+                    .Active = True
+                    .DeletedInERP = False
+                    .ItemNo = SIS.PAK.pakPOBItems.GetMaxItemNo(SerialNo, BOMNo) + 1
+                    .ItemDescription = ItemDesc
+                    .UOMQuantity = UOMQty
+                    .Quantity = q
+                    .UOMWeight = UOMWt
+                    .WeightPerUnit = w
+                    .ParentItemNo = pItm.ItemNo
+                    .Root = False
+                    .Middle = False
+                    .Bottom = True
+                    .ItemLevel = pItm.ItemLevel + 1
+                    .Prefix = .Prefix.PadLeft(.ItemLevel, Chr(187))
+                    .DivisionID = pItm.DivisionID
+                    .ElementID = pItm.ElementID
+                    .TotalWeight = SIS.PAK.pakPO.GetTotalWeight(.Quantity, .WeightPerUnit, .UOMQuantity, .UOMWeight)
+                  End With
+                  tmp = SIS.PAK.pakPOBItems.InsertData(tmp)
+                  With pItm
+                    If Not .Root Then
+                      .Middle = True
+                      .Bottom = False
+                    Else
+                      .Middle = False
+                      .Bottom = False
+                    End If
+                  End With
+                  pItm = SIS.PAK.pakPOBItems.UpdateData(pItm)
+                End If
               Next
             Catch ex As Exception
               Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
@@ -259,22 +489,22 @@ Partial Class EF_pakPOItem
             wsD.Dispose()
             xlP.Dispose()
           End Using
-          Dim FileNameForUser As String = F_FileUpload.FileName
-          '======================
-          Response.Clear()
-          Response.AppendHeader("content-disposition", "attachment; filename=" & FileNameForUser)
-          Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(FileNameForUser)
-          Response.WriteFile(tmpFile)
           HttpContext.Current.Server.ScriptTimeout = st
-          Response.End()
+          '======================
+          'Dim FileNameForUser As String = F_FileUpload.FileName
+          'Response.Clear()
+          'Response.AppendHeader("content-disposition", "attachment; filename=" & FileNameForUser)
+          'Response.ContentType = SIS.SYS.Utilities.ApplicationSpacific.ContentType(FileNameForUser)
+          'Response.WriteFile(tmpFile)
+          'Response.End()
         End If
       End With
     Catch ex As Exception
+      HttpContext.Current.Server.ScriptTimeout = st
       Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
       Dim script As String = String.Format("alert({0});", message)
       ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
     End Try
-over:
   End Sub
 
 End Class

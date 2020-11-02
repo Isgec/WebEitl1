@@ -14,10 +14,11 @@ Partial Class GF_pakPOItem
       Catch ex As Exception
       End Try
     End If
-    If e.CommandName.ToLower = "initiatewf".ToLower Then
+    If e.CommandName.ToLower = "SubmitWF".ToLower Then
       Try
         Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
-        SIS.PAK.pakPO.InitiateWF(SerialNo)
+        SIS.PAK.pakPO.SubmitWF(SerialNo)
+        SIS.PAK.pakPO.CreateHistory(SerialNo)
         GVpakPO.DataBind()
       Catch ex As Exception
         Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
@@ -25,10 +26,10 @@ Partial Class GF_pakPOItem
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
       End Try
     End If
-    If e.CommandName.ToLower = "approvewf".ToLower Then
+    If e.CommandName.ToLower = "FreezeWF".ToLower Then
       Try
         Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
-        SIS.PAK.pakPO.ApproveWF(SerialNo)
+        SIS.PAK.pakPO.FreezeBOMWF(SerialNo)
         GVpakPO.DataBind()
       Catch ex As Exception
         Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
@@ -36,20 +37,15 @@ Partial Class GF_pakPOItem
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
       End Try
     End If
-    If e.CommandName.ToLower = "rejectwf".ToLower Then
+    If e.CommandName.ToLower = "UnFreezeWF".ToLower Then
       Try
         Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
-        SIS.PAK.pakPO.RejectWF(SerialNo)
+        SIS.PAK.pakPO.UnFreezeBOMWF(SerialNo)
         GVpakPO.DataBind()
       Catch ex As Exception
-      End Try
-    End If
-    If e.CommandName.ToLower = "completewf".ToLower Then
-      Try
-        Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
-        SIS.PAK.pakPO.CompleteWF(SerialNo)
-        GVpakPO.DataBind()
-      Catch ex As Exception
+        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+        Dim script As String = String.Format("alert({0});", message)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
       End Try
     End If
   End Sub

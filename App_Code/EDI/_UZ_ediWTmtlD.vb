@@ -138,25 +138,61 @@ Namespace SIS.EDI
       End Using
       Return Results
     End Function
+    Public Shared Function UZ_ediWTmtlDSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal t_tran As String, ByVal Comp As String) As List(Of SIS.EDI.ediWTmtlD)
+      Dim Results As List(Of SIS.EDI.ediWTmtlD) = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          If SearchState Then
+            Cmd.CommandText = "spedi_LG_WTmtlDSelectListSearch"
+            Cmd.CommandText = "spediWTmtlDSelectListSearch_" & Comp
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
+          Else
+            Cmd.CommandText = "spedi_LG_WTmtlDSelectListFilteres"
+            Cmd.CommandText = "spediWTmtlDSelectListFilteres_" & Comp
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_t_tran", SqlDbType.VarChar, 9, IIf(t_tran Is Nothing, String.Empty, t_tran))
+          End If
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          _RecordCount = -1
+          Results = New List(Of SIS.EDI.ediWTmtlD)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.EDI.ediWTmtlD(Reader))
+          End While
+          Reader.Close()
+          _RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
+      Return Results
+    End Function
+    Public Shared Function ediWTmtlDSelectCount(ByVal SearchState As Boolean, ByVal SearchText As String, ByVal t_tran As String, ByVal Comp As String) As Integer
+      Return _RecordCount
+    End Function
     Public Shared Function SetDefaultValues(ByVal sender As System.Web.UI.WebControls.FormView, ByVal e As System.EventArgs) As System.Web.UI.WebControls.FormView
       With sender
         Try
-        CType(.FindControl("F_t_tran"), TextBox).Text = ""
-        CType(.FindControl("F_t_docn"), TextBox).Text = ""
-        CType(.FindControl("F_t_revn"), TextBox).Text = ""
-        CType(.FindControl("F_t_remk"), TextBox).Text = ""
-        CType(.FindControl("F_t_recv"), TextBox).Text = ""
-        CType(.FindControl("F_t_pono"), TextBox).Text = 0
-        CType(.FindControl("F_t_refr"), TextBox).Text = ""
-        CType(.FindControl("F_t_redt"), TextBox).Text = ""
-        CType(.FindControl("F_t_rekm"), TextBox).Text = ""
-        CType(.FindControl("F_t_issu"), TextBox).Text = 0
-        CType(.FindControl("F_t_lock"), TextBox).Text = 0
-        CType(.FindControl("F_t_revd"), TextBox).Text = 0
-        CType(.FindControl("F_t_stid"), TextBox).Text = ""
-        CType(.FindControl("F_t_Refcntd"), TextBox).Text = 0
-        CType(.FindControl("F_t_Refcntu"), TextBox).Text = 0
-        CType(.FindControl("F_t_recc"), TextBox).Text = 0
+          CType(.FindControl("F_t_tran"), TextBox).Text = ""
+          CType(.FindControl("F_t_docn"), TextBox).Text = ""
+          CType(.FindControl("F_t_revn"), TextBox).Text = ""
+          CType(.FindControl("F_t_remk"), TextBox).Text = ""
+          CType(.FindControl("F_t_recv"), TextBox).Text = ""
+          CType(.FindControl("F_t_pono"), TextBox).Text = 0
+          CType(.FindControl("F_t_refr"), TextBox).Text = ""
+          CType(.FindControl("F_t_redt"), TextBox).Text = ""
+          CType(.FindControl("F_t_rekm"), TextBox).Text = ""
+          CType(.FindControl("F_t_issu"), TextBox).Text = 0
+          CType(.FindControl("F_t_lock"), TextBox).Text = 0
+          CType(.FindControl("F_t_revd"), TextBox).Text = 0
+          CType(.FindControl("F_t_stid"), TextBox).Text = ""
+          CType(.FindControl("F_t_Refcntd"), TextBox).Text = 0
+          CType(.FindControl("F_t_Refcntu"), TextBox).Text = 0
+          CType(.FindControl("F_t_recc"), TextBox).Text = 0
         Catch ex As Exception
         End Try
       End With

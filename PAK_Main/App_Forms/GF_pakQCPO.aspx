@@ -173,6 +173,15 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="QCO" >
+          <ItemTemplate>
+            <div style="display:flex; flex-direction:row;justify-content:center;">
+              <div title="QC Offered" style='font-weight:bold;padding:5px;border-radius:10px;background-color:#ff0033;color:white;'><%# Eval("QCOCount") %></div>
+            </div>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="30px" />
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="Serial No" SortExpression="SerialNo">
           <ItemTemplate>
             <asp:Label ID="LabelSerialNo" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("SerialNo") %>'></asp:Label>

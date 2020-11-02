@@ -3,7 +3,108 @@ Imports System.Web.Script.Serialization
 Imports System.IO
 Partial Class GF_pakIQCListH
   Inherits SIS.SYS.GridBase
+  Private Sub cmdSubmit_Command(sender As Object, e As CommandEventArgs) Handles cmdSubmit.Command
+    Try
+      Dim aVar() As String = e.CommandArgument.ToString.Split("|".ToCharArray)
+      Dim SerialNo As Integer = aVar(0)
+      Dim QCLNo As Integer = aVar(1)
+      Dim IsMicn As Boolean = Convert.ToBoolean(aVar(2))
+      Dim tmpPO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+      Dim tmp As SIS.PAK.pakQCListI = SIS.PAK.pakQCListI.pakQCListIGetByID(SerialNo, QCLNo)
+      Dim Found As Boolean = True
+      If tmp Is Nothing Then
+        Found = False
+        tmp = New SIS.PAK.pakQCListI
+        If IsMicn Then
+          tmp.IsMICN = True
+          tmp.InspectionReportNo = SIS.PAK.pakQCListI.GetNextMICN(tmpPO.ProjectID)
+        Else
+          tmp.IsMICN = False
+          tmp.InspectionReportNo = SIS.PAK.pakQCListI.GetNextIW(tmpPO.ProjectID)
+        End If
+        tmp.SerialNo = SerialNo
+        tmp.QCLNo = QCLNo
+        tmp.InspectionReportPrefix = tmpPO.ProjectID & "-" & tmpPO.PONumber & "-" & tmpPO.PORevision & "-" & QCLNo
+      End If
+      With tmp
+        .SubSupplier = F_SubSupplier.Text
+        .MainItem = F_MainItem.Text
+        .RefReportNo = F_RefReportNo.Text
+        .ComplianceReportNo = F_ComplianceReportNo.Text
+        .POClosed = False 'Get Actual PO Status
+      End With
+      If Not Found Then
+        SIS.PAK.pakQCListI.InsertData(tmp)
+      Else
+        SIS.PAK.pakQCListI.UpdateData(tmp)
+      End If
+    Catch ex As Exception
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+    End Try
+  End Sub
+
   Protected Sub GVpakIQCListH_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakIQCListH.RowCommand
+    If e.CommandName.ToLower = "CloseQC".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
+        SIS.PAK.pakIQCListH.CloseQC(SerialNo, QCLNo)
+        GVpakIQCListH.DataBind()
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
+    If e.CommandName.ToLower = "cmdMicn".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
+        Dim tmp As SIS.PAK.pakQCListI = SIS.PAK.pakQCListI.pakQCListIGetByID(SerialNo, QCLNo)
+        If tmp Is Nothing Then tmp = New SIS.PAK.pakQCListI
+        qcHeader.InnerHtml = "Issue MICN Certificate"
+        F_SubSupplier.Text = tmp.SubSupplier
+        F_MainItem.Text = tmp.MainItem
+        F_RefReportNo.Text = tmp.RefReportNo
+        F_ComplianceReportNo.Text = tmp.ComplianceReportNo
+        cmdSubmit.CommandArgument = SerialNo & "|" & QCLNo & "|True"
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "qci_script.show_qci();", True)
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
+    If e.CommandName.ToLower = "prnMicn".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
+        Dim tmp As SIS.PAK.pakQCListI = SIS.PAK.pakQCListI.pakQCListIGetByID(SerialNo, QCLNo)
+        If tmp Is Nothing Then tmp = New SIS.PAK.pakQCListI
+        qcHeader.InnerHtml = "Issue MICN Certificate"
+        F_SubSupplier.Text = tmp.SubSupplier
+        F_MainItem.Text = tmp.MainItem
+        F_RefReportNo.Text = tmp.RefReportNo
+        F_ComplianceReportNo.Text = tmp.ComplianceReportNo
+        cmdSubmit.CommandArgument = SerialNo & "|" & QCLNo & "|True"
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "qci_script.show_qci();", True)
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
+    If e.CommandName.ToLower = "cmdIW".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
+        Dim tmp As SIS.PAK.pakQCListI = SIS.PAK.pakQCListI.pakQCListIGetByID(SerialNo, QCLNo)
+        If tmp Is Nothing Then tmp = New SIS.PAK.pakQCListI
+        qcHeader.InnerHtml = "Issue Inspection Waiver"
+        F_SubSupplier.Text = tmp.SubSupplier
+        F_MainItem.Text = tmp.MainItem
+        F_RefReportNo.Text = tmp.RefReportNo
+        F_ComplianceReportNo.Text = tmp.ComplianceReportNo
+        cmdSubmit.CommandArgument = SerialNo & "|" & QCLNo & "|False"
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "qci_script.show_qci();", True)
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
         Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
@@ -16,7 +117,7 @@ Partial Class GF_pakIQCListH
     End If
     If e.CommandName.ToLower = "approvewf".ToLower Then
       Try
-        Dim Remarks As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_Remarks"), TextBox).Text
+        Dim Remarks As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_ReturnRemarks"), TextBox).Text
         Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
         Dim QCRequestNo As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_QCRequestNo"), LC_qcmSRequests).SelectedValue
@@ -28,7 +129,7 @@ Partial Class GF_pakIQCListH
     End If
     If e.CommandName.ToLower = "rejectwf".ToLower Then
       Try
-        Dim Remarks As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_Remarks"), TextBox).Text
+        Dim Remarks As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_ReturnRemarks"), TextBox).Text
         Dim QCRequestNo As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_QCRequestNo"), LC_qcmSRequests).SelectedValue
         Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
@@ -572,10 +673,10 @@ Partial Class GF_pakIQCListH
                 BOMNo = wsD.Cells(I, 2).Text
                 If BOMNo = String.Empty Then Exit For
                 ItemNo = wsD.Cells(I, 3).Text
-                Updatable = IIf(wsD.Cells(I, 6).Text <> String.Empty, True, False)
+                Updatable = IIf(wsD.Cells(I, 7).Text <> String.Empty, True, False)
                 If Not Updatable Then Continue For
-                tmpQCQuantity = wsD.Cells(I, 16).Text
-                tmpRemarks = wsD.Cells(I, 17).Text
+                tmpQCQuantity = wsD.Cells(I, 17).Text
+                tmpRemarks = wsD.Cells(I, 18).Text
 
                 If Not IsNumeric(tmpQCQuantity) Then
                   tmpQCQuantity = "0.0000"
@@ -627,4 +728,5 @@ Partial Class GF_pakIQCListH
     End If
     HttpContext.Current.Server.ScriptTimeout = st
   End Sub
+
 End Class

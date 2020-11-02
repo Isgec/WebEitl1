@@ -5,6 +5,59 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.PAK
   Partial Public Class pakIQCListH
+    Public ReadOnly Property MICNIWAttachHandle As String
+      Get
+        Return "J_PKGQC_MICNIW_" & HttpContext.Current.Session("FinanceCompany")
+      End Get
+    End Property
+    Public ReadOnly Property MICNIWAttachIndex As String
+      Get
+        Return SerialNo & "_" & QCLNo
+      End Get
+    End Property
+
+    Public ReadOnly Property GetMICNIWAttachLink() As String
+      Get
+        Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
+        If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
+          UrlAuthority = "192.9.200.146"
+        End If
+        Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
+        mRet &= "/Attachment/Attachment.aspx?AthHandle=" & MICNIWAttachHandle
+        Dim Index As String = MICNIWAttachIndex
+        Dim User As String = HttpContext.Current.Session("LoginID")
+        Dim canEdit As String = "n"
+        If Editable Then
+          canEdit = "y"
+        End If
+        mRet &= "&Index=" & Index & "&AttachedBy=" & User & "&ed=" & canEdit
+        mRet = "javascript:window.open('" & mRet & "', 'win_" & SerialNo & "', 'left=20,top=20,width=600,height=400,toolbar=0,resizable=1,scrollbars=1'); return false;"
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property ShowMICNIWAttachLink() As String
+      Get
+        Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
+        If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
+          UrlAuthority = "192.9.200.146"
+        End If
+        Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
+        mRet &= "/Attachment/Attachment.aspx?AthHandle=" & MICNIWAttachHandle
+        Dim Index As String = MICNIWAttachIndex
+        Dim User As String = ""
+        Dim canEdit As String = "n"
+        mRet &= "&Index=" & Index & "&AttachedBy=" & User & "&ed=" & canEdit
+        mRet = "javascript:window.open('" & mRet & "', 'win_" & SerialNo & "', 'left=20,top=20,width=600,height=400,toolbar=0,resizable=1,scrollbars=1'); return false;"
+        Return mRet
+      End Get
+    End Property
+
+    Public Shadows ReadOnly Property GetPkgLink As String
+      Get
+        Return "~/PAK_Main/App_Edit/EF_pakPkgListH.aspx?SerialNo=" & SerialNo & "&PkgNo=" & PkgNo
+      End Get
+    End Property
+
     Public ReadOnly Property GetNotesLink() As String
       Get
         Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority
@@ -23,6 +76,25 @@ Namespace SIS.PAK
     Public Shadows ReadOnly Property GetPrintLink() As String
       Get
         Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Downloads/qcldownload.aspx?qcl=" & PrimaryKey & "&typ=1" & "', 'win" & QCLNo & "', 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1'); return false;"
+      End Get
+    End Property
+    Public Shadows ReadOnly Property GetPrintQCILink() As String
+      Get
+        Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Downloads/qciPrint.aspx?qcl=" & PrimaryKey & "&typ=1" & "', 'win" & QCLNo & "', 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1'); return false;"
+      End Get
+    End Property
+    Public ReadOnly Property SumOfQty As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = "select isnull(sum(quantity),0) from pak_qclistd where qclno=" & QCLNo
+            Con.Open()
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
       End Get
     End Property
     Public Shadows Function GetEditable() As Boolean
@@ -98,6 +170,30 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
+    Public ReadOnly Property MICNVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          Select Case StatusID
+            Case pakQCStates.QCCompleted
+              mRet = True
+          End Select
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public Shared Function CloseQC(ByVal SerialNo As Int32, ByVal QCLNo As Int32) As SIS.PAK.pakIQCListH
+      Dim Results As SIS.PAK.pakIQCListH = pakIQCListHGetByID(SerialNo, QCLNo)
+      With Results
+        .ClearedBy = HttpContext.Current.Session("LoginID")
+        .ClearedOn = Now
+        .StatusID = pakQCStates.QCClosed
+      End With
+      Results = SIS.PAK.pakIQCListH.UpdateData(Results)
+      Return Results
+    End Function
+
     Public Shared Function ApproveWF(ByVal SerialNo As Int32, ByVal QCLNo As Int32, ByVal QCRequestNo As String, ByVal Remarks As String) As SIS.PAK.pakIQCListH
       If QCRequestNo Is Nothing Then QCRequestNo = ""
       Dim Results As SIS.PAK.pakIQCListH = pakIQCListHGetByID(SerialNo, QCLNo)
@@ -120,7 +216,9 @@ Namespace SIS.PAK
         .ClearedBy = HttpContext.Current.Session("LoginID")
         .ClearedOn = Now
         .StatusID = pakQCStates.QCCompleted
-        .QCRequestNo = QCRequestNo
+        If Results.QCRequestNo = "" Then
+          .QCRequestNo = QCRequestNo
+        End If
         .Remarks = Remarks
       End With
       Results = SIS.PAK.pakIQCListH.UpdateData(Results)

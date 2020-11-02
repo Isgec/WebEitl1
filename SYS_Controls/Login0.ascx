@@ -37,10 +37,11 @@
       <table>
         <td>
           <LGM:Informations ID="Informations1" Visible="false" runat="server" />
+          <asp:Label ID="sysInfo" runat="server" Text=""></asp:Label>
         </td>
         <td  valign="top" align="right" >
             <asp:LinkButton ID="LinkButton1"  runat="server" Height="26px"  PostBackUrl="~/ChangePassword.aspx" Text="Change Password" /><br />
-            <b><asp:LoginStatus ID="LoginStatus1" CssClass="signin" runat="server" Height="18px" Width="86px" style="padding:3px 10px 3px 10px" OnLoggedOut="LoggedOut" LoginText="Sign In" LogoutAction="Redirect" LogoutPageUrl="~/Default.aspx" LogoutText="  Sign Out  " ToolTip="Sign Out" /></b>
+            <b><asp:LoginStatus ID="LoginStatus1" CssClass="signin" runat="server" Height="18px" Width="86px" style="padding:3px 10px 3px 10px" LoginText="Sign In" LogoutAction="Redirect" LogoutPageUrl="~/Default.aspx" LogoutText="  Sign Out  " ToolTip="Sign Out" /></b>
         </td>
       </table>
     </LoggedInTemplate>

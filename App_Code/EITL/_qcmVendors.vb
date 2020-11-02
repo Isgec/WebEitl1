@@ -421,54 +421,7 @@ Namespace SIS.QCM
 			Return Results.ToArray
 		End Function
     Public Sub New(ByVal Reader As SqlDataReader)
-      On Error Resume Next
-      _VendorID = Ctype(Reader("VendorID"),String)
-      _Description = Ctype(Reader("Description"),String)
-      If Convert.IsDBNull(Reader("ContactPerson")) Then
-        _ContactPerson = String.Empty
-      Else
-        _ContactPerson = Ctype(Reader("ContactPerson"), String)
-      End If
-      If Convert.IsDBNull(Reader("EmailID")) Then
-        _EmailID = String.Empty
-      Else
-        _EmailID = Ctype(Reader("EmailID"), String)
-      End If
-      If Convert.IsDBNull(Reader("ContactNo")) Then
-        _ContactNo = String.Empty
-      Else
-        _ContactNo = Ctype(Reader("ContactNo"), String)
-      End If
-      If Convert.IsDBNull(Reader("Address1")) Then
-        _Address1 = String.Empty
-      Else
-        _Address1 = Ctype(Reader("Address1"), String)
-      End If
-      If Convert.IsDBNull(Reader("Address2")) Then
-        _Address2 = String.Empty
-      Else
-        _Address2 = Ctype(Reader("Address2"), String)
-      End If
-      If Convert.IsDBNull(Reader("Address3")) Then
-        _Address3 = String.Empty
-      Else
-        _Address3 = Ctype(Reader("Address3"), String)
-      End If
-      If Convert.IsDBNull(Reader("Address4")) Then
-        _Address4 = String.Empty
-      Else
-        _Address4 = Ctype(Reader("Address4"), String)
-      End If
-      If Convert.IsDBNull(Reader("ToEMailID")) Then
-        _ToEMailID = String.Empty
-      Else
-        _ToEMailID = Ctype(Reader("ToEMailID"), String)
-      End If
-      If Convert.IsDBNull(Reader("CCEmailID")) Then
-        _CCEmailID = String.Empty
-      Else
-        _CCEmailID = Ctype(Reader("CCEmailID"), String)
-      End If
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, Reader)
     End Sub
     Public Sub New()
     End Sub

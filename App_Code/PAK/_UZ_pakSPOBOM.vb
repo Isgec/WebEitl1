@@ -125,7 +125,7 @@ Namespace SIS.PAK
       Dim tmp As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.pakPOBItemsSelectList(0, 99999, "", False, "", BOMNo, SerialNo)
       For Each ttmp As SIS.PAK.pakPOBItems In tmp
         With ttmp
-          .StatusID = pakItemStates.ChangeRequiredBySupplier
+          '.StatusID = pakItemStates.ChangeRequiredBySupplier
           .AcceptedBy = HttpContext.Current.Session("LoginID")
           .AcceptedOn = Now
           .Accepted = False

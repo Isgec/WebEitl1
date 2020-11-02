@@ -154,6 +154,48 @@
       <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
       <tr>
         <td class="alignright">
+          <asp:Label ID="L_SupplierBillNo" runat="server" Text="Supplier Bill No :" />
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillNo"
+            Text='<%# Bind("SupplierBillNo") %>'
+            CssClass = "dmytxt"
+            Enabled = "False"
+            Width="300px"
+            runat="server" />
+        </td>
+        <td class="alignright">
+          <asp:Label ID="L_SupplierBillDate" runat="server" Text="Supplier Bill Date :" />
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillDate"
+            Text='<%# Bind("SupplierBillDate") %>'
+            Width="168px"
+            CssClass = "dmytxt"
+            Enabled = "False"
+            runat="server" />
+        </td>
+      </tr>
+      <tr>
+        <td class="alignright">
+          <asp:Label ID="L_SupplierBillAmount" runat="server" Text="Supplier Bill Amount :" />&nbsp;
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillAmount"
+            Text='<%# Bind("SupplierBillAmount") %>'
+            style="text-align: right"
+            Width="168px"
+            CssClass = "dmytxt"
+            Enabled = "False"
+            runat="server" />
+        </td>
+        <td class="alignright">
+        </td>
+        <td>
+      </tr>
+      <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
+      <tr>
+        <td class="alignright">
           <asp:Label ID="L_VRExecutionNo" runat="server" Text="Vehicle Execution No. :" />&nbsp;
         </td>
         <td colspan="3">

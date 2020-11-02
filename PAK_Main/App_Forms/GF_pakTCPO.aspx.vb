@@ -533,10 +533,8 @@ Partial Class GF_pakTCPO
   End Function
   Private Sub cmdImport_Click(sender As Object, e As EventArgs) Handles cmdImport.Click
     Try
-      Dim xPOs As List(Of SIS.PAK.pakPO) = SIS.PAK.erpData.erpPO.ImportFromERP("", F_PONumber.Text, True)
-      For Each po As SIS.PAK.pakPO In xPOs
-        SIS.PAK.erpData.erpPO.ImportPOLineFromERP(po)
-      Next
+      Dim po As SIS.PAK.pakPO = SIS.PAK.erpData.erpPO.ImportFromERP(F_PONumber.Text, True, False, False)
+      SIS.PAK.erpData.erpPO.ImportPOLineFromERP(po)
       GVpakTCPO.DataBind()
     Catch ex As Exception
       Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())

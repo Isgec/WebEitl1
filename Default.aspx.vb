@@ -9,21 +9,15 @@ Imports System.IO
 Partial Class LGDefault
   Inherits System.Web.UI.Page
 
-  Private Sub LGDefault_Load(sender As Object, e As EventArgs) Handles Me.Load
+  Private Sub F_FinanceCompany_SelectedIndexChanged(sender As Object, e As EventArgs) Handles F_FinanceCompany.SelectedIndexChanged
+    HttpContext.Current.Session("FinanceCompany") = F_FinanceCompany.SelectedValue
   End Sub
-
-  <System.Web.Services.WebMethod()>
-  <System.Web.Script.Services.ScriptMethod()>
-  Public Shared Function LoadUserControl(ByVal message As String) As String
-    Using page As New Page()
-      Dim userControl As UserControl = DirectCast(page.LoadControl("Message.ascx"), UserControl)
-      TryCast(userControl.FindControl("lblMessage"), Label).Text = message
-      page.Controls.Add(userControl)
-      Using writer As New StringWriter()
-        page.Controls.Add(userControl)
-        HttpContext.Current.Server.Execute(page, writer, False)
-        Return writer.ToString()
-      End Using
-    End Using
-  End Function
+  Private Sub LGDefault_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
+    div1.Visible = False
+    If HttpContext.Current.User.Identity.IsAuthenticated Then
+      F_FinanceCompany.SelectedValue = HttpContext.Current.Session("FinanceCompany")
+      F_SelectedCompany.InnerText = "Selected Company: " & HttpContext.Current.Session("FinanceCompany")
+      div1.Visible = True
+    End If
+  End Sub
 End Class

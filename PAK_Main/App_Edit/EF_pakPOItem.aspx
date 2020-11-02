@@ -186,7 +186,7 @@
                       <table width="100%">
                         <tr>
                           <td>
-                            <div id="F_Upload" runat="server" style="width: auto; margin: 10px 10px 10px 10px; padding: 10px 10px 10px 10px" class="file_upload" visible='<%# Editable %>'>
+                            <div id="F_Upload" runat="server" Visible='<%# UploadVisible %>' style="width: auto; margin: 10px 10px 10px 10px; padding: 10px 10px 10px 10px" class="file_upload">
                               <table>
                                 <tr>
                                   <td colspan="4">
@@ -200,7 +200,7 @@
                                     <asp:FileUpload ID="F_FileUpload" runat="server" Width="180px" ToolTip="Upload Item Template" />
                                   </td>
                                   <td>
-                                    <asp:Button ID="cmdFileUpload" OnClientClick="return this.style.display='none';true;" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="Upload" CommandArgument="" />
+                                    <asp:Button ID="cmdFileUpload" OnClientClick="return !showProcessingMPV();" Text="Upload" runat="server" ToolTip="Click to upload & process template file." CommandName="Upload" CommandArgument="" />
                                   </td>
                                 </tr>
                               </table>
@@ -222,17 +222,6 @@
                                 <span style="color: #ff0033">Loading...</span>
                               </ProgressTemplate>
                             </asp:UpdateProgress>
-                            <script type="text/javascript">
-                              var pcnt = 0;
-                              function print_report(o) {
-                                pcnt = pcnt + 1;
-                                var nam = 'wTask' + pcnt;
-                                var url = self.location.href.replace('App_Edit/EF_', 'App_Print/RP_');
-                                url = url + '&pk=' + o.alt;
-                                window.open(url, nam, 'left=20,top=20,width=1100,height=600,toolbar=1,resizable=1,scrollbars=1');
-                                return false;
-                              }
-                            </script>
                             <asp:GridView ID="GVpakPOBOM" SkinID="gv_silver" runat="server" DataSourceID="ODSpakPOBOM" DataKeyNames="SerialNo,BOMNo">
                               <Columns>
                                 <asp:TemplateField HeaderText="EDIT">
@@ -244,7 +233,7 @@
                                 </asp:TemplateField>
                                 <asp:TemplateField HeaderText="PRINT">
                                   <ItemTemplate>
-                                    <asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# Eval("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick="return print_report(this);" />
+                                    <asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# Eval("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick='<%# Eval("GetPrintBOMLink") %>' />
                                   </ItemTemplate>
                                   <ItemStyle CssClass="alignCenter" />
                                   <HeaderStyle HorizontalAlign="Center" Width="30px" />
@@ -270,15 +259,18 @@
                                   <ItemStyle CssClass="alignCenter" />
                                   <HeaderStyle CssClass="alignCenter" Width="40px" />
                                 </asp:TemplateField>
+                                <asp:TemplateField HeaderText="<div style='display:flex; flex-direction:column;'><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:royalblue;color:white;'>To ACK</div><div style='font-weight:bold;padding:2px;border-radius:10px;background-color:gold;'>Get-ACK</div></div>" >
+                                  <ItemTemplate>
+                                    <div style="display:flex; flex-direction:row;justify-content:center;">
+                                      <div class='btn-danger' title="You have to ACK." style='font-weight:bold;padding:5px;border-radius:10px;background-color:royalblue;color:white;'><%# Eval("ToAckCount") %></div>
+                                      <div class='btn-warning' title="You have to get ACK." style='font-weight:bold;padding:5px;border-radius:10px;background-color:gold;'><%# Eval("GetAckCount") %></div>
+                                    </div>
+                                  </ItemTemplate>
+                                  <HeaderStyle Width="60px" Font-Size="8px"/>
+                                </asp:TemplateField>
                                 <asp:TemplateField HeaderText="Item Description" SortExpression="ItemDescription">
                                   <ItemTemplate>
                                     <asp:Label ID="LabelItemDescription" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("ItemDescription") %>'></asp:Label>
-                                  </ItemTemplate>
-                                  <HeaderStyle HorizontalAlign="Left" Width="100px" />
-                                </asp:TemplateField>
-                                <asp:TemplateField HeaderText="Element" SortExpression="PAK_Elements5_Description">
-                                  <ItemTemplate>
-                                    <asp:Label ID="L_ElementID" runat="server" ForeColor='<%# Eval("ForeColor") %>' Title='<%# EVal("ElementID") %>' Text='<%# Eval("PAK_Elements5_Description") %>'></asp:Label>
                                   </ItemTemplate>
                                   <HeaderStyle HorizontalAlign="Left" Width="100px" />
                                 </asp:TemplateField>
@@ -286,17 +278,17 @@
                                   <ItemTemplate>
                                     <asp:Label ID="LabelISGECRemarks" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("ISGECRemarks") %>'></asp:Label>
                                   </ItemTemplate>
-                                  <ItemStyle CssClass="" />
-                                  <HeaderStyle HorizontalAlign="Left" CssClass="" Width="100px" />
+                                  <ItemStyle CssClass="alignleft" />
+                                  <HeaderStyle HorizontalAlign="Left" Width="150px" />
                                 </asp:TemplateField>
                                 <asp:TemplateField HeaderText="Supplier Remarks" SortExpression="SupplierRemarks">
                                   <ItemTemplate>
                                     <asp:Label ID="LabelSupplierRemarks" runat="server" ForeColor='<%# Eval("ForeColor") %>' Text='<%# Bind("SupplierRemarks") %>'></asp:Label>
                                   </ItemTemplate>
-                                  <ItemStyle CssClass="" />
-                                  <HeaderStyle CssClass="" HorizontalAlign="Left" Width="100px" />
+                                  <ItemStyle CssClass="aligncenter" />
+                                  <HeaderStyle HorizontalAlign="Left" Width="150px" />
                                 </asp:TemplateField>
-                                <asp:TemplateField HeaderText="DELETE">
+                                <asp:TemplateField HeaderText="DEL">
                                   <ItemTemplate>
                                     <asp:ImageButton ID="cmdDelete" ValidationGroup='<%# "Delete" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("DeleteWFVisible") %>' Enabled='<%# EVal("DeleteWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Delete Package from PO" SkinID="Delete" OnClientClick='<%# "return Page_ClientValidate(""Delete" & Container.DataItemIndex & """) && confirm(""ALL BOM Item Details will also be DELETED ?"");" %>' CommandName="DeleteWF" CommandArgument='<%# Container.DataItemIndex %>' />
                                   </ItemTemplate>
@@ -335,7 +327,7 @@
                   </asp:UpdatePanel>
                 </div>
               </fieldset>
-              <fieldset class="ui-widget-content page" id="fsUnlinked" runat="server">
+              <fieldset class="ui-widget-content page" id="fsUnlinked" runat="server" Visible='<%# DUListVisible %>'>
                 <legend>
                   <asp:Label ID="LabelpakUItems" runat="server" Text="&nbsp;List: Unlinked Items"></asp:Label>
                 </legend>
@@ -362,7 +354,7 @@
                               <Columns>
                                 <asp:TemplateField HeaderText="EDIT">
                                   <ItemTemplate>
-                                    <asp:ImageButton ID="cmdEditPage" ValidationGroup="Edit" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText="Edit" ToolTip="Edit the record." SkinID="Edit" CommandName="lgEdit" CommandArgument='<%# Container.DataItemIndex %>' />
+                                    <asp:ImageButton ID="cmdEditPage" ValidationGroup="Edit" runat="server" Visible='<%# Eval("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText="Edit" ToolTip="Edit the record." SkinID="Edit" CommandName="lgEdit" CommandArgument='<%# Container.DataItemIndex %>' />
                                   </ItemTemplate>
                                   <ItemStyle CssClass="alignCenter" />
                                   <HeaderStyle HorizontalAlign="Center" Width="30px" />
@@ -458,4 +450,9 @@
       </asp:ObjectDataSource>
     </div>
   </div>
+  <script>
+    try {hideProcessingMPV();}catch (e){}
+    //document Ready
+    window.history.replaceState('', '', window.location.href);
+  </script>
 </asp:Content>

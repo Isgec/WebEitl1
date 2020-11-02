@@ -29,6 +29,13 @@
                         Width="80px"
                         runat="server" />
                       <asp:Button ID="cmdPrint" runat="server" Text="Print" OnClientClick='<%# Eval("GetPrintLink") %>' />
+                      <asp:TextBox ID="F_Comp"
+                        Text='<%# Bind("Comp") %>'
+                        Enabled="False"
+                        Width="80px"
+                        style="display:none;"
+                        runat="server" />
+
                     </td>
                     <td class="alignright">
                       <asp:Label ID="L_t_refr" runat="server" Text="Reference No. :" />&nbsp;
@@ -270,6 +277,7 @@
                               SortParameterName="OrderBy" EnablePaging="True">
                               <SelectParameters>
                                 <asp:ControlParameter ControlID="F_t_tran" PropertyName="Text" Name="t_tran" Type="String" Size="9" />
+                                <asp:ControlParameter ControlID="F_Comp" PropertyName="Text" Name="Comp" Type="String" Size="9" DefaultValue="200" />
                                 <asp:Parameter Name="SearchState" Type="Boolean" Direction="Input" DefaultValue="false" />
                                 <asp:Parameter Name="SearchText" Type="String" Direction="Input" DefaultValue="" />
                               </SelectParameters>
@@ -299,6 +307,7 @@
         runat="server">
         <SelectParameters>
           <asp:QueryStringParameter DefaultValue="0" QueryStringField="t_tran" Name="t_tran" Type="String" />
+          <asp:QueryStringParameter DefaultValue="200" QueryStringField="comp" Name="comp" Type="String" />
         </SelectParameters>
       </asp:ObjectDataSource>
     </div>

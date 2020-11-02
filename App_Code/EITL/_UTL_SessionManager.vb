@@ -4,13 +4,34 @@ Imports System.Collections.Generic
 Imports System.Diagnostics
 Imports System.Net.Mail
 Imports System.Net.Mail.SmtpClient
+Imports System.Net
 Namespace SIS.SYS.Utilities
   Public Class SessionManager
+    Public Shared ci As System.Globalization.CultureInfo = New System.Globalization.CultureInfo("en-GB", True)
     Public Shared ReadOnly Property IsAdmin As Boolean
       Get
         Return IIf(ConfigurationManager.AppSettings("Admin").IndexOf(HttpContext.Current.Session("LoginID")) >= 0, True, False)
       End Get
     End Property
+    Public ReadOnly Property GetHost As String
+      Get
+        Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
+        If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
+          UrlAuthority = "192.9.200.146"
+        End If
+        Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
+        Return mRet
+      End Get
+    End Property
+    Public Shared Function GetComputerName(ByVal clientIP As String) As String
+      Dim he As IPHostEntry = Nothing
+      Try
+        he = System.Net.Dns.GetHostEntry(clientIP)
+        Return he.HostName
+      Catch ex As Exception
+      End Try
+      Return ""
+    End Function
     Public Shared Sub CreateSessionEnvironement()
       With HttpContext.Current
         .Session("ApplicationID") = 0
@@ -18,6 +39,7 @@ Namespace SIS.SYS.Utilities
         .Session("LoginID") = Nothing
         .Session("PageSizeProvider") = False
         .Session("PageNoProvider") = False
+        .Session("FinanceCompany") = ""
       End With
     End Sub
     Public Shared Sub InitializeEnvironment()
@@ -116,7 +138,7 @@ Namespace SIS.SYS.Utilities
   Public Class GlobalVariables
     Public Shared Function PageNo(ByVal PageName As String, ByVal LoginID As String) As Integer
       Dim _Result As Integer = 0
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString)
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString)
         Using Cmd As SqlCommand = Con.CreateCommand()
           Dim mSql As String = "SELECT TOP 1 [SYS_LGPageSize].[PageNo] FROM [SYS_LGPageSize] WHERE [SYS_LGPageSize].[PageName] = '" & PageName & "' AND [SYS_LGPageSize].[LoginID] = '" & LoginID & "' AND [SYS_LGPageSize].[ApplicationID] = '" & HttpContext.Current.Session("ApplicationID") & "'"
           Cmd.CommandType = System.Data.CommandType.Text
@@ -132,7 +154,7 @@ Namespace SIS.SYS.Utilities
     End Function
     Public Shared Function PageNo(ByVal PageName As String, ByVal LoginID As String, ByVal Position As Integer) As Integer
       Dim _Result As Integer = 0
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spSYS_LG_SetPageNumber"
@@ -148,7 +170,7 @@ Namespace SIS.SYS.Utilities
     End Function
     Public Shared Function PageSize(ByVal PageName As String, ByVal LoginID As String) As Integer
       Dim _Result As Integer = 0
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString)
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString)
         Using Cmd As SqlCommand = Con.CreateCommand()
           Dim mSql As String = "SELECT TOP 1 [SYS_LGPageSize].[PageSize] FROM [SYS_LGPageSize] WHERE [SYS_LGPageSize].[PageName] = '" & PageName & "' AND [SYS_LGPageSize].[LoginID] = '" & LoginID & "' AND [SYS_LGPageSize].[ApplicationID] = " & HttpContext.Current.Session("ApplicationID")
           Cmd.CommandType = System.Data.CommandType.Text
@@ -164,7 +186,7 @@ Namespace SIS.SYS.Utilities
     End Function
     Public Shared Function PageSize(ByVal PageName As String, ByVal LoginID As String, ByVal Size As Integer) As Integer
       Dim _Result As Integer = 0
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spSYS_LG_SetPageSize"
@@ -181,6 +203,7 @@ Namespace SIS.SYS.Utilities
   End Class
   Public Class ValidateURL
     Public Shared Function Validate(ByVal PageUrl As String) As Boolean
+      If Convert.ToBoolean(ConfigurationManager.AppSettings("UnderDevelopment")) Then Return True
       Dim aParts() As String = PageUrl.Split("/".ToCharArray)
       If aParts.Length <= 3 Then
         Return True
@@ -202,7 +225,7 @@ Namespace SIS.SYS.Utilities
         Case "DF_"
           FileName = FileName.Replace("DF_", "GD_")
       End Select
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spSYS_LG_VRSessionByUserFile"

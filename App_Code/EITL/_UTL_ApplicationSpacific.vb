@@ -7,8 +7,9 @@ Namespace SIS.SYS.Utilities
       With HttpContext.Current
         .Session("ApplicationID") = 23
         .Session("ApplicationDefaultPage") = "~/Default.aspx"
-        .Session("DivisionID") = GetDivision(HttpContext.Current.Session("LoginID"))
         .Session("IsSupplier") = False
+        .Session("DivisionID") = GetDivision(HttpContext.Current.Session("LoginID"))
+        .Session("FinanceCompany") = "200"
       End With
       EJI.DBCommon.BaaNLive = Convert.ToBoolean(ConfigurationManager.AppSettings("BaaNLive"))
       EJI.DBCommon.JoomlaLive = Convert.ToBoolean(ConfigurationManager.AppSettings("JoomlaLive"))
@@ -16,11 +17,9 @@ Namespace SIS.SYS.Utilities
       EJI.DBCommon.IsLocalISGECVault = Convert.ToBoolean(ConfigurationManager.AppSettings("IsLocalISGECVault"))
       EJI.DBCommon.ISGECVaultIP = ConfigurationManager.AppSettings("ISGECVaultIP")
     End Sub
+
     Public Shared Function GetDivision(ByVal CardNo As String) As Integer
-      If CardNo.StartsWith("UP") AndAlso CardNo.Length >= 7 Then
-        HttpContext.Current.Session("IsSupplier") = True
-        Return 0
-      End If
+      Dim Found As Boolean = False
       Dim Division As String = ""
       Dim Department As String = ""
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
@@ -34,30 +33,41 @@ Namespace SIS.SYS.Utilities
           If Reader.Read() Then
             Division = IIf(IsDBNull(Reader("C_DivisionID")), "", Reader("C_DivisionID"))
             Department = IIf(IsDBNull(Reader("C_DepartmentID")), "", Reader("C_DepartmentID"))
+            Found = True
           End If
           Reader.Close()
         End Using
       End Using
+
       Dim mRet As Integer = 0
-      Select Case Division.ToUpper
-        Case "APCE"
-          mRet = 4
-        Case "BOILER", "BOI", "BOILE", "ESP"
-          mRet = 1
-        Case "EPC"
-          mRet = 3
-        Case "PC"
-          mRet = 5
-        Case "SMD"
-          mRet = 2
-      End Select
-      Try
-        Select Case Department.ToUpper.Substring(0, 3)
-          Case "FGD"
-            mRet = 6
+      If Not Found Then
+        'Logged In is 3rd Party / Supplier
+        mRet = 0
+        HttpContext.Current.Session("IsSupplier") = True
+      Else
+        Select Case Division.ToUpper
+          Case "APCE"
+            mRet = 4
+          Case "BOILER", "BOI", "BOILE", "ESP"
+            mRet = 1
+          Case "EPC"
+            mRet = 3
+          Case "PC"
+            mRet = 5
+          Case "SMD"
+            mRet = 2
+            'ESP is mearged with Boiler
+            'Case "ESP"
+            '  mRet = 7
         End Select
-      Catch ex As Exception
-      End Try
+        Try
+          Select Case Department.ToUpper.Substring(0, 3)
+            Case "FGD"
+              mRet = 6
+          End Select
+        Catch ex As Exception
+        End Try
+      End If
       Return mRet
     End Function
     Public Shared Sub ApplicationReports(ByVal Context As HttpContext)

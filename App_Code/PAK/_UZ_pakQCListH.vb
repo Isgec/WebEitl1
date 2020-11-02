@@ -5,6 +5,53 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.PAK
   Partial Public Class pakQCListH
+    Public ReadOnly Property AttachHandle As String
+      Get
+        Return "J_PKGQC_OFFER_" & HttpContext.Current.Session("FinanceCompany")
+      End Get
+    End Property
+    Public ReadOnly Property AttachIndex As String
+      Get
+        Return SerialNo & "_" & QCLNo
+      End Get
+    End Property
+
+    Public ReadOnly Property GetOfferAttachLink() As String
+      Get
+        Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
+        If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
+          UrlAuthority = "192.9.200.146"
+        End If
+        Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
+        mRet &= "/Attachment/Attachment.aspx?AthHandle=" & AttachHandle
+        Dim Index As String = AttachIndex
+        Dim User As String = HttpContext.Current.Session("LoginID")
+        Dim canEdit As String = "n"
+        If Editable Then
+          canEdit = "y"
+        End If
+        mRet &= "&Index=" & Index & "&AttachedBy=" & User & "&ed=" & canEdit
+        mRet = "javascript:window.open('" & mRet & "', 'win_" & SerialNo & "', 'left=20,top=20,width=600,height=400,toolbar=0,resizable=1,scrollbars=1'); return false;"
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property ShowOfferAttachLink() As String
+      Get
+        Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
+        If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then
+          UrlAuthority = "192.9.200.146"
+        End If
+        Dim mRet As String = HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & UrlAuthority
+        mRet &= "/Attachment/Attachment.aspx?AthHandle=" & AttachHandle
+        Dim Index As String = AttachIndex
+        Dim User As String = ""
+        Dim canEdit As String = "n"
+        mRet &= "&Index=" & Index & "&AttachedBy=" & User & "&ed=" & canEdit
+        mRet = "javascript:window.open('" & mRet & "', 'win_" & SerialNo & "', 'left=20,top=20,width=600,height=400,toolbar=0,resizable=1,scrollbars=1'); return false;"
+        Return mRet
+      End Get
+    End Property
+
     Public ReadOnly Property GetPkgLink As String
       Get
         Return "~/PAK_Main/App_Edit/EF_pakPkgListH.aspx?SerialNo=" & SerialNo & "&PkgNo=" & PkgNo
@@ -101,7 +148,7 @@ Namespace SIS.PAK
         Dim mRet As Boolean = False
         Try
           Select Case StatusID
-            Case pakQCStates.QCCompleted
+            Case pakQCStates.QCClosed
               mRet = True
           End Select
         Catch ex As Exception
@@ -200,8 +247,29 @@ Namespace SIS.PAK
           End If
         Next
       End If
+      Dim qTmp As SIS.QCM.qcmRequests = Nothing
+      If Results.QCRequestNo <> "" Then
+        qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(Results.QCRequestNo)
+        Select Case qTmp.RequestStateID
+          Case "OPEN", "RETURNED"
+            If Convert.ToDateTime(qTmp.RequestedInspectionStartDate).Date <= Now.Date Then
+              Throw New Exception("Can NOT forward Inspenction request for today or earlier date. Pl. change requested date, then forward")
+            ElseIf Now.Hour > 11 Then
+              If Convert.ToDateTime(qTmp.RequestedInspectionStartDate).Date <= Now.AddDays(1).Date Then
+                Throw New Exception("After 11 AM, you can raise Inspection request for day after tomorrow only. Pl. change requested date, then forward.")
+              End If
+            End If
+            qTmp.ReturnRemarks = ""
+            qTmp.CreatedOn = Now
+            qTmp.RequestStateID = "UNDERALLOT"
+            SIS.QCM.qcmRequests.UpdateData(qTmp)
+        End Select
+      End If
+
       With Results
-        .QCRequestNo = QCRequestNo
+        If Results.QCRequestNo = "" Then
+          .QCRequestNo = QCRequestNo
+        End If
         .StatusID = pakQCStates.UnderQualityInspection
         .CreatedBy = HttpContext.Current.Session("LoginID")
         .CreatedOn = Now

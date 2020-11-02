@@ -39,6 +39,7 @@ Namespace SIS.EDI
     Private _t_Refcntd As Int32 = 0
     Private _t_Refcntu As Int32 = 0
     Private _t_edif As Int32 = 0
+    Public Property Comp As String = "200"
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -413,6 +414,23 @@ Namespace SIS.EDI
       End Using
       Return Results
     End Function
+    Public Shared Function ediWTmtlHGetByID(ByVal t_tran As String, ByVal Comp As String) As SIS.EDI.ediWTmtlH
+      Dim Results As SIS.EDI.ediWTmtlH = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = "select * from tdmisg131" & Comp & " where t_tran='" & t_tran & "'"
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          If Reader.Read() Then
+            Results = New SIS.EDI.ediWTmtlH(Reader)
+            Results.Comp = Comp
+          End If
+          Reader.Close()
+        End Using
+      End Using
+      Return Results
+    End Function
     <DataObjectMethod(DataObjectMethodType.Select)>
     Public Shared Function ediWTmtlHSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal t_tran As String) As List(Of SIS.EDI.ediWTmtlH)
       Dim Results As List(Of SIS.EDI.ediWTmtlH) = Nothing
@@ -449,10 +467,9 @@ Namespace SIS.EDI
       Return _RecordCount
     End Function
     'Select By ID One Record Filtered Overloaded GetByID
-    <DataObjectMethod(DataObjectMethodType.Select)>
-    Public Shared Function ediWTmtlHGetByID(ByVal t_tran As String, ByVal Filter_t_tran As String) As SIS.EDI.ediWTmtlH
-      Return ediWTmtlHGetByID(t_tran)
-    End Function
+    'Public Shared Function ediWTmtlHGetByID(ByVal t_tran As String, ByVal Filter_t_tran As String) As SIS.EDI.ediWTmtlH
+    '  Return ediWTmtlHGetByID(t_tran)
+    'End Function
     '    Autocomplete Method
     Public Shared Function SelectediWTmtlHAutoCompleteList(ByVal Prefix As String, ByVal count As Integer, ByVal contextKey As String) As String()
       Dim Results As List(Of String) = Nothing

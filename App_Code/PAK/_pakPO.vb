@@ -52,6 +52,8 @@ Namespace SIS.PAK
     Public Property POWeight As Decimal = 0
     Public Property PortRequired As Boolean = False
     Public Property PortID As String = ""
+    Public Property erpPOStatus As String = ""
+    Public Property UsePackageMaster As Boolean = True
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -303,7 +305,7 @@ Namespace SIS.PAK
     Public Property ClosedOn() As String
       Get
         If Not _ClosedOn = String.Empty Then
-          Return Convert.ToDateTime(_ClosedOn).ToString("dd/MM/yyyy")
+          Return Convert.ToDateTime(_ClosedOn).ToString("dd/MM/yyyy HH:mm")
         End If
         Return _ClosedOn
       End Get
@@ -726,6 +728,7 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@POWeight", SqlDbType.Decimal, 25, Record.POWeight)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PortRequired", SqlDbType.Bit, 3, Record.PortRequired)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PortID", SqlDbType.Int, 11, IIf(Record.PortID = "", Convert.DBNull, Record.PortID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@UsePackageMaster", SqlDbType.Bit, 3, Record.UsePackageMaster)
           Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_SerialNo").Direction = ParameterDirection.Output
           Con.Open()
@@ -795,6 +798,7 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@POWeight", SqlDbType.Decimal, 25, Record.POWeight)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PortRequired", SqlDbType.Bit, 3, Record.PortRequired)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PortID", SqlDbType.Int, 11, IIf(Record.PortID = "", Convert.DBNull, Record.PortID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@UsePackageMaster", SqlDbType.Bit, 3, Record.UsePackageMaster)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1
@@ -883,8 +887,10 @@ Namespace SIS.PAK
         Next
       Catch ex As Exception
       End Try
+      _IsSupplier = HttpContext.Current.Session("IsSupplier")
     End Sub
     Public Sub New()
+      _IsSupplier = HttpContext.Current.Session("IsSupplier")
     End Sub
   End Class
 End Namespace

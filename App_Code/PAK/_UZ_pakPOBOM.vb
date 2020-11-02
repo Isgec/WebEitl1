@@ -5,6 +5,47 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.PAK
   Partial Public Class pakPOBOM
+    Public ReadOnly Property ToAckCount As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            If IsSupplier Then
+              Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_POBItems where Changed=1 and serialno=" & SerialNo & " and BomNo=" & BOMNo
+            Else
+              Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_POBItems where ChangedBySupplier=1 and serialno=" & SerialNo & " and BomNo=" & BOMNo
+            End If
+            Con.Open()
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property GetAckCount As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            If IsSupplier Then
+              Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_POBItems where ChangedBySupplier=1 and serialno=" & SerialNo & " and BomNo=" & BOMNo
+            Else
+              Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_POBItems where Changed=1 and serialno=" & SerialNo & " and BomNo=" & BOMNo
+            End If
+            Con.Open()
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property GetPrintBOMLink() As String
+      Get
+        Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Print/RP_PakPO.aspx?pk=" & PrimaryKey & "', 'win" & _ItemNo & "', 'left=20,top=20,width=1100,height=600,toolbar=1,resizable=1,scrollbars=1'); return false;"
+      End Get
+    End Property
     Public ReadOnly Property GetDownloadLink() As String
       Get
         Return "javascript:window.open('" & HttpContext.Current.Request.Url.Scheme & Uri.SchemeDelimiter & HttpContext.Current.Request.Url.Authority & HttpContext.Current.Request.ApplicationPath & "/PAK_Main/App_Downloads/filedownload.aspx?bomi=" & PrimaryKey & "', 'win" & _ItemNo & "', 'left=20,top=20,width=100,height=100,toolbar=1,resizable=1,scrollbars=1'); return false;"
@@ -31,14 +72,18 @@ Namespace SIS.PAK
       Dim mRet As Boolean = True
       Return mRet
     End Function
+    Public ReadOnly Property IsSupplier As Boolean
+      Get
+        Return HttpContext.Current.Session("IsSupplier")
+      End Get
+    End Property
     Public ReadOnly Property Editable() As Boolean
       Get
         Dim mRet As Boolean = False
         Try
-          Select Case FK_PAK_POBOM_SerialNo.POStatusID
-            Case pakPOStates.Free, pakPOStates.UnderISGECApproval
-              mRet = True
-          End Select
+          If FK_PAK_POBOM_SerialNo.POStatusID = pakPOStates.Free And Not IsSupplier Then Return True
+          If FK_PAK_POBOM_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier Then Return True
+          If FK_PAK_POBOM_SerialNo.POStatusID = pakPOStates.UnderSupplierVerification And IsSupplier Then Return True
         Catch ex As Exception
         End Try
         Return mRet
@@ -58,8 +103,10 @@ Namespace SIS.PAK
         Dim mRet As Boolean = False
         Try
           Select Case FK_PAK_POBOM_SerialNo.POStatusID
-            Case pakPOStates.Free, pakPOStates.UnderISGECApproval
-              mRet = True
+            Case pakPOStates.Free
+              If FK_PAK_POBOM_SerialNo.UsePackageMaster Then
+                mRet = True
+              End If
           End Select
         Catch ex As Exception
         End Try
@@ -229,6 +276,7 @@ Namespace SIS.PAK
       Dim _Rec As SIS.PAK.pakPOBOM = SIS.PAK.pakPOBOM.pakPOBOMGetByID(Record.SerialNo, Record.BOMNo)
       With _Rec
         .ISGECRemarks = Record.ISGECRemarks
+        .SupplierRemarks = Record.SupplierRemarks
       End With
       Return SIS.PAK.pakPOBOM.UpdateData(_Rec)
     End Function

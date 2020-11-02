@@ -73,6 +73,16 @@ Partial Class EF_pakPkgPO
     If Not Page.ClientScript.IsClientScriptBlockRegistered("scriptpakPkgPO") Then
       Page.ClientScript.RegisterClientScriptBlock(GetType(System.String), "scriptpakPkgPO", mStr)
     End If
+    If ShowPopup Then
+      HeaderText.Text = "Packing List No.: " & PkgNo
+      'Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+      'Dim Supplier As SIS.PAK.pakBusinessPartner = PO.FK_PAK_SupplierID
+      'L_PrimaryKey.Text = Supplier.BPID
+      'HeaderText.Text = Supplier.BPName
+      'F_EMailIDs.Text = Supplier.EMailID
+      mPopup.Show()
+    End If
+
   End Sub
   Partial Class gvBase
     Inherits SIS.SYS.GridBase
@@ -85,6 +95,29 @@ Partial Class EF_pakPkgPO
   Protected Sub TBLpakPkgListH_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles TBLpakPkgListH.Init
     gvpakPkgListHCC.SetToolBar = TBLpakPkgListH
   End Sub
+  Public Property PkgNo As Integer
+    Get
+      If ViewState("PkgNo") IsNot Nothing Then
+        Return ViewState("PkgNo")
+      End If
+      Return 0
+    End Get
+    Set(value As Integer)
+      ViewState.Add("PkgNo", value)
+    End Set
+  End Property
+  Public Property SerialNo As Integer
+    Get
+      If ViewState("SerialNo") IsNot Nothing Then
+        Return ViewState("SerialNo")
+      End If
+      Return 0
+    End Get
+    Set(value As Integer)
+      ViewState.Add("SerialNo", value)
+    End Set
+  End Property
+  Private ShowPopup As Boolean = False
   Protected Sub GVpakPkgListH_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakPkgListH.RowCommand
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
@@ -94,6 +127,35 @@ Partial Class EF_pakPkgPO
         Response.Redirect(RedirectUrl)
       Catch ex As Exception
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
+    If e.CommandName.ToLower = "DespatchDetails".ToLower Then
+      'Despatch Details
+      Try
+        SerialNo = GVpakPkgListH.DataKeys(e.CommandArgument).Values("SerialNo")
+        PkgNo = GVpakPkgListH.DataKeys(e.CommandArgument).Values("PkgNo")
+        Dim tmp As SIS.PAK.pakPkgListH = SIS.PAK.pakPkgListH.pakPkgListHGetByID(SerialNo, PkgNo)
+        F_GRDate.Text = tmp.GRDate
+        F_GRNo.Text = tmp.GRNo
+        F_PortID.SelectedValue = tmp.PortID
+        F_Remarks.Text = tmp.Remarks
+        F_SerialNo.Text = tmp.SerialNo
+        F_SerialNo_Display.Text = tmp.PAK_PO2_PODescription
+        F_SupplierBillAmount.Text = tmp.SupplierBillAmount
+        F_SupplierBillDate.Text = tmp.SupplierBillDate
+        F_SupplierBillNo.Text = tmp.SupplierBillNo
+        F_SupplierRefNo.Text = tmp.SupplierRefNo
+        F_TransporterID.Text = tmp.TransporterID
+        F_TransporterID_Display.Text = tmp.VR_BusinessPartner4_BPName
+        F_TransporterName.Text = tmp.TransporterName
+        F_VehicleNo.Text = tmp.VehicleNo
+        F_VRExecutionNo.Text = tmp.VRExecutionNo
+        F_VRExecutionNo_Display.Text = tmp.VR_RequestExecution5_ExecutionDescription
+        ShowPopup = True
+      Catch ex As Exception
+        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
+        Dim script As String = String.Format("alert({0});", message)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
       End Try
     End If
     If e.CommandName.ToLower = "initiatewf".ToLower Then
@@ -134,6 +196,7 @@ Partial Class EF_pakPkgPO
       End Try
     End If
     If e.CommandName.ToLower = "approvewf".ToLower Then
+      'Approve button not used
       Try
         Dim SerialNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("SerialNo")
         Dim PkgNo As Int32 = GVpakPkgListH.DataKeys(e.CommandArgument).Values("PkgNo")
@@ -144,9 +207,43 @@ Partial Class EF_pakPkgPO
       End Try
     End If
   End Sub
+  Private Sub cmdOK_Click(sender As Object, e As EventArgs) Handles cmdOK.Click
+    Try
+      Dim tmp As SIS.PAK.pakPkgListH = SIS.PAK.pakPkgListH.pakPkgListHGetByID(SerialNo, PkgNo)
+      tmp.GRDate = F_GRDate.Text
+      tmp.GRNo = F_GRNo.Text
+      tmp.PortID = F_PortID.SelectedValue
+      tmp.Remarks = F_Remarks.Text
+      tmp.SupplierBillAmount = F_SupplierBillAmount.Text
+      tmp.SupplierBillDate = F_SupplierBillDate.Text
+      tmp.SupplierBillNo = F_SupplierBillNo.Text
+      tmp.SupplierRefNo = F_SupplierRefNo.Text
+      tmp.TransporterID = F_TransporterID.Text
+      tmp.TransporterName = F_TransporterName.Text
+      tmp.VehicleNo = F_VehicleNo.Text
+      tmp.VRExecutionNo = F_VRExecutionNo.Text
+      SIS.PAK.pakPkgListH.UpdateData(tmp)
+    Catch ex As Exception
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+    End Try
+
+  End Sub
+
   Protected Sub TBLpakPkgListH_AddClicked(ByVal sender As Object, ByVal e As System.Web.UI.ImageClickEventArgs) Handles TBLpakPkgListH.AddClicked
     Dim SerialNo As Int32 = CType(FVpakPkgPO.FindControl("F_SerialNo"), TextBox).Text
+    Dim xTmp As New SIS.PAK.pakPkgListH
+    With xTmp
+      .SerialNo = SerialNo
+      .PkgNo = 0
+      .Remarks = ""
+      .StatusID = pakPkgStates.Free
+      .CreatedBy = HttpContext.Current.Session("LoginID")
+      .CreatedOn = Now
+    End With
+    xTmp = SIS.PAK.pakPkgListH.InsertData(xTmp)
+    Dim PkgNo As String = xTmp.PkgNo
     TBLpakPkgListH.AddUrl &= "?SerialNo=" & SerialNo
+    TBLpakPkgListH.AddUrl &= "&PkgNo=" & PkgNo
   End Sub
   Private st As Long = HttpContext.Current.Server.ScriptTimeout
   Private AllowNegativeBalance As Boolean = False
@@ -405,4 +502,47 @@ Partial Class EF_pakPkgPO
     End If
     HttpContext.Current.Server.ScriptTimeout = st
   End Sub
+
+  <System.Web.Services.WebMethod()>
+  <System.Web.Script.Services.ScriptMethod()>
+  Public Shared Function TransporterIDCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
+    Return SIS.PAK.pakBusinessPartner.SelectpakBusinessPartnerAutoCompleteList(prefixText, count, contextKey)
+  End Function
+  <System.Web.Services.WebMethod()>
+  <System.Web.Script.Services.ScriptMethod()>
+  Public Shared Function VRExecutionNoCompletionList(ByVal prefixText As String, ByVal count As Integer, ByVal contextKey As String) As String()
+    Return SIS.VR.vrRequestExecution.SelectvrRequestExecutionAutoCompleteList(prefixText, count, contextKey)
+  End Function
+  <System.Web.Services.WebMethod()>
+  Public Shared Function validate_FK_PAK_PkgListH_TransporterID(ByVal value As String) As String
+    Dim aVal() As String = value.Split(",".ToCharArray)
+    Dim mRet As String = "0|" & aVal(0)
+    Dim TransporterID As String = CType(aVal(1), String)
+    Dim oVar As SIS.PAK.pakBusinessPartner = SIS.PAK.pakBusinessPartner.pakBusinessPartnerGetByID(TransporterID)
+    If oVar Is Nothing Then
+      mRet = "1|" & aVal(0) & "|Record not found."
+    Else
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField
+    End If
+    Return mRet
+  End Function
+  <System.Web.Services.WebMethod()>
+  Public Shared Function validate_FK_PAK_PkgListH_VRExecutionNo(ByVal value As String) As String
+    Dim aVal() As String = value.Split(",".ToCharArray)
+    Dim mRet As String = "0|" & aVal(0)
+    Dim VRExecutionNo As Int32 = 0
+    Try
+      VRExecutionNo = CType(aVal(1), Int32)
+    Catch ex As Exception
+      VRExecutionNo = 0
+    End Try
+    Dim oVar As SIS.VR.vrRequestExecution = SIS.VR.vrRequestExecution.vrRequestExecutionGetByID(VRExecutionNo)
+    If oVar Is Nothing Then
+      mRet = "1|" & aVal(0) & "|Record not found.|"
+    Else
+      mRet = "0|" & aVal(0) & "|" & oVar.DisplayField & "|" & oVar.TransporterID
+    End If
+    Return mRet
+  End Function
+
 End Class

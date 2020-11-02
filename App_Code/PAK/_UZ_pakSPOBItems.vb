@@ -137,7 +137,7 @@ Namespace SIS.PAK
       If Items.Count > 0 Then
         For Each Itm As SIS.PAK.pakPOBItems In Items
           With Itm
-            .StatusID = pakItemStates.ChangeRequiredBySupplier
+            '.StatusID = pakItemStates.ChangeRequiredBySupplier
             .AcceptedBy = HttpContext.Current.Session("LoginID")
             .AcceptedOn = Now
             .Accepted = False
@@ -151,7 +151,7 @@ Namespace SIS.PAK
     Public Shared Shadows Function RejectWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakSPOBItems
       Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
       With Results
-        .StatusID = pakItemStates.ChangeRequiredBySupplier
+        '.StatusID = pakItemStates.ChangeRequiredBySupplier
         .AcceptedBy = HttpContext.Current.Session("LoginID")
         .AcceptedOn = Now
         .Accepted = False

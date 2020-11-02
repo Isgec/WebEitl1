@@ -30,7 +30,14 @@ Namespace SIS.PAK
             mRet = Drawing.Color.Olive
         End Select
       ElseIf Bottom Then
-        mRet = Drawing.Color.Black
+        If Not Freezed Then
+          mRet = Drawing.Color.Black
+        Else
+          mRet = Drawing.Color.DarkCyan
+        End If
+        If StatusID = pakItemStates.DeleteRequiredByISGEC Or StatusID = pakItemStates.DeleteRequiredBySupplier Then
+          mRet = Drawing.Color.Fuchsia
+        End If
       End If
       Return mRet
     End Function
@@ -38,6 +45,16 @@ Namespace SIS.PAK
       Get
         If Free Then
           Return "*"
+        End If
+        Return ""
+      End Get
+    End Property
+    Public ReadOnly Property ShowCreated As String
+      Get
+        If Free Then
+          Return "I"
+        ElseIf CreatedBySupplier Then
+          Return "S"
         End If
         Return ""
       End Get
@@ -86,43 +103,157 @@ Namespace SIS.PAK
       Dim mRet As Boolean = True
       Return mRet
     End Function
+    Public ReadOnly Property IsSupplier As Boolean
+      Get
+        Return HttpContext.Current.Session("IsSupplier")
+      End Get
+    End Property
+    Public ReadOnly Property ACKToolTip() As String
+      Get
+        Dim mRet As String = "Click to acknowledge/accept changes."
+        Select Case StatusID
+          Case pakItemStates.DeleteRequiredBySupplier, pakItemStates.DeleteRequiredByISGEC
+            mRet = "Click to acknowledge/accept DELETION of Item [Tree form here]."
+          Case pakItemStates.ChangedByIsgec, pakItemStates.ChangedBySupplier
+            mRet = "Click to acknowledge/accept CHANGES."
+          Case pakItemStates.CreatedByISGEC, pakItemStates.CreatedBySupplier
+            mRet = "Click to acknowledge/accept NEW ITEM."
+        End Select
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property ACKConfirm() As String
+      Get
+        Dim mRet As String = "Acknowledge/accept changes."
+        Select Case StatusID
+          Case pakItemStates.DeleteRequiredBySupplier, pakItemStates.DeleteRequiredByISGEC
+            mRet = "Acknowledge/accept DELETION of Item [Tree form here]."
+          Case pakItemStates.ChangedByIsgec, pakItemStates.ChangedBySupplier
+            mRet = "Acknowledge/accept CHANGES."
+          Case pakItemStates.CreatedByISGEC, pakItemStates.CreatedBySupplier
+            mRet = "Acknowledge/accept NEW ITEM."
+        End Select
+        Return mRet
+      End Get
+    End Property
+
     Public ReadOnly Property Editable() As Boolean
       Get
         Dim mRet As Boolean = False
         Try
-          Select Case FK_PAK_POBItems_SerialNo.POStatusID
-            Case pakPOStates.Free, pakPOStates.UnderISGECApproval
-              mRet = True
-          End Select
+          If Freezed Then Return False
+          If StatusID = pakItemStates.DeleteRequiredBySupplier Then Return False
+          If StatusID = pakItemStates.DeleteRequiredByISGEC Then Return False
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier Then Return True
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderSupplierVerification And IsSupplier Then Return True
         Catch ex As Exception
         End Try
         Return mRet
       End Get
     End Property
-    Public ReadOnly Property Deleteable() As Boolean
+    Public Property Deleteable As Boolean = False
+    Public ReadOnly Property ModifiedWFVisible() As Boolean
       Get
         Dim mRet As Boolean = False
         Try
+          If Freezed Then Return False
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier And Changed Then Return True
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderSupplierVerification And IsSupplier And ChangedBySupplier Then Return True
         Catch ex As Exception
         End Try
         Return mRet
       End Get
     End Property
+
+    Public ReadOnly Property AcceptWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          If Freezed Then Return False
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier And ChangedBySupplier Then Return True
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderSupplierVerification And IsSupplier And Changed Then Return True
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property FreezeWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          If Freezed Then Return False
+          If StatusID = pakItemStates.DeleteRequiredBySupplier Then Return False
+          If StatusID = pakItemStates.DeleteRequiredByISGEC Then Return False
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier Then Return True
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property UnFreezeWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          If Not Freezed Then Return False
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier Then Return True
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+
+    Public ReadOnly Property AddChildWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          If Freezed Then Return False
+          If Quantity > 0 Then Return False
+          If StatusID = pakItemStates.DeleteRequiredBySupplier Then Return False
+          If StatusID = pakItemStates.DeleteRequiredByISGEC Then Return False
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier Then Return True
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderSupplierVerification And IsSupplier Then Return True
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+
     Public ReadOnly Property DeleteWFVisible() As Boolean
       Get
         Dim mRet As Boolean = False
         Try
-          If Not Root Then
-            Select Case Me.FK_PAK_POBItems_SerialNo.POStatusID
-              Case pakPOStates.Free, pakPOStates.UnderISGECApproval
-                mRet = True
-            End Select
+          If Root Then Return False
+          If Freezed Then Return False
+          If StatusID = pakItemStates.DeleteRequiredBySupplier Then Return False
+          If StatusID = pakItemStates.DeleteRequiredByISGEC Then Return False
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier Then Return True
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderSupplierVerification And IsSupplier Then Return True
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property UnDeleteWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          If Root Then Return mRet
+          If Freezed Then Return mRet
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier Then
+            If StatusID = pakItemStates.DeleteRequiredBySupplier Then Return True
+            If StatusID = pakItemStates.DeleteRequiredByISGEC Then Return True
+          End If
+          If FK_PAK_POBItems_SerialNo.POStatusID = pakPOStates.UnderSupplierVerification And IsSupplier Then
+            If StatusID = pakItemStates.DeleteRequiredBySupplier Then Return True
+            'To disable supplier to undelete, delete marked by ISGEC, => comment the following line
+            If StatusID = pakItemStates.DeleteRequiredByISGEC Then Return True
           End If
         Catch ex As Exception
         End Try
         Return mRet
       End Get
     End Property
+
     Public ReadOnly Property DeleteWFEnable() As Boolean
       Get
         Dim mRet As Boolean = True
@@ -134,27 +265,105 @@ Namespace SIS.PAK
       End Get
     End Property
     Private Shared Sub rDeleteWF(ByVal pItm As SIS.PAK.pakPOBItems)
-      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, pItm.ItemNo, "")
-      If Items.Count > 0 Then
-        For Each Itm As SIS.PAK.pakPOBItems In Items
-          rDeleteWF(Itm)
-        Next
-        SIS.PAK.pakPOBItems.pakPOBItemsDelete(pItm)
-      Else
+      If pItm IsNot Nothing Then
+        Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, pItm.ItemNo, "")
+        If Items.Count > 0 Then
+          For Each Itm As SIS.PAK.pakPOBItems In Items
+            rDeleteWF(Itm)
+          Next
+        End If
         SIS.PAK.pakPOBItems.pakPOBItemsDelete(pItm)
       End If
     End Sub
-    Public Shared Function DeleteWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
+    Private Shared Sub rMarkDeleteWF(ByVal pItm As SIS.PAK.pakPOBItems, isSupplier As Boolean, LoginID As String)
+      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, pItm.ItemNo, "")
+      If Items.Count > 0 Then
+        For Each Itm As SIS.PAK.pakPOBItems In Items
+          rMarkDeleteWF(Itm, isSupplier, LoginID)
+        Next
+      End If
+      With pItm
+        .ChangedBySupplier = False
+        .Changed = False
+        .Accepted = False
+        .AcceptedBySupplier = False
+        .AcceptedBy = LoginID
+        .AcceptedOn = Now
+        If isSupplier Then
+          .ChangedBySupplier = True
+          .StatusID = pakItemStates.DeleteRequiredBySupplier
+        Else
+          .Changed = True
+          .StatusID = pakItemStates.DeleteRequiredByISGEC
+        End If
+      End With
+      SIS.PAK.pakPOBItems.UpdateData(pItm)
+    End Sub
+    Public Shared Function AcceptDeleteWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
       Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
       rDeleteWF(Results)
-      Dim tmpP As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(Results.SerialNo, Results.BOMNo, Results.ParentItemNo)
-      If tmpP IsNot Nothing Then
-        If Not tmpP.Root Then
-          Dim tmpPs As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(Results.SerialNo, Results.BOMNo, Results.ParentItemNo, "")
-          If tmpPs.Count <= 0 Then
-            tmpP.Middle = False
-            tmpP.Bottom = True
-            tmpP = UpdateData(tmpP)
+      Return Results
+    End Function
+    Public Shared Function CanBeDeleted(ByVal pItm As SIS.PAK.pakPOBItems) As Boolean
+      If pItm Is Nothing Then Return True
+      If pItm.QualityClearedQty > 0 Or pItm.QualityClearedQtyStage > 0 Or pItm.QuantityDespatched > 0 Or pItm.QuantityDespatchedToPort > 0 Then
+        Return False
+      End If
+      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, pItm.ItemNo, "")
+      If Items.Count > 0 Then
+        For Each Itm As SIS.PAK.pakPOBItems In Items
+          If Not CanBeDeleted(Itm) Then
+            Return False
+          End If
+        Next
+      End If
+      Return True
+    End Function
+    Public Shared Function DeleteWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
+      Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
+      '===================================
+      'Check QC or Despatch, If Not found then only can initiate or delete
+      If Not CanBeDeleted(Results) Then
+        Throw New Exception("There are QC or Despatch in Item [tree from here], CAN Not perform Delete. You may try to delete individual Item.")
+      End If
+      '===================================
+      Dim isMarking As Boolean = False
+      Dim isSupplier As Boolean = HttpContext.Current.Session("IsSupplier")
+      Dim LoginID As String = HttpContext.Current.Session("LoginID")
+      If isSupplier Then
+        If Not Results.CreatedBySupplier Then
+          rMarkDeleteWF(Results, isSupplier, LoginID)
+          isMarking = True
+        ElseIf Results.CreatedBySupplier AndAlso Results.StatusID <> pakItemStates.CreatedBySupplier Then
+          rMarkDeleteWF(Results, isSupplier, LoginID)
+          isMarking = True
+        ElseIf Results.CreatedBySupplier AndAlso Results.StatusID = pakItemStates.CreatedBySupplier Then
+          'Status is NOT changed, status will be changed by ISGEC after acceptance
+          rDeleteWF(Results)
+        End If
+      Else
+        If Results.CreatedBySupplier Then
+          rMarkDeleteWF(Results, isSupplier, LoginID)
+          isMarking = True
+        ElseIf Not Results.CreatedBySupplier AndAlso Results.StatusID <> pakItemStates.CreatedByISGEC Then
+          rMarkDeleteWF(Results, isSupplier, LoginID)
+          isMarking = True
+        ElseIf Results.StatusID = pakItemStates.CreatedByISGEC Then
+          rDeleteWF(Results)
+        End If
+      End If
+      If Not isMarking Then
+        If Not Results.Root Then
+          Dim tmpP As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(Results.SerialNo, Results.BOMNo, Results.ParentItemNo)
+          If tmpP IsNot Nothing Then
+            If Not tmpP.Root Then
+              Dim tmpPs As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(Results.SerialNo, Results.BOMNo, Results.ParentItemNo, "")
+              If tmpPs.Count <= 0 Then
+                tmpP.Middle = False
+                tmpP.Bottom = True
+                tmpP = UpdateData(tmpP)
+              End If
+            End If
           End If
         End If
       End If
@@ -172,6 +381,42 @@ Namespace SIS.PAK
         End Using
       End Using
       Return mRet
+    End Function
+    Private Shared Sub rUnDelete(ByVal pItm As SIS.PAK.pakPOBItems, isSupplier As Boolean, LoginID As String)
+      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, pItm.ItemNo, "")
+      If Items.Count > 0 Then
+        For Each Itm As SIS.PAK.pakPOBItems In Items
+          rUnDelete(Itm, isSupplier, LoginID)
+        Next
+      End If
+      With pItm
+        .Changed = False
+        .ChangedBySupplier = False
+        If isSupplier Then
+          .StatusID = pakItemStates.UndeleteBySupplier
+        Else
+          .StatusID = pakItemStates.UndeleteByIsgec
+        End If
+        .AcceptedBy = LoginID
+        .AcceptedOn = Now
+      End With
+      SIS.PAK.pakPOBItems.UpdateData(pItm)
+    End Sub
+    Public Shared Function UnDeleteWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
+      Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
+      Dim isSupplier As Boolean = HttpContext.Current.Session("IsSupplier")
+      Dim LoginID As String = HttpContext.Current.Session("LoginID")
+      If isSupplier Then
+        'To Restrict Supplier, He can not undelete ISGEC request for Deletion
+        'Un comment following condition
+        'If Results.StatusID = pakItemStates.DeleteRequiredBySupplier Then
+        rUnDelete(Results, isSupplier, LoginID)
+        'End If
+      Else
+        'Isgec Person can unmark any delete request
+        rUnDelete(Results, isSupplier, LoginID)
+      End If
+      Return Results
     End Function
 
     Private Shared Sub rCopyCWF(ByVal pItm As SIS.PAK.pakPOBItems, ByVal ParentItemNo As Integer)
@@ -290,72 +535,87 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
-    Public Shared Function InitiateWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
-      Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
-      Return Results
-    End Function
-    Private Shared Sub rApproveWF(ByVal pItm As SIS.PAK.pakPOBItems, ByVal ParentItemNo As Integer)
-      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, ParentItemNo, "")
+    'Public Shared Function InitiateWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
+    '  Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
+    '  Return Results
+    'End Function
+    Private Shared Sub rFreezeWF(ByVal pItm As SIS.PAK.pakPOBItems, ElementID As String)
+      If Not pItm.Freezed Then
+        With pItm
+          .StatusID = pakItemStates.FreezedbyISGEC
+          .FreezedBy = HttpContext.Current.Session("LoginID")
+          .FreezedOn = Now
+          .Freezed = True
+          If ElementID <> "" Then .ElementID = ElementID
+          If .ItemCode = "" Then .ItemCode = .ItemNo
+          If .UOMQuantity = "" Then .UOMQuantity = 8 'Nos
+          If .UOMWeight = "" Then .UOMWeight = 6 'Kg
+        End With
+        pItm = pakPOBItems.UpdateData(pItm)
+      End If
+      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, pItm.ItemNo, "")
       If Items.Count > 0 Then
         For Each Itm As SIS.PAK.pakPOBItems In Items
-          With Itm
-            .StatusID = pakItemStates.FreezedbyISGEC
-            .FreezedBy = HttpContext.Current.Session("LoginID")
-            .FreezedOn = Now
-            .Freezed = True
-            .Changed = False
-          End With
-          Itm = pakPOBItems.UpdateData(Itm)
-          rApproveWF(Itm, Itm.ItemNo)
+          rFreezeWF(Itm, ElementID)
         Next
       End If
     End Sub
-    Public Shared Function ApproveWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
+    Public Shared Function FreezeWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
       Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
-      With Results
-        .StatusID = pakItemStates.FreezedbyISGEC
-        .FreezedBy = HttpContext.Current.Session("LoginID")
-        .FreezedOn = Now
-        .Freezed = True
-        .Changed = False
-      End With
-      Results = pakPOBItems.UpdateData(Results)
-      rApproveWF(Results, ItemNo)
+      rFreezeWF(Results, Results.FK_PAK_POBItems_PAK_POBOM.ElementID)
       Return Results
     End Function
-    Private Shared Sub rRejectWF(ByVal pItm As SIS.PAK.pakPOBItems, ByVal ParentItemNo As Integer)
-      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, ParentItemNo, "")
+    Private Shared Sub rUnFreezeWF(ByVal pItm As SIS.PAK.pakPOBItems)
+      If pItm.Freezed Then
+        With pItm
+          .StatusID = pakItemStates.UnfreezedByISGEC
+          .FreezedBy = HttpContext.Current.Session("LoginID")
+          .FreezedOn = Now
+          .Freezed = False
+        End With
+        pItm = pakPOBItems.UpdateData(pItm)
+      End If
+      Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, pItm.ItemNo, "")
       If Items.Count > 0 Then
         For Each Itm As SIS.PAK.pakPOBItems In Items
-          With Itm
-            .StatusID = pakItemStates.ChangeRequiredByISGEC
-            .FreezedBy = HttpContext.Current.Session("LoginID")
-            .FreezedOn = Now
-            .Freezed = False
-            .Changed = True
-          End With
-          Itm = pakPOBItems.UpdateData(Itm)
-          rRejectWF(Itm, Itm.ItemNo)
+          rUnFreezeWF(Itm)
         Next
       End If
     End Sub
-    Public Shared Function RejectWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
+    Public Shared Function UnFreezeWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
       Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
-      With Results
-        .StatusID = pakItemStates.ChangeRequiredByISGEC
-        .FreezedBy = HttpContext.Current.Session("LoginID")
-        .FreezedOn = Now
-        .Freezed = False
-        .Changed = True
-      End With
-      Results = pakPOBItems.UpdateData(Results)
-      rRejectWF(Results, ItemNo)
+      rUnFreezeWF(Results)
       Return Results
     End Function
-    Public Shared Function CompleteWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
-      Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
+    'Public Shared Function CompleteWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
+    '  Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
+    '  Return Results
+    'End Function
+    Public Shared Function GetChangedCount(ByVal SerialNo As Int32, ByVal BOMNo As Int32) As Integer
+      Dim Results As Integer = 0
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = "Select isnull(Count(ItemNo),0) as cnt from pak_pobItems where serialno=" & SerialNo & " and bomno=" & BOMNo & " and changed=1 "
+          Con.Open()
+          Results = Cmd.ExecuteScalar()
+        End Using
+      End Using
       Return Results
     End Function
+    Public Shared Function GetChangedBySupplierCount(ByVal SerialNo As Int32, ByVal BOMNo As Int32) As Integer
+      Dim Results As Integer = 0
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = "Select isnull(Count(ItemNo),0) as cnt from pak_pobItems where serialno=" & SerialNo & " and bomno=" & BOMNo & " and ChangedBySupplier=1 "
+          Con.Open()
+          Results = Cmd.ExecuteScalar()
+        End Using
+      End Using
+      Return Results
+    End Function
+
     Public Shared Function GetpakPOBItemsCreatedByISGECCount(ByVal SerialNo As Int32, ByVal BOMNo As Int32) As Integer
       Dim Results As Integer = 0
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
@@ -385,7 +645,7 @@ Namespace SIS.PAK
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.Text
-          Cmd.CommandText = "Select Count(ItemNo) as cnt from pak_pobItems where serialno=" & SerialNo & " and bomno=" & BOMNo & " and bottom=1 and StatusID IN (" & pakItemStates.ChangeRequiredBySupplier & "," & pakItemStates.VerifiedbySupplier & " )"
+          Cmd.CommandText = "Select Count(ItemNo) as cnt from pak_pobItems where serialno=" & SerialNo & " and bomno=" & BOMNo & " and bottom=1 and Changed=1 and StatusID = " & pakItemStates.ChangedBySupplier
           Con.Open()
           Results = Cmd.ExecuteScalar()
         End Using
@@ -491,6 +751,26 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SerialNo", SqlDbType.Int, SerialNo.ToString.Length, SerialNo)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@BOMNo", SqlDbType.Int, BOMNo.ToString.Length, BOMNo)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ItemCode", SqlDbType.NVarChar, ItemCode.Length, ItemCode)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          If Reader.Read() Then
+            Results = New SIS.PAK.pakPOBItems(Reader)
+          End If
+          Reader.Close()
+        End Using
+      End Using
+      Return Results
+    End Function
+    Public Shared Function pakPOBItemsGetBySupplierItemCode(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal SupplierItemCode As String) As SIS.PAK.pakPOBItems
+      Dim Results As SIS.PAK.pakPOBItems = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          Cmd.CommandText = "sppak_LG_POBItemsSelectBySupplierItemCode"
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SerialNo", SqlDbType.Int, SerialNo.ToString.Length, SerialNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@BOMNo", SqlDbType.Int, BOMNo.ToString.Length, BOMNo)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierItemCode", SqlDbType.NVarChar, SupplierItemCode.Length, SupplierItemCode)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
           Con.Open()
           Dim Reader As SqlDataReader = Cmd.ExecuteReader()

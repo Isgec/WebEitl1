@@ -194,26 +194,12 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
-<%--        <asp:TemplateField HeaderText="PRINT">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdPrintPage" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Print the record." SkinID="Print" OnClientClick="return print_report(this);" />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>
-        <asp:TemplateField HeaderText="Get XL">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdDownload" runat="server" Visible='<%# EVal("Visible") %>' Enabled='<%# EVal("Enable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Download Template File." SkinID="download" OnClientClick='<%# Eval("GetDownloadLink") %>' />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>--%>
         <asp:TemplateField HeaderText="Item No" SortExpression="ItemNo">
           <ItemTemplate>
             <asp:Label ID="LabelItemNo" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("ItemNo") %>'></asp:Label>
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle CssClass="alignCenter" Width="80px" />
+          <HeaderStyle CssClass="alignCenter" Width="40px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="">
           <ItemTemplate>
@@ -227,7 +213,7 @@
             <asp:Label ID="LabelItemDescription" runat="server" Font-Bold='<%# Eval("FontBold") %>' ForeColor='<%# Eval("ForeColor") %>' Text='<%# Eval("pItemDescription") %>'></asp:Label>
           </ItemTemplate>
           <ItemStyle CssClass="alignleft" />
-        <HeaderStyle CssClass="alignleft" Width="500px" />
+        <HeaderStyle CssClass="alignleft" Width="400px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Quantity" SortExpression="Quantity">
           <ItemTemplate>
@@ -248,16 +234,9 @@
              <asp:Label ID="L_StatusID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("StatusID") %>' Text='<%# Eval("PAK_POBOMStatus9_Description") %>'></asp:Label>
           </ItemTemplate>
           <ItemStyle CssClass="alignright" />
-          <HeaderStyle CssClass="alignright" Width="80px" />
+          <HeaderStyle CssClass="alignright" Width="150px" />
         </asp:TemplateField>
-<%--        <asp:TemplateField HeaderText="FWD">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdInitiateWF" ValidationGroup='<%# "Initiate" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("InitiateWFVisible") %>' Enabled='<%# EVal("InitiateWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Forward" SkinID="forward" OnClientClick='<%# "return Page_ClientValidate(""Initiate" & Container.DataItemIndex & """) && confirm(""Forward record ?"");" %>' CommandName="InitiateWF" CommandArgument='<%# Container.DataItemIndex %>' />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>--%>
-        <asp:TemplateField HeaderText="CHECKED">
+<%--        <asp:TemplateField HeaderText="CHECKED">
           <ItemTemplate>
             <asp:ImageButton ID="cmdApproveWF" ValidationGroup='<%# "Approve" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("ApproveWFVisible") %>' Enabled='<%# EVal("ApproveWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Set status to Freeze including Child" SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Approve" & Container.DataItemIndex & """) && confirm(""Set status as FREEZE of this item including Child ?"");" %>' CommandName="ApproveWF" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
@@ -267,27 +246,6 @@
         <asp:TemplateField HeaderText="CHANGE">
           <ItemTemplate>
             <asp:ImageButton ID="cmdRejectWF" ValidationGroup='<%# "Reject" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("RejectWFVisible") %>' Enabled='<%# EVal("RejectWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Set status to Change Requited including child" SkinID="reject" OnClientClick='<%# "return Page_ClientValidate(""Reject" & Container.DataItemIndex & """) && confirm(""Set status as CHANGE REQUIRED of this item including Child ?"");" %>' CommandName="RejectWF" CommandArgument='<%# Container.DataItemIndex %>' />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>
-<%--        <asp:TemplateField HeaderText="OK">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdCompleteWF" ValidationGroup='<%# "Complete" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("CompleteWFVisible") %>' Enabled='<%# EVal("CompleteWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Complete" SkinID="complete" OnClientClick='<%# "return Page_ClientValidate(""Complete" & Container.DataItemIndex & """) && confirm(""Complete record ?"");" %>' CommandName="CompleteWF" CommandArgument='<%# Container.DataItemIndex %>' />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>--%>
-<%--        <asp:TemplateField HeaderText="CC">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdCopyC" ValidationGroup='<%# "CopyC" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("DeleteWFVisible") %>' Enabled='<%# EVal("DeleteWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Copy Complete [Tree from here]" SkinID="copy" OnClientClick='<%# "return Page_ClientValidate(""CopyC" & Container.DataItemIndex & """) && confirm(""It will also COPY all CHILD ITEMs below this item ?"");" %>' CommandName="DeleteWF" CommandArgument='<%#  Container.DataItemIndex & ",CopyC"  %>' />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>
-        <asp:TemplateField HeaderText="DEL">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdDelete" ValidationGroup='<%# "Delete" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("DeleteWFVisible") %>' Enabled='<%# EVal("DeleteWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Delete" SkinID="Delete" OnClientClick='<%# "return Page_ClientValidate(""Delete" & Container.DataItemIndex & """) && confirm(""It will also DELETE all CHILD ITEMs below this item ?"");" %>' CommandName="DeleteWF" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />

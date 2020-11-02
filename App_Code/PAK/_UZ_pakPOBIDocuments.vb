@@ -21,16 +21,21 @@ Namespace SIS.PAK
       Dim mRet As Boolean = True
       Return mRet
     End Function
+    Public ReadOnly Property IsSupplier As Boolean
+      Get
+        Return HttpContext.Current.Session("IsSupplier")
+      End Get
+    End Property
     Public ReadOnly Property Editable() As Boolean
       Get
         Dim mRet As Boolean = False
         Try
-          Select Case FK_PAK_POBIDocuments_SerialNo.POStatusID
-            Case pakPOStates.Free, pakPOStates.UnderISGECApproval
-              If Not FK_PAK_POBIDocuments_ItemNo.Freezed Then
-                mRet = True
-              End If
-          End Select
+          If FK_PAK_POBIDocuments_ItemNo.Freezed Then Return False
+          If Not FK_PAK_POBIDocuments_ItemNo.Bottom Then Return False
+          If FK_PAK_POBIDocuments_ItemNo.StatusID = pakItemStates.DeleteRequiredBySupplier Then Return False
+          If FK_PAK_POBIDocuments_ItemNo.StatusID = pakItemStates.DeleteRequiredByISGEC Then Return False
+          If FK_PAK_POBIDocuments_SerialNo.POStatusID = pakPOStates.UnderISGECApproval And Not IsSupplier Then Return True
+          If FK_PAK_POBIDocuments_SerialNo.POStatusID = pakPOStates.UnderSupplierVerification And IsSupplier Then Return True
         Catch ex As Exception
         End Try
         Return mRet
@@ -38,26 +43,12 @@ Namespace SIS.PAK
     End Property
     Public ReadOnly Property Deleteable() As Boolean
       Get
-        Dim mRet As Boolean = False
-        Try
-        Catch ex As Exception
-        End Try
-        Return mRet
+        Return Editable
       End Get
     End Property
     Public ReadOnly Property DeleteWFVisible() As Boolean
       Get
-        Dim mRet As Boolean = False
-        Try
-          Select Case FK_PAK_POBIDocuments_SerialNo.POStatusID
-            Case pakPOStates.Free, pakPOStates.UnderISGECApproval
-              If Not FK_PAK_POBIDocuments_ItemNo.Freezed Then
-                mRet = True
-              End If
-          End Select
-        Catch ex As Exception
-        End Try
-        Return mRet
+        Return Editable
       End Get
     End Property
     Public ReadOnly Property DeleteWFEnable() As Boolean
@@ -72,6 +63,7 @@ Namespace SIS.PAK
     End Property
     Public Shared Function DeleteWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32, ByVal DocNo As Int32) As SIS.PAK.pakPOBIDocuments
       Dim Results As SIS.PAK.pakPOBIDocuments = pakPOBIDocumentsGetByID(SerialNo, BOMNo, ItemNo, DocNo)
+      SIS.PAK.pakPOBIDocuments.UZ_pakPOBIDocumentsDelete(Results)
       Return Results
     End Function
     Public Shared Function UZ_pakPOBIDocumentsSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As List(Of SIS.PAK.pakPOBIDocuments)

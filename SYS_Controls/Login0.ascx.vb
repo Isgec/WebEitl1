@@ -21,10 +21,13 @@ Partial Class Login0
 	End Sub
 	Public Sub LoggedIn(ByVal sender As Object, ByVal e As System.EventArgs)
 		Dim oLogin As System.Web.UI.WebControls.Login = CType(sender, Login)
-		Dim Username As String = oLogin.UserName
-		SIS.SYS.Utilities.SessionManager.InitializeEnvironment(Username)
+    Dim Username As String = oLogin.UserName
+    Try
+      SIS.SYS.Utilities.SessionManager.InitializeEnvironment(Username)
+    Catch ex As Exception
+    End Try
     RaiseEvent SignedIn(sender, e)
-	End Sub
+  End Sub
 	Public Sub LoginError(ByVal sender As Object, ByVal e As System.EventArgs)
 		Dim oLogin As System.Web.UI.WebControls.Login = CType(sender, Login)
 		Dim Username As String = oLogin.UserName
@@ -39,9 +42,9 @@ Partial Class Login0
 			End If
 		End If
 	End Sub
-	Public Sub LoggedOut(ByVal sender As Object, ByVal e As System.EventArgs)
-		'SIS.SYS.Utilities.SessionManager.DestroySessionEnvironement()
-		'Response.Redirect("~/Default.aspx")
-		RaiseEvent SignOut(sender, e)
-	End Sub
+  'Public Sub LoggedOut(ByVal sender As Object, ByVal e As System.EventArgs)
+  '	'SIS.SYS.Utilities.SessionManager.DestroySessionEnvironement()
+  '	'Response.Redirect("~/Default.aspx")
+  '	RaiseEvent SignOut(sender, e)
+  'End Sub
 End Class

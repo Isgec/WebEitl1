@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-  <title>ISGEC-Leave Management</title>
+  <title>ISGEC-Packing List Module</title>
   <link rel="SHORTCUT ICON" type="image/x-icon" runat="server" href="~/isgec.ico" />
   <link rel="stylesheet" href="/../UserRights/Menu/Menu.css" />
   <script type="text/javascript" src="/../UserRights/jquery/jquery.js"></script>

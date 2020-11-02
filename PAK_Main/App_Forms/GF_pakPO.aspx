@@ -31,239 +31,249 @@
         </div>
       </div>
     </asp:Panel>
-    <asp:Panel ID="pnlD" runat="server" CssClass="cp_filter" Height="0">
-      <div id="frmdiv" style="width:30%;float:left" class="ui-widget-content ui-corner-all">
-        <h3 class="ui-widget-header ui-corner-all" style="margin: 0; padding: 0.4em; text-align: center;">
-                    FILTER RECORDS</h3>
-        <table>
-      <tr>
-        <td class="alignright">
-          <b><asp:Label ID="L_SupplierID" runat="server" Text="Supplier :" /></b>
-        </td>
-        <td>
-          <asp:TextBox
-            ID = "F_SupplierID"
-            CssClass = "myfktxt"
-            Width="80px"
-            Text=""
-            onfocus = "return this.select();"
-            AutoCompleteType = "None"
-            onblur= "validate_SupplierID(this);"
-            Runat="Server" />
-          <asp:Label
-            ID = "F_SupplierID_Display"
-            Text=""
-            Runat="Server" />
-          <AJX:AutoCompleteExtender
-            ID="ACESupplierID"
-            BehaviorID="B_ACESupplierID"
-            ContextKey=""
-            UseContextKey="true"
-            ServiceMethod="SupplierIDCompletionList"
-            TargetControlID="F_SupplierID"
-            CompletionInterval="100"
-            FirstRowSelected="true"
-            MinimumPrefixLength="1"
-            OnClientItemSelected="ACESupplierID_Selected"
-            OnClientPopulating="ACESupplierID_Populating"
-            OnClientPopulated="ACESupplierID_Populated"
-            CompletionSetCount="10"
-            CompletionListCssClass = "autocomplete_completionListElement"
-            CompletionListItemCssClass = "autocomplete_listItem"
-            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
-            Runat="Server" />
-        </td>
-      </tr>
-      <tr>
-        <td class="alignright">
-          <b><asp:Label ID="L_ProjectID" runat="server" Text="Project :" /></b>
-        </td>
-        <td>
-          <asp:TextBox
-            ID = "F_ProjectID"
-            CssClass = "myfktxt"
-            Width="56px"
-            Text=""
-            onfocus = "return this.select();"
-            AutoCompleteType = "None"
-            onblur= "validate_ProjectID(this);"
-            Runat="Server" />
-          <asp:Label
-            ID = "F_ProjectID_Display"
-            Text=""
-            Runat="Server" />
-          <AJX:AutoCompleteExtender
-            ID="ACEProjectID"
-            BehaviorID="B_ACEProjectID"
-            ContextKey=""
-            UseContextKey="true"
-            ServiceMethod="ProjectIDCompletionList"
-            TargetControlID="F_ProjectID"
-            CompletionInterval="100"
-            FirstRowSelected="true"
-            MinimumPrefixLength="1"
-            OnClientItemSelected="ACEProjectID_Selected"
-            OnClientPopulating="ACEProjectID_Populating"
-            OnClientPopulated="ACEProjectID_Populated"
-            CompletionSetCount="10"
-            CompletionListCssClass = "autocomplete_completionListElement"
-            CompletionListItemCssClass = "autocomplete_listItem"
-            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
-            Runat="Server" />
-        </td>
-      </tr>
-      <tr>
-        <td class="alignright">
-          <b><asp:Label ID="L_POStatusID" runat="server" Text="Status :" /></b>
-        </td>
-        <td>
-          <LGM:LC_pakPOStatus
-            ID="F_POStatusID"
-            SelectedValue=""
-            OrderBy="Description"
-            DataTextField="Description"
-            DataValueField="StatusID"
-            IncludeDefault="true"
-            DefaultText="-- Select --"
-            Width="200px"
-            AutoPostBack="true"
-            RequiredFieldErrorMessage="<div class='errorLG'>Required!</div>"
-            CssClass="myddl"
-            Runat="Server" />
-          </td>
-      </tr>
-      <tr>
-        <td class="alignright">
-          <b><asp:Label ID="L_IssuedBy" runat="server" Text="Issued By :" /></b>
-        </td>
-        <td>
-          <asp:TextBox
-            ID = "F_IssuedBy"
-            CssClass = "myfktxt"
-            Width="72px"
-            Text=""
-            onfocus = "return this.select();"
-            AutoCompleteType = "None"
-            onblur= "validate_IssuedBy(this);"
-            Runat="Server" />
-          <asp:Label
-            ID = "F_IssuedBy_Display"
-            Text=""
-            Runat="Server" />
-          <AJX:AutoCompleteExtender
-            ID="ACEIssuedBy"
-            BehaviorID="B_ACEIssuedBy"
-            ContextKey=""
-            UseContextKey="true"
-            ServiceMethod="IssuedByCompletionList"
-            TargetControlID="F_IssuedBy"
-            CompletionInterval="100"
-            FirstRowSelected="true"
-            MinimumPrefixLength="1"
-            OnClientItemSelected="ACEIssuedBy_Selected"
-            OnClientPopulating="ACEIssuedBy_Populating"
-            OnClientPopulated="ACEIssuedBy_Populated"
-            CompletionSetCount="10"
-            CompletionListCssClass = "autocomplete_completionListElement"
-            CompletionListItemCssClass = "autocomplete_listItem"
-            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
-            Runat="Server" />
-        </td>
-      </tr>
-      <tr>
-        <td class="alignright">
-          <b><asp:Label ID="L_POTypeID" runat="server" Text="PO Type :" /></b>
-        </td>
-        <td>
-          <LGM:LC_pakPOTypes
-            ID="F_POTypeID"
-            SelectedValue=""
-            OrderBy="Description"
-            DataTextField="Description"
-            DataValueField="POTypeID"
-            IncludeDefault="true"
-            DefaultText="-- Select --"
-            Width="200px"
-            AutoPostBack="true"
-            RequiredFieldErrorMessage="<div class='errorLG'>Required!</div>"
-            CssClass="myddl"
-            Runat="Server" />
-          </td>
-      </tr>
-      <tr>
-        <td class="alignright">
-          <b><asp:Label ID="L_BuyerID" runat="server" Text="Buyer :" /></b>
-        </td>
-        <td>
-          <asp:TextBox
-            ID = "F_BuyerID"
-            CssClass = "myfktxt"
-            Width="72px"
-            Text=""
-            onfocus = "return this.select();"
-            AutoCompleteType = "None"
-            onblur= "validate_BuyerID(this);"
-            Runat="Server" />
-          <asp:Label
-            ID = "F_BuyerID_Display"
-            Text=""
-            Runat="Server" />
-          <AJX:AutoCompleteExtender
-            ID="ACEBuyerID"
-            BehaviorID="B_ACEBuyerID"
-            ContextKey=""
-            UseContextKey="true"
-            ServiceMethod="BuyerIDCompletionList"
-            TargetControlID="F_BuyerID"
-            CompletionInterval="100"
-            FirstRowSelected="true"
-            MinimumPrefixLength="1"
-            OnClientItemSelected="ACEBuyerID_Selected"
-            OnClientPopulating="ACEBuyerID_Populating"
-            OnClientPopulated="ACEBuyerID_Populated"
-            CompletionSetCount="10"
-            CompletionListCssClass = "autocomplete_completionListElement"
-            CompletionListItemCssClass = "autocomplete_listItem"
-            CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem"
-            Runat="Server" />
-        </td>
-      </tr>
-    </table>
-      </div>
-      <div style="width:60%;float:right"  class="ui-widget-content ui-corner-all">
-                  <h3 class="ui-widget-header ui-corner-all" style="margin: 0; padding: 0.4em; text-align: center;">
-                    IMPORT PO DETAILS FROM ERP</h3>
-        <table style="margin:10px 10px 10px 10px">
-      <tr>
-        <td class="alignright">
-          <b><asp:Label ID="Label1" runat="server" Text="PO Number :" /></b>
-        </td>
-        <td style="padding-left: 10px">
-          <asp:TextBox
-            ID = "F_PONumber"
-            CssClass = "myfktxt"
-            Width="110px"
-            Text=""
-            MaxLength="9"
-            ToolTip="Enter PO Number to import"
-            onfocus = "return this.select();"
-            AutoCompleteType = "None"
-            Runat="Server" />
-          </td>
-          <td style="padding-left: 10px">
-          <asp:Button ID="cmdBoughtout" runat="server" Text="As BOUGHTOUT PO" ToolTip="Mainly used by EPC Division" OnClientClick="return confirm('Import PO as Boughtout, It is generally used by EPC Division ?');" />
-            </td>
-          <td style="padding-left: 10px">
-          <asp:Button ID="cmdImport" runat="server" Text="As PACKAGE PO" ToolTip="Mainly used by EPC Division" OnClientClick="return confirm('Import PO as Package, It is generally used by EPC Division ?');" />
-            </td>
-          <td style="padding-left: 10px">
-          <asp:Button ID="cmdIsgec" runat="server" Text="As ISGEC Engineered PO" ToolTip="Mainly used by BOILER Division" OnClientClick="return confirm('Import PO as Isgec Engineered, It is generally used by BOILER Division ?');" />
-        </td>
-      </tr>
-        </table>
-      </div>
-    </asp:Panel>
-    <AJX:CollapsiblePanelExtender ID="cpe1" runat="Server" TargetControlID="pnlD" ExpandControlID="pnlH" CollapseControlID="pnlH" Collapsed="True" TextLabelID="lblH" ImageControlID="imgH" ExpandedText="(Hide Filters...)" CollapsedText="(Show Filters...)" ExpandedImage="~/images/ua.png" CollapsedImage="~/images/da.png" SuppressPostBack="true" />
+      <asp:Panel ID="pnlD" runat="server" CssClass="cp_filter" Height="0">
+        <div id="frmdiv" style="width: 30%; float: left" class="ui-widget-content ui-corner-all">
+          <h3 class="ui-widget-header ui-corner-all" style="margin: 0; padding: 0.4em; text-align: center;">FILTER RECORDS</h3>
+          <table>
+            <tr>
+              <td class="alignright">
+                <b>
+                  <asp:Label ID="L_SupplierID" runat="server" Text="Supplier :" /></b>
+              </td>
+              <td>
+                <asp:TextBox
+                  ID="F_SupplierID"
+                  CssClass="myfktxt"
+                  Width="80px"
+                  Text=""
+                  onfocus="return this.select();"
+                  AutoCompleteType="None"
+                  onblur="validate_SupplierID(this);"
+                  runat="Server" />
+                <asp:Label
+                  ID="F_SupplierID_Display"
+                  Text=""
+                  runat="Server" />
+                <AJX:AutoCompleteExtender
+                  ID="ACESupplierID"
+                  BehaviorID="B_ACESupplierID"
+                  ContextKey=""
+                  UseContextKey="true"
+                  ServiceMethod="SupplierIDCompletionList"
+                  TargetControlID="F_SupplierID"
+                  CompletionInterval="100"
+                  FirstRowSelected="true"
+                  MinimumPrefixLength="1"
+                  OnClientItemSelected="ACESupplierID_Selected"
+                  OnClientPopulating="ACESupplierID_Populating"
+                  OnClientPopulated="ACESupplierID_Populated"
+                  CompletionSetCount="10"
+                  CompletionListCssClass="autocomplete_completionListElement"
+                  CompletionListItemCssClass="autocomplete_listItem"
+                  CompletionListHighlightedItemCssClass="autocomplete_highlightedListItem"
+                  runat="Server" />
+              </td>
+            </tr>
+            <tr>
+              <td class="alignright">
+                <b>
+                  <asp:Label ID="L_ProjectID" runat="server" Text="Project :" /></b>
+              </td>
+              <td>
+                <asp:TextBox
+                  ID="F_ProjectID"
+                  CssClass="myfktxt"
+                  Width="56px"
+                  Text=""
+                  onfocus="return this.select();"
+                  AutoCompleteType="None"
+                  onblur="validate_ProjectID(this);"
+                  runat="Server" />
+                <asp:Label
+                  ID="F_ProjectID_Display"
+                  Text=""
+                  runat="Server" />
+                <AJX:AutoCompleteExtender
+                  ID="ACEProjectID"
+                  BehaviorID="B_ACEProjectID"
+                  ContextKey=""
+                  UseContextKey="true"
+                  ServiceMethod="ProjectIDCompletionList"
+                  TargetControlID="F_ProjectID"
+                  CompletionInterval="100"
+                  FirstRowSelected="true"
+                  MinimumPrefixLength="1"
+                  OnClientItemSelected="ACEProjectID_Selected"
+                  OnClientPopulating="ACEProjectID_Populating"
+                  OnClientPopulated="ACEProjectID_Populated"
+                  CompletionSetCount="10"
+                  CompletionListCssClass="autocomplete_completionListElement"
+                  CompletionListItemCssClass="autocomplete_listItem"
+                  CompletionListHighlightedItemCssClass="autocomplete_highlightedListItem"
+                  runat="Server" />
+              </td>
+            </tr>
+            <tr>
+              <td class="alignright">
+                <b>
+                  <asp:Label ID="L_POStatusID" runat="server" Text="Status :" /></b>
+              </td>
+              <td>
+                <LGM:LC_pakPOStatus
+                  ID="F_POStatusID"
+                  SelectedValue=""
+                  OrderBy="Description"
+                  DataTextField="Description"
+                  DataValueField="StatusID"
+                  IncludeDefault="true"
+                  DefaultText="-- Select --"
+                  Width="200px"
+                  AutoPostBack="true"
+                  RequiredFieldErrorMessage="<div class='errorLG'>Required!</div>"
+                  CssClass="myddl"
+                  runat="Server" />
+              </td>
+            </tr>
+            <tr>
+              <td class="alignright">
+                <b>
+                  <asp:Label ID="L_IssuedBy" runat="server" Text="Issued By :" /></b>
+              </td>
+              <td>
+                <asp:TextBox
+                  ID="F_IssuedBy"
+                  CssClass="myfktxt"
+                  Width="72px"
+                  Text=""
+                  onfocus="return this.select();"
+                  AutoCompleteType="None"
+                  onblur="validate_IssuedBy(this);"
+                  runat="Server" />
+                <asp:Label
+                  ID="F_IssuedBy_Display"
+                  Text=""
+                  runat="Server" />
+                <AJX:AutoCompleteExtender
+                  ID="ACEIssuedBy"
+                  BehaviorID="B_ACEIssuedBy"
+                  ContextKey=""
+                  UseContextKey="true"
+                  ServiceMethod="IssuedByCompletionList"
+                  TargetControlID="F_IssuedBy"
+                  CompletionInterval="100"
+                  FirstRowSelected="true"
+                  MinimumPrefixLength="1"
+                  OnClientItemSelected="ACEIssuedBy_Selected"
+                  OnClientPopulating="ACEIssuedBy_Populating"
+                  OnClientPopulated="ACEIssuedBy_Populated"
+                  CompletionSetCount="10"
+                  CompletionListCssClass="autocomplete_completionListElement"
+                  CompletionListItemCssClass="autocomplete_listItem"
+                  CompletionListHighlightedItemCssClass="autocomplete_highlightedListItem"
+                  runat="Server" />
+              </td>
+            </tr>
+            <tr>
+              <td class="alignright">
+                <b>
+                  <asp:Label ID="L_POTypeID" runat="server" Text="PO Type :" /></b>
+              </td>
+              <td>
+                <LGM:LC_pakPOTypes
+                  ID="F_POTypeID"
+                  SelectedValue=""
+                  OrderBy="Description"
+                  DataTextField="Description"
+                  DataValueField="POTypeID"
+                  IncludeDefault="true"
+                  DefaultText="-- Select --"
+                  Width="200px"
+                  AutoPostBack="true"
+                  RequiredFieldErrorMessage="<div class='errorLG'>Required!</div>"
+                  CssClass="myddl"
+                  runat="Server" />
+              </td>
+            </tr>
+            <tr>
+              <td class="alignright">
+                <b>
+                  <asp:Label ID="L_BuyerID" runat="server" Text="Buyer :" /></b>
+              </td>
+              <td>
+                <asp:TextBox
+                  ID="F_BuyerID"
+                  CssClass="myfktxt"
+                  Width="72px"
+                  Text=""
+                  onfocus="return this.select();"
+                  AutoCompleteType="None"
+                  onblur="validate_BuyerID(this);"
+                  runat="Server" />
+                <asp:Label
+                  ID="F_BuyerID_Display"
+                  Text=""
+                  runat="Server" />
+                <AJX:AutoCompleteExtender
+                  ID="ACEBuyerID"
+                  BehaviorID="B_ACEBuyerID"
+                  ContextKey=""
+                  UseContextKey="true"
+                  ServiceMethod="BuyerIDCompletionList"
+                  TargetControlID="F_BuyerID"
+                  CompletionInterval="100"
+                  FirstRowSelected="true"
+                  MinimumPrefixLength="1"
+                  OnClientItemSelected="ACEBuyerID_Selected"
+                  OnClientPopulating="ACEBuyerID_Populating"
+                  OnClientPopulated="ACEBuyerID_Populated"
+                  CompletionSetCount="10"
+                  CompletionListCssClass="autocomplete_completionListElement"
+                  CompletionListItemCssClass="autocomplete_listItem"
+                  CompletionListHighlightedItemCssClass="autocomplete_highlightedListItem"
+                  runat="Server" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div style="width: 60%; float: right" class="ui-widget-content ui-corner-all">
+          <h3 class="ui-widget-header ui-corner-all" style="margin: 0; padding: 0.4em; text-align: center;">IMPORT PO DETAILS FROM ERP</h3>
+          <table style="margin: 10px 10px 10px 10px">
+            <tr>
+              <td class="alignright">
+                <b>
+                  <asp:Label ID="Label1" runat="server" Text="PO Number :" /></b>
+              </td>
+              <td style="padding-left: 10px">
+                <asp:TextBox
+                  ID="F_PONumber"
+                  CssClass="myfktxt"
+                  Width="110px"
+                  Text=""
+                  MaxLength="9"
+                  ToolTip="Enter PO Number to import"
+                  onfocus="return this.select();"
+                  AutoCompleteType="None"
+                  runat="Server" />
+              </td>
+              <td style="padding-left: 10px">
+                <asp:Button ID="cmdBoughtout" runat="server" Text="As BOUGHTOUT PO" ToolTip="Mainly used by EPC Division" OnClientClick="return confirm('Import PO as Boughtout, It is generally used by EPC Division ?');" />
+              </td>
+              <td style="padding-left: 10px">
+                <asp:Button ID="cmdImport" runat="server" Text="As PACKAGE PO" ToolTip="Mainly used by EPC Division" OnClientClick="return confirm('Import PO as Package, It is generally used by EPC Division ?');" />
+              </td>
+              <td style="padding-left: 10px">
+                <asp:Button ID="cmdIsgec" runat="server" Text="As ISGEC Engineered PO" ToolTip="Mainly used by BOILER Division" OnClientClick="return confirm('Import PO as Isgec Engineered, It is generally used by BOILER Division ?');" />
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5">
+                <asp:CheckBox ID="chkRevertConfig" runat="server" Text="Revert Configuration USE Package Master" />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </asp:Panel>
+      <AJX:CollapsiblePanelExtender ID="cpe1" runat="Server" TargetControlID="pnlD" ExpandControlID="pnlH" CollapseControlID="pnlH" Collapsed="True" TextLabelID="lblH" ImageControlID="imgH" ExpandedText="(Hide Filters...)" CollapsedText="(Show Filters...)" ExpandedImage="~/images/ua.png" CollapsedImage="~/images/da.png" SuppressPostBack="true" />
     <asp:GridView ID="GVpakPO" SkinID="gv_silver" runat="server" DataSourceID="ODSpakPO" DataKeyNames="SerialNo">
       <Columns>
         <asp:TemplateField HeaderText="EDIT">
@@ -273,19 +283,29 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="PRINT">
+        <asp:TemplateField HeaderText="PRN">
           <ItemTemplate>
             <asp:ImageButton ID="cmdPrint" runat="server" AlternateText='<%# Eval("PrimaryKey") %>' ToolTip="Print PO" SkinID="print" OnClientClick='<%# Eval("GetPrintLink") %>' CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
-        <asp:TemplateField HeaderText="NOTE">
+        <asp:TemplateField HeaderText="NT">
           <ItemTemplate>
             <asp:ImageButton ID="cmdNotes" runat="server" AlternateText='<%# Eval("PrimaryKey") %>' ToolTip="View/reply Notes" SkinID="notes" OnClientClick='<%# Eval("GetNotesLink") %>' CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="QCO PKG" >
+          <ItemTemplate>
+            <div style="display:flex; flex-direction:row;">
+              <div title="QC Offered" style='font-weight:bold;padding:5px;border-radius:10px;background-color:#ff0033;color:white;'><%# Eval("QCOCount") %></div>
+              <div title="Packing Lists" style='font-weight:bold;padding:5px;border-radius:10px;background-color:gold;color:black;'><%# Eval("PKGCount") %></div>
+            </div>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="30px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Serial No" SortExpression="SerialNo">
           <ItemTemplate>
@@ -349,39 +369,34 @@
         </asp:TemplateField>
         <asp:TemplateField HeaderText="UPD">
           <ItemTemplate>
-            <asp:ImageButton ID="cmdUpdateWF" ValidationGroup='<%# "Update" & Container.DataItemIndex %>' CausesValidation="true" runat="server" AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Update PO from ERP" SkinID="update" OnClientClick='<%# "return Page_ClientValidate(""Update" & Container.DataItemIndex & """) && confirm(""Update PO to Latest version in ERP ?"");" %>' CommandName="UpdateWF" CommandArgument='<%# Container.DataItemIndex %>' />
-          </ItemTemplate>
-          <ItemStyle CssClass="alignCenter" />
-          <HeaderStyle HorizontalAlign="Center" Width="30px" />
-        </asp:TemplateField>
-        <asp:TemplateField HeaderText="BOM VRF">
-          <ItemTemplate>
-            <asp:ImageButton ID="cmdInitiateWF" ValidationGroup='<%# "Initiate" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("InitiateWFVisible") %>' Enabled='<%# EVal("InitiateWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Send to supplier for BOM verification" SkinID="forward" OnClientClick='<%# "return Page_ClientValidate(""Initiate" & Container.DataItemIndex & """) && confirm(""Send to supplier for BOM verification ?"");" %>' CommandName="InitiateWF" CommandArgument='<%# Container.DataItemIndex %>' />
+            <asp:ImageButton ID="cmdUpdateWF" Visible='<%# Eval("UpdateWFVisible") %>' ValidationGroup='<%# "Update" & Container.DataItemIndex %>' CausesValidation="true" runat="server" AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Update PO from ERP" SkinID="update" OnClientClick='<%# "return Page_ClientValidate(""Update" & Container.DataItemIndex & """) && confirm(""Update PO to Latest version in ERP ?"");" %>' CommandName="UpdateWF" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="ISS">
           <ItemTemplate>
-            <asp:ImageButton ID="cmdApproveWF" ValidationGroup='<%# "Approve" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("ApproveWFVisible") %>' Enabled='<%# EVal("ApproveWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Final Issue to supplier after BOM Freezing" SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Approve" & Container.DataItemIndex & """) && confirm(""Final Issue to supplier ?"");" %>' CommandName="ApproveWF" CommandArgument='<%# Container.DataItemIndex %>' />
+            <asp:ImageButton ID="cmdInitiateWF" runat="server" Visible='<%# Eval("InitiateWFVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Send to supplier" SkinID="forward" OnClientClick="return confirm('Issue PO to supplier ?');" CommandName="InitiateWF" CommandArgument='<%# Container.DataItemIndex %>' />
           </ItemTemplate>
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
         <asp:TemplateField >
           <ItemTemplate>
+            <asp:ImageButton ID="cmdDeleteWF" runat="server" Visible='<%# Eval("DeleteWFVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Delete PO." SkinID="delete" OnClientClick="return confirm('Delete PO ?');" CommandName="DeleteWF" CommandArgument='<%# Container.DataItemIndex %>' />
             </td></tr>
             <tr style="background-color:AntiqueWhite; color:DeepPink">
               <td></td>
               <td></td>
               <td></td>
-              <td colspan="3">
+              <td colspan="4">
                 <asp:Label ID="LabelISGECRemarks" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("ISGECRemarks") %>'></asp:Label>
               </td>
               <td></td>
-              <td colspan="3">
+              <td colspan="4">
                 <asp:Label ID="LabelSupplierRemarks" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("SupplierRemarks") %>'></asp:Label>
               </td>
+              <td></td>
               <td></td>
               <td></td>
               <td></td>

@@ -249,7 +249,10 @@ Namespace SIS.PAK
           .Cells(4, 12).Value = IIf(tmpPkg.TransporterID <> "", tmpPkg.VR_BusinessPartner4_BPName, tmpPkg.TransporterName)
           .Cells(5, 12).Value = tmpPkg.VehicleNo
           .Cells(6, 12).Value = tmpPkg.GRNo
-          .Cells(7, 12).Value = "'" & Convert.ToDateTime(tmpPkg.GRDate).ToString("dd/MM/yyyy")
+          Try
+            .Cells(7, 12).Value = "'" & Convert.ToDateTime(tmpPkg.GRDate).ToString("dd/MM/yyyy")
+          Catch ex As Exception
+          End Try
         End With
 
         '2. Data
@@ -261,9 +264,9 @@ Namespace SIS.PAK
         For Each tmp As SIS.PAK.pakPkgListD In PkgItems
           With xlWS
             c = 1
-            .Cells(r, c).Value = cnt
+            .Cells(r, c).Value = "" ' cnt
             c += 1
-            .Cells(r, c).Value = tmp.ItemNo
+            .Cells(r, c).Value = "" 'tmp.ItemNo
             c += 1
             .Cells(r, c).Value = tmp.FK_PAK_PkgListD_ItemNo.ItemCode
             c += 1

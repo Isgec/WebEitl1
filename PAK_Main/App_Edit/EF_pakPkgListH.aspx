@@ -320,6 +320,83 @@
       <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
       <tr>
         <td class="alignright">
+          <asp:Label ID="L_SupplierBillNo" runat="server" Text="Supplier Bill No :" />
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillNo"
+            Text='<%# Bind("SupplierBillNo") %>'
+            CssClass = "mytxt"
+            onfocus = "return this.select();"
+            ValidationGroup="pakPkgListH"
+            onblur= "this.value=this.value.replace(/\'/g,'');"
+            ToolTip="Enter Supplier Bill No."
+            MaxLength="50"
+            Width="300px"
+            runat="server" />
+        </td>
+        <td class="alignright">
+          <asp:Label ID="L_SupplierBillDate" runat="server" Text="Supplier Bill Date :" />
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillDate"
+            Text='<%# Bind("SupplierBillDate") %>'
+            Width="80px"
+            CssClass = "mytxt"
+            ValidationGroup="pakPkgListH"
+            onfocus = "return this.select();"
+            runat="server" />
+          <asp:Image ID="ImageButtonSupplierBillDate" runat="server" ToolTip="Click to open calendar" style="cursor: pointer; vertical-align:bottom" ImageUrl="~/Images/cal.png" />
+          <AJX:CalendarExtender 
+            ID = "CESupplierBillDate"
+            TargetControlID="F_SupplierBillDate"
+            Format="dd/MM/yyyy"
+            runat = "server" CssClass="MyCalendar" PopupButtonID="ImageButtonSupplierBillDate" />
+          <AJX:MaskedEditExtender 
+            ID = "MEESupplierBillDate"
+            runat = "server"
+            mask = "99/99/9999"
+            MaskType="Date"
+            CultureName = "en-GB"
+            MessageValidatorTip="true"
+            InputDirection="LeftToRight"
+            ErrorTooltipEnabled="true"
+            TargetControlID="F_SupplierBillDate" />
+          <AJX:MaskedEditValidator 
+            ID = "MEVSupplierBillDate"
+            runat = "server"
+            ControlToValidate = "F_SupplierBillDate"
+            ControlExtender = "MEESupplierBillDate"
+            EmptyValueBlurredText = "<div class='errorLG'>Required!</div>"
+            Display = "Dynamic"
+            EnableClientScript = "true"
+            ValidationGroup = "pakPkgListH"
+            IsValidEmpty = "true"
+            SetFocusOnError="true" />
+        </td>
+      </tr>
+      <tr>
+        <td class="alignright">
+          <asp:Label ID="L_SupplierBillAmount" runat="server" Text="Supplier Bill Amount :" />&nbsp;
+        </td>
+        <td>
+          <asp:TextBox ID="F_SupplierBillAmount"
+            Text='<%# Bind("SupplierBillAmount") %>'
+            style="text-align: right"
+            Width="168px"
+            CssClass = "mytxt"
+            MaxLength="20"
+            onfocus = "return this.select();"
+            onblur="return dc(this,2);"
+            runat="server" />
+        </td>
+        <td class="alignright">
+        </td>
+        <td>
+      </tr>
+
+      <tr><td colspan="4" style="border-top: solid 1pt LightGrey" ></td></tr>
+      <tr>
+        <td class="alignright">
           <asp:Label ID="L_Remarks" runat="server" Text="Remarks :" />&nbsp;
         </td>
         <td colspan="3">

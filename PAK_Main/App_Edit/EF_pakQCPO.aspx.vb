@@ -61,6 +61,16 @@ Partial Class EF_pakQCPO
       Page.ClientScript.RegisterClientScriptBlock(GetType(System.String), "scriptpakQCPO", mStr)
     End If
     CType(FVpakQCPO.FindControl("IsUploaded"), HiddenField).Value = ""
+    If ShowPopup Then
+      HeaderText.Text = "Offer List No.: " & QCLNo
+      'Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+      'Dim Supplier As SIS.PAK.pakBusinessPartner = PO.FK_PAK_SupplierID
+      'L_PrimaryKey.Text = Supplier.BPID
+      'HeaderText.Text = Supplier.BPName
+      'F_EMailIDs.Text = Supplier.EMailID
+      mPopup.Show()
+    End If
+
   End Sub
   Partial Class gvBase
     Inherits SIS.SYS.GridBase
@@ -73,6 +83,40 @@ Partial Class EF_pakQCPO
   Protected Sub TBLpakQCListH_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles TBLpakQCListH.Init
     gvpakQCListHCC.SetToolBar = TBLpakQCListH
   End Sub
+  Public Property QCRequestNo As String
+    Get
+      If ViewState("QCRequestNo") IsNot Nothing Then
+        Return ViewState("QCRequestNo")
+      End If
+      Return ""
+    End Get
+    Set(value As String)
+      ViewState.Add("QCRequestNo", value)
+    End Set
+  End Property
+  Public Property QCLNo As Integer
+    Get
+      If ViewState("QCLNo") IsNot Nothing Then
+        Return ViewState("QCLNo")
+      End If
+      Return 0
+    End Get
+    Set(value As Integer)
+      ViewState.Add("QCLNo", value)
+    End Set
+  End Property
+  Public Property SerialNo As Integer
+    Get
+      If ViewState("SerialNo") IsNot Nothing Then
+        Return ViewState("SerialNo")
+      End If
+      Return 0
+    End Get
+    Set(value As Integer)
+      ViewState.Add("SerialNo", value)
+    End Set
+  End Property
+  Private ShowPopup As Boolean = False
   Protected Sub GVpakQCListH_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakQCListH.RowCommand
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
@@ -91,6 +135,35 @@ Partial Class EF_pakQCPO
         Dim QCLNo As Int32 = GVpakQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
         SIS.PAK.pakQCListH.InitiateWF(SerialNo, QCLNo, QCRequestNo)
         GVpakQCListH.DataBind()
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
+    If e.CommandName.ToLower = "RaiseQCRequest".ToLower Then
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize("Temporarily Disabled.") & "');", True)
+      Exit Sub
+      Try
+        SerialNo = GVpakQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
+        QCLNo = GVpakQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
+        QCRequestNo = CType(GVpakQCListH.Rows(e.CommandArgument).FindControl("F_QCRequestNo"), LC_qcmSRequests).SelectedValue
+        Dim tmp As SIS.PAK.pakQCListH = SIS.PAK.pakQCListH.pakQCListHGetByID(SerialNo, QCLNo)
+        Dim qTmp As SIS.QCM.qcmRequests = New SIS.QCM.qcmRequests
+        If tmp.QCRequestNo <> "" Then
+          qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(tmp.QCRequestNo)
+        End If
+        If QCRequestNo <> "" AndAlso QCRequestNo <> tmp.QCRequestNo Then
+          qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(QCRequestNo)
+        End If
+        F_RequestID.Text = qTmp.RequestID
+        F_CreationRemarks.Text = qTmp.CreationRemarks
+        F_RegionID.SelectedValue = qTmp.RegionID
+        F_Description.Text = qTmp.Description
+        F_InspectionStageiD.SelectedValue = qTmp.InspectionStageiD
+        F_TotalRequestedQuantity.Text = qTmp.TotalRequestedQuantity
+        F_LotSize.Text = qTmp.LotSize
+        F_UOM.SelectedValue = qTmp.UOM
+        F_RequestedInspectionStartDate.Text = qTmp.RequestedInspectionStartDate
+        ShowPopup = True
       Catch ex As Exception
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
@@ -316,4 +389,151 @@ Partial Class EF_pakQCPO
     End If
     HttpContext.Current.Server.ScriptTimeout = st
   End Sub
+  Private Sub cmdOK_Click(sender As Object, e As EventArgs) Handles cmdOK.Click
+    Dim IsValid As Boolean = True
+    Dim errMsg As String = ""
+    If F_RequestedInspectionStartDate.Text = "" Then
+      IsValid = False
+      errMsg = "Please enter expected inspection date."
+    End If
+    If F_UOM.SelectedValue = "" Then
+      IsValid = False
+      errMsg = "Place select UOM."
+    End If
+    If F_TotalRequestedQuantity.Text = "" And F_LotSize.Text = "" Then
+      IsValid = False
+      errMsg = "Place enter approx. quantity offered."
+    End If
+    If F_InspectionStageiD.SelectedValue = "" Then
+      IsValid = False
+      errMsg = "Please select relevant Inspection stage."
+    End If
+    If F_Description.Text = "" Then
+      IsValid = False
+      errMsg = "Brief Item description is required."
+    End If
+    If F_RegionID.SelectedValue = "" Then
+      IsValid = False
+      errMsg = "Please select relevant inspection region. [If not sure, select any value.]"
+    End If
+    If F_CreationRemarks.Text = "" Then
+      IsValid = False
+      errMsg = "Place of Inspection and contact details is required."
+    End If
+    If Not IsValid Then
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(errMsg) & "');", True)
+      Exit Sub
+    End If
+    'After Basic validation
+    Dim tmp As SIS.PAK.pakQCListH = SIS.PAK.pakQCListH.pakQCListHGetByID(SerialNo, QCLNo)
+    Dim qTmp As SIS.QCM.qcmRequests = Nothing
+    If tmp.QCRequestNo <> "" AndAlso tmp.QCRequestNo = QCRequestNo Then
+      qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(tmp.QCRequestNo)
+    ElseIf tmp.QCRequestNo <> "" AndAlso QCRequestNo = "" Then
+      qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(tmp.QCRequestNo)
+      If qTmp.CreatedBy <> HttpContext.Current.Session("LoginID") Then
+        tmp.QCRequestNo = ""
+        SIS.PAK.pakQCListH.UpdateData(tmp)
+        errMsg = "Request delinked."
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(errMsg) & "');", True)
+        Exit Sub
+      Else
+        Select Case qTmp.RequestStateID
+          Case "OPEN", "RETURNED"
+            tmp.QCRequestNo = ""
+            SIS.PAK.pakQCListH.UpdateData(tmp)
+            SIS.QCM.qcmRequests.qcmRequestsDelete(qTmp)
+            errMsg = "Request delinked and deleted."
+            ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(errMsg) & "');", True)
+            Exit Sub
+          Case Else
+            errMsg = "Request is processed by ISGEC, can not delink and delete."
+            ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(errMsg) & "');", True)
+            Exit Sub
+        End Select
+      End If
+    ElseIf tmp.QCRequestNo <> "" AndAlso QCRequestNo <> "" AndAlso tmp.QCRequestNo <> QCRequestNo Then
+      qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(tmp.QCRequestNo)
+      If qTmp.CreatedBy <> HttpContext.Current.Session("LoginID") Then
+        'Link with new selected
+        tmp.QCRequestNo = QCRequestNo
+        SIS.PAK.pakQCListH.UpdateData(tmp)
+        qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(QCRequestNo)
+        If qTmp.CreatedBy <> HttpContext.Current.Session("LoginID") Then
+          Exit Sub
+        End If
+      Else
+        Select Case qTmp.RequestStateID
+          Case "OPEN", "RETURNED"
+            tmp.QCRequestNo = QCRequestNo
+            SIS.PAK.pakQCListH.UpdateData(tmp)
+            SIS.QCM.qcmRequests.qcmRequestsDelete(qTmp)
+            qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(QCRequestNo)
+            If qTmp.CreatedBy <> HttpContext.Current.Session("LoginID") Then
+              Exit Sub
+            End If
+          Case Else
+            errMsg = "Request is processed by ISGEC, can not change created request."
+            ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(errMsg) & "');", True)
+            Exit Sub
+        End Select
+      End If
+    ElseIf tmp.QCRequestNo = "" AndAlso QCRequestNo <> "" Then
+      tmp.QCRequestNo = QCRequestNo
+      SIS.PAK.pakQCListH.UpdateData(tmp)
+      qTmp = SIS.QCM.qcmRequests.qcmRequestsGetByID(QCRequestNo)
+      If qTmp.CreatedBy <> HttpContext.Current.Session("LoginID") Then
+        Exit Sub
+      End If
+    ElseIf tmp.QCRequestNo = "" AndAlso QCRequestNo = "" Then
+      qTmp = Nothing
+    End If
+    Dim isNew As Boolean = False
+    Try
+      If qTmp IsNot Nothing Then
+        Select Case qTmp.RequestStateID
+          Case "OPEN", "RETURNED"
+          Case Else
+            IsValid = False
+            errMsg = "Request is processed by ISGEC, can not update."
+        End Select
+      Else
+        qTmp = New SIS.QCM.qcmRequests
+        isNew = True
+      End If
+      If Not IsValid Then
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(errMsg) & "');", True)
+        Exit Sub
+      End If
+      qTmp.CreationRemarks = F_CreationRemarks.Text
+      qTmp.RegionID = F_RegionID.SelectedValue
+      qTmp.Description = F_Description.Text
+      qTmp.InspectionStageiD = F_InspectionStageiD.SelectedValue
+      qTmp.TotalRequestedQuantity = F_TotalRequestedQuantity.Text
+      qTmp.LotSize = F_LotSize.Text
+      qTmp.UOM = F_UOM.SelectedValue
+      qTmp.RequestedInspectionStartDate = F_RequestedInspectionStartDate.Text
+      qTmp.CreatedOn = HttpContext.Current.Session("LoginID")
+      qTmp.CreatedOn = Now
+      If isNew Then
+        With qTmp
+          Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+          .RequestStateID = "OPEN"
+          .ProjectID = PO.ProjectID
+          .OrderNo = PO.PONumber
+          .OrderDate = PO.PODate
+          .SupplierID = PO.SupplierID
+          .POWeight = PO.POWeight
+        End With
+        qTmp = SIS.QCM.qcmRequests.InsertData(qTmp)
+        tmp.QCRequestNo = qTmp.RequestID
+        SIS.PAK.pakQCListH.UpdateData(tmp)
+      Else
+        SIS.QCM.qcmRequests.UpdateData(qTmp)
+      End If
+    Catch ex As Exception
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+    End Try
+  End Sub
+
 End Class

@@ -55,6 +55,10 @@ Namespace SIS.PAK
     Private _FK_PAK_PkgListH_PortID As SIS.ELOG.elogPorts = Nothing
     Private _FK_PAK_PkgListH_ProjectID As SIS.QCM.qcmProjects = Nothing
     Private _FK_PAK_PkgListH_VRConvertedBy As SIS.QCM.qcmUsers = Nothing
+    Public Property SupplierBillNo As String = ""
+    Public Property SupplierBillDate As String = ""
+    Public Property SupplierBillAmount As String = ""
+
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -742,6 +746,9 @@ Namespace SIS.PAK
         .CreatedOn = Now
         .TotalWeight = Record.TotalWeight
         .StatusID = pakPkgStates.Free
+        .SupplierBillAmount = Record.SupplierBillAmount
+        .SupplierBillDate = Record.SupplierBillDate
+        .SupplierBillNo = Record.SupplierBillNo
         Try
           .PortID = Record.FK_PAK_PkgListH_SerialNo.PortID
         Catch ex As Exception
@@ -787,6 +794,9 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRConvertedBy", SqlDbType.NVarChar, 9, IIf(Record.VRConvertedBy = "", Convert.DBNull, Record.VRConvertedBy))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRRequestNo", SqlDbType.Int, 11, IIf(Record.VRRequestNo = "", Convert.DBNull, Record.VRRequestNo))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRExecuted", SqlDbType.Bit, 3, Record.VRExecuted)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillAmount", SqlDbType.Decimal, 23, IIf(Record.SupplierBillAmount = "", Convert.DBNull, Record.SupplierBillAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillDate", SqlDbType.DateTime, 21, IIf(Record.SupplierBillDate = "", Convert.DBNull, Record.SupplierBillDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillNo", SqlDbType.NVarChar, 51, IIf(Record.SupplierBillNo = "", Convert.DBNull, Record.SupplierBillNo))
           Cmd.Parameters.Add("@Return_SerialNo", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_SerialNo").Direction = ParameterDirection.Output
           Cmd.Parameters.Add("@Return_PkgNo", SqlDbType.Int, 11)
@@ -818,6 +828,9 @@ Namespace SIS.PAK
         .CreatedOn = Record.CreatedOn
         .TotalWeight = Record.TotalWeight
         .StatusID = Record.StatusID
+        .SupplierBillAmount = Record.SupplierBillAmount
+        .SupplierBillDate = Record.SupplierBillDate
+        .SupplierBillNo = Record.SupplierBillNo
       End With
       Return SIS.PAK.pakPkgListH.UpdateData(_Rec)
     End Function
@@ -855,6 +868,9 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRConvertedBy", SqlDbType.NVarChar, 9, IIf(Record.VRConvertedBy = "", Convert.DBNull, Record.VRConvertedBy))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRRequestNo", SqlDbType.Int, 11, IIf(Record.VRRequestNo = "", Convert.DBNull, Record.VRRequestNo))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@VRExecuted", SqlDbType.Bit, 3, Record.VRExecuted)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillAmount", SqlDbType.Decimal, 23, IIf(Record.SupplierBillAmount = "", Convert.DBNull, Record.SupplierBillAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillDate", SqlDbType.DateTime, 21, IIf(Record.SupplierBillDate = "", Convert.DBNull, Record.SupplierBillDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillNo", SqlDbType.NVarChar, 51, IIf(Record.SupplierBillNo = "", Convert.DBNull, Record.SupplierBillNo))
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

@@ -31,6 +31,8 @@ Partial Class EF_qcmRequests
       Case "OPEN", "RETURNED"
         Editable = True
     End Select
+    'to disable
+    Editable = False
   End Sub
   Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
     If Not Page.IsCallback And Not Page.IsPostBack Then

@@ -43,7 +43,7 @@ Namespace SIS.PAK
       End Get
     End Property
     'AS Linked in Joomla
-    Public ReadOnly Property GetAttachLink() As String
+    Public Shadows ReadOnly Property GetAttachLink() As String
       Get
         Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
         If UrlAuthority.ToLower <> "cloud.isgec.co.in" Then

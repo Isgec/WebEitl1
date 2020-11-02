@@ -388,9 +388,14 @@ Namespace SIS.PAK
         _VR_BusinessPartner7_BPName = value
       End Set
     End Property
+    Public ReadOnly Property DropdownField() As String
+      Get
+        Return _MRNNo & ", " & IIf(_TransporterName = "", _VR_BusinessPartner7_BPName, _TransporterName) & ", " & _VehicleRegistrationNo & ", " & _VehicleInDate
+      End Get
+    End Property
     Public ReadOnly Property DisplayField() As String
       Get
-        Return "" & _TransporterName.ToString.PadRight(50, " ")
+        Return _VehicleRegistrationNo & ", " & _VehicleInDate
       End Get
     End Property
     Public ReadOnly Property PrimaryKey() As String
@@ -716,25 +721,28 @@ Namespace SIS.PAK
     End Function
 '    Autocomplete Method
     Public Shared Function SelectpakLorryReceiptsAutoCompleteList(ByVal Prefix As String, ByVal count As Integer, ByVal contextKey As String) As String()
+      Dim ProjectID As String = ""
+      Dim RecNo As Integer = 0
       Dim Results As List(Of String) = Nothing
       Dim aVal() As String = contextKey.Split("|".ToCharArray)
+      ProjectID = aVal(0)
+      RecNo = aVal(1)
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakLorryReceiptsAutoCompleteList"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NvarChar, 9, HttpContext.Current.Session("LoginID"))
+          Cmd.CommandText = "sppak_LG_LorryReceiptsAutoCompleteList"
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ProjectID", SqlDbType.NVarChar, 7, ProjectID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RecNo", SqlDbType.Int, -1, RecNo)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@prefix", SqlDbType.NVarChar, 50, Prefix)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@records", SqlDbType.Int, -1, count)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@bycode", SqlDbType.Int, 1, IIf(IsNumeric(Prefix),0,IIf(Prefix.ToLower=Prefix, 0, 1)))
           Results = New List(Of String)()
           Con.Open()
           Dim Reader As SqlDataReader = Cmd.ExecuteReader()
           If Not Reader.HasRows Then
-            Results.Add(AjaxControlToolkit.AutoCompleteExtender.CreateAutoCompleteItem("---Select Value---".PadRight(50, " "),"" & "|" & ""))
+            Results.Add(AjaxControlToolkit.AutoCompleteExtender.CreateAutoCompleteItem("---Select Value---".PadRight(50, " "), "" & "|" & ""))
           End If
           While (Reader.Read())
             Dim Tmp As SIS.PAK.pakLorryReceipts = New SIS.PAK.pakLorryReceipts(Reader)
-            Results.Add(AjaxControlToolkit.AutoCompleteExtender.CreateAutoCompleteItem(Tmp.DisplayField, Tmp.PrimaryKey))
+            Results.Add(AjaxControlToolkit.AutoCompleteExtender.CreateAutoCompleteItem(Tmp.DropdownField, Tmp.PrimaryKey))
           End While
           Reader.Close()
         End Using

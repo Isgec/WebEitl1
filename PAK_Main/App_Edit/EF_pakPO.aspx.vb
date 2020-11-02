@@ -16,6 +16,17 @@ Partial Class EF_pakPO
       ViewState.Add("DUListVisible", value)
     End Set
   End Property
+  Public Property UploadVisible() As Boolean
+    Get
+      If ViewState("UploadVisible") IsNot Nothing Then
+        Return CType(ViewState("UploadVisible"), Boolean)
+      End If
+      Return True
+    End Get
+    Set(ByVal value As Boolean)
+      ViewState.Add("UploadVisible", value)
+    End Set
+  End Property
   Public Property Editable() As Boolean
     Get
       If ViewState("Editable") IsNot Nothing Then
@@ -54,7 +65,16 @@ Partial Class EF_pakPO
     Editable = tmp.Editable
     Deleteable = tmp.Deleteable
     PrimaryKey = tmp.PrimaryKey
-    DUListVisible = IIf(tmp.POTypeID = pakErpPOTypes.ISGECEngineered, False, tmp.Editable)
+
+    DUListVisible = False
+    UploadVisible = False
+    If tmp.POTypeID = pakErpPOTypes.Package Then
+      If tmp.UsePackageMaster Then
+        If tmp.POStatusID = pakPOStates.Free Then
+          DUListVisible = True
+        End If
+      End If
+    End If
   End Sub
   Protected Sub FVpakPO_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVpakPO.Init
     DataClassName = "EpakPO"
@@ -66,8 +86,6 @@ Partial Class EF_pakPO
   Protected Sub FVpakPO_PreRender(ByVal sender As Object, ByVal e As System.EventArgs) Handles FVpakPO.PreRender
     TBLpakPO.EnableSave = Editable
     TBLpakPO.EnableDelete = Deleteable
-    Dim ctl As HtmlControl = FVpakPO.FindControl("fsUnlinked")
-    ctl.Visible = Editable
     Dim mStr As String = ""
     Dim oTR As IO.StreamReader = New IO.StreamReader(HttpContext.Current.Server.MapPath("~/PAK_Main/App_Edit") & "/EF_pakPO.js")
     mStr = oTR.ReadToEnd

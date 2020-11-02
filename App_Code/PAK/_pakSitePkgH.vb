@@ -48,6 +48,9 @@ Namespace SIS.PAK
     Private _FK_PAK_SitePkgH_SupplierID As SIS.PAK.pakBusinessPartner = Nothing
     Private _FK_PAK_SitePkgH_MRNNo As SIS.PAK.pakLorryReceipts = Nothing
     Private _FK_PAK_SitePkgH_MaterialStatusID As SIS.PAK.pakMaterialStates = Nothing
+    Public Property SupplierBillNo As String = ""
+    Public Property SupplierBillDate As String = ""
+    Public Property SupplierBillAmount As String = ""
     Public ReadOnly Property ForeColor() As System.Drawing.Color
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
@@ -661,6 +664,9 @@ Namespace SIS.PAK
         .CreatedBy =  Global.System.Web.HttpContext.Current.Session("LoginID")
         .CreatedOn = Now
         .ReceiveStatusID = siteReceiveStates.Free
+        .SupplierBillAmount = Record.SupplierBillAmount
+        .SupplierBillDate = Record.SupplierBillDate
+        .SupplierBillNo = Record.SupplierBillNo
       End With
       Return SIS.PAK.pakSitePkgH.InsertData(_Rec)
     End Function
@@ -689,6 +695,9 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedBy",SqlDbType.NVarChar,9, Iif(Record.CreatedBy= "" ,Convert.DBNull, Record.CreatedBy))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn",SqlDbType.DateTime,21, Iif(Record.CreatedOn= "" ,Convert.DBNull, Record.CreatedOn))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceiveStatusID",SqlDbType.Int,11, Iif(Record.ReceiveStatusID= "" ,Convert.DBNull, Record.ReceiveStatusID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillAmount", SqlDbType.Decimal, 23, IIf(Record.SupplierBillAmount = "", Convert.DBNull, Record.SupplierBillAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillDate", SqlDbType.DateTime, 21, IIf(Record.SupplierBillDate = "", Convert.DBNull, Record.SupplierBillDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillNo", SqlDbType.NVarChar, 51, IIf(Record.SupplierBillNo = "", Convert.DBNull, Record.SupplierBillNo))
           Cmd.Parameters.Add("@Return_ProjectID", SqlDbType.NVarChar, 7)
           Cmd.Parameters("@Return_ProjectID").Direction = ParameterDirection.Output
           Cmd.Parameters.Add("@Return_RecNo", SqlDbType.Int, 11)
@@ -724,6 +733,9 @@ Namespace SIS.PAK
         .CreatedBy = Global.System.Web.HttpContext.Current.Session("LoginID")
         .CreatedOn = Record.CreatedOn
         .ReceiveStatusID = Record.ReceiveStatusID
+        .SupplierBillAmount = Record.SupplierBillAmount
+        .SupplierBillDate = Record.SupplierBillDate
+        .SupplierBillNo = Record.SupplierBillNo
       End With
       Return SIS.PAK.pakSitePkgH.UpdateData(_Rec)
     End Function
@@ -754,6 +766,9 @@ Namespace SIS.PAK
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedBy",SqlDbType.NVarChar,9, Iif(Record.CreatedBy= "" ,Convert.DBNull, Record.CreatedBy))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn",SqlDbType.DateTime,21, Iif(Record.CreatedOn= "" ,Convert.DBNull, Record.CreatedOn))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceiveStatusID",SqlDbType.Int,11, Iif(Record.ReceiveStatusID= "" ,Convert.DBNull, Record.ReceiveStatusID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillAmount", SqlDbType.Decimal, 23, IIf(Record.SupplierBillAmount = "", Convert.DBNull, Record.SupplierBillAmount))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillDate", SqlDbType.DateTime, 21, IIf(Record.SupplierBillDate = "", Convert.DBNull, Record.SupplierBillDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierBillNo", SqlDbType.NVarChar, 51, IIf(Record.SupplierBillNo = "", Convert.DBNull, Record.SupplierBillNo))
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

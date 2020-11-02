@@ -7,11 +7,11 @@
 <div id="div3" class="pagedata">
 <asp:UpdatePanel ID="UPNLpakPOBIDocuments" runat="server" >
   <ContentTemplate>
+<%-- "~/PAK_Main/App_Edit/EF_pakPOBIDocuments.aspx"--%>
   <LGM:ToolBar0 
     ID = "TBLpakPOBIDocuments"
     ToolType = "lgNMAdd"
     InsertAndStay = "False"
-    AfterInsertURL = "~/PAK_Main/App_Edit/EF_pakPOBIDocuments.aspx"
     ValidationGroup = "pakPOBIDocuments"
     runat = "server" />
 <asp:FormView ID="FVpakPOBIDocuments"

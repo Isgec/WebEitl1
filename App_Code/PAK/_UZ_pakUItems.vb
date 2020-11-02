@@ -89,7 +89,10 @@ Namespace SIS.PAK
       Return Results
     End Function
     Public Shared Function UZ_pakUItemsSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal SerialNo As String) As List(Of SIS.PAK.pakUItems)
-      Dim Results As List(Of SIS.PAK.pakUItems) = Nothing
+      Dim Results As New List(Of SIS.PAK.pakUItems)
+      If HttpContext.Current.Session("IsSupplier") Then
+        Return Results
+      End If
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
@@ -99,7 +102,6 @@ Namespace SIS.PAK
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
           Else
             Cmd.CommandText = "sppak_LG_UItemsSelectListFilteres"
-            'Cmd.CommandText = "sppakUItemsSelectListFilteres"
           End If
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
@@ -111,7 +113,6 @@ Namespace SIS.PAK
           Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
           Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
           RecordCount = -1
-          Results = New List(Of SIS.PAK.pakUItems)()
           Con.Open()
           Dim Reader As SqlDataReader = Cmd.ExecuteReader()
           While (Reader.Read())

@@ -223,10 +223,7 @@ Namespace SIS.QCM
 			Return Results.ToArray
 		End Function
     Public Sub New(ByVal Reader As SqlDataReader)
-      On Error Resume Next
-      _ProjectID = Ctype(Reader("ProjectID"),String)
-      _Description = Ctype(Reader("Description"),String)
-      BusinessPartnerID = CType(Reader("BusinessPartnerID"), String)
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, Reader)
     End Sub
     Public Sub New()
     End Sub

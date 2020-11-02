@@ -57,8 +57,8 @@ Namespace SIS.QCM
     Private _QCM_InspectionStatus11_Description As String = ""
     Private _QCM_Regions12_RegionName As String = ""
     Private _FK_QCM_Requests_Createdby As SIS.QCM.qcmEmployees = Nothing
-    Private _FK_QCM_Requests_AllotedTo As SIS.QCM.qcmEmployees = Nothing
-    Private _FK_QCM_Requests_AllotedBy As SIS.QCM.qcmEmployees = Nothing
+    Private _FK_QCM_Requests_AllotedTo As SIS.QCM.qcmUsers = Nothing
+    Private _FK_QCM_Requests_AllotedBy As SIS.QCM.qcmUsers = Nothing
     Private _FK_QCM_Requests_CancelledBy As SIS.QCM.qcmEmployees = Nothing
     Private _FK_QCM_Requests_ReceivedBy As SIS.QCM.qcmEmployees = Nothing
     Private _FK_QCM_Requests_ProjectID As SIS.QCM.qcmProjects = Nothing
@@ -70,6 +70,8 @@ Namespace SIS.QCM
     Public Property PausedHrs As Decimal = 0
     Public Property LastPausedOn As String = ""
     Public Property TotalHrs As Decimal = 0
+    Public Property POWeight As Decimal = 0
+    Public Property Company As String = ""
     Public Property LotSize As String
       Get
         Return _LotSize
@@ -122,7 +124,7 @@ Namespace SIS.QCM
       Get
         Dim mRet As System.Drawing.Color = Drawing.Color.Blue
         Try
-					mRet = GetColor()
+          mRet = GetColor()
         Catch ex As Exception
         End Try
         Return mRet
@@ -132,7 +134,7 @@ Namespace SIS.QCM
       Get
         Dim mRet As Boolean = True
         Try
-					mRet = GetVisible()
+          mRet = GetVisible()
         Catch ex As Exception
         End Try
         Return mRet
@@ -142,7 +144,7 @@ Namespace SIS.QCM
       Get
         Dim mRet As Boolean = True
         Try
-					mRet = GetEnable()
+          mRet = GetEnable()
         Catch ex As Exception
         End Try
         Return mRet
@@ -169,11 +171,11 @@ Namespace SIS.QCM
         Return _OrderNo
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _OrderNo = ""
-				 Else
-					 _OrderNo = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _OrderNo = ""
+        Else
+          _OrderNo = value
+        End If
       End Set
     End Property
     Public Property OrderDate() As String
@@ -184,11 +186,11 @@ Namespace SIS.QCM
         Return _OrderDate
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _OrderDate = ""
-				 Else
-					 _OrderDate = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _OrderDate = ""
+        Else
+          _OrderDate = value
+        End If
       End Set
     End Property
     Public Property SupplierID() As String
@@ -212,11 +214,11 @@ Namespace SIS.QCM
         Return _TotalRequestedQuantity
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _TotalRequestedQuantity = ""
-				 Else
-					 _TotalRequestedQuantity = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _TotalRequestedQuantity = ""
+        Else
+          _TotalRequestedQuantity = value
+        End If
       End Set
     End Property
     Public Property RequestedInspectionStartDate() As String
@@ -227,7 +229,7 @@ Namespace SIS.QCM
         Return _RequestedInspectionStartDate
       End Get
       Set(ByVal value As String)
-			   _RequestedInspectionStartDate = value
+        _RequestedInspectionStartDate = value
       End Set
     End Property
     Public Property RequestedInspectionFinishDate() As String
@@ -238,7 +240,7 @@ Namespace SIS.QCM
         Return _RequestedInspectionFinishDate
       End Get
       Set(ByVal value As String)
-			   _RequestedInspectionFinishDate = value
+        _RequestedInspectionFinishDate = value
       End Set
     End Property
     Public Property ClientInspectionRequired() As Boolean
@@ -265,11 +267,11 @@ Namespace SIS.QCM
         Return _ReceivedOn
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _ReceivedOn = ""
-				 Else
-					 _ReceivedOn = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _ReceivedOn = ""
+        Else
+          _ReceivedOn = value
+        End If
       End Set
     End Property
     Public Property ReceivedBy() As String
@@ -277,11 +279,11 @@ Namespace SIS.QCM
         Return _ReceivedBy
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _ReceivedBy = ""
-				 Else
-					 _ReceivedBy = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _ReceivedBy = ""
+        Else
+          _ReceivedBy = value
+        End If
       End Set
     End Property
     Public Property ReceivingMediumID() As String
@@ -289,11 +291,11 @@ Namespace SIS.QCM
         Return _ReceivingMediumID
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _ReceivingMediumID = ""
-				 Else
-					 _ReceivingMediumID = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _ReceivingMediumID = ""
+        Else
+          _ReceivingMediumID = value
+        End If
       End Set
     End Property
     Public Property CreationRemarks() As String
@@ -301,11 +303,11 @@ Namespace SIS.QCM
         Return _CreationRemarks
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _CreationRemarks = ""
-				 Else
-					 _CreationRemarks = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _CreationRemarks = ""
+        Else
+          _CreationRemarks = value
+        End If
       End Set
     End Property
     Public Property CreatedBy() As String
@@ -324,7 +326,7 @@ Namespace SIS.QCM
         Return _CreatedOn
       End Get
       Set(ByVal value As String)
-			   _CreatedOn = value
+        _CreatedOn = value
       End Set
     End Property
     Public Property RequestStateID() As String
@@ -348,11 +350,11 @@ Namespace SIS.QCM
         Return _InspectionStageiD
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _InspectionStageiD = ""
-				 Else
-					 _InspectionStageiD = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _InspectionStageiD = ""
+        Else
+          _InspectionStageiD = value
+        End If
       End Set
     End Property
     Public Property AllotedTo() As String
@@ -360,11 +362,11 @@ Namespace SIS.QCM
         Return _AllotedTo
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _AllotedTo = ""
-				 Else
-					 _AllotedTo = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _AllotedTo = ""
+        Else
+          _AllotedTo = value
+        End If
       End Set
     End Property
     Public Property AllotedStartDate() As String
@@ -375,11 +377,11 @@ Namespace SIS.QCM
         Return _AllotedStartDate
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _AllotedStartDate = ""
-				 Else
-					 _AllotedStartDate = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _AllotedStartDate = ""
+        Else
+          _AllotedStartDate = value
+        End If
       End Set
     End Property
     Public Property AllotedFinishDate() As String
@@ -390,11 +392,11 @@ Namespace SIS.QCM
         Return _AllotedFinishDate
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _AllotedFinishDate = ""
-				 Else
-					 _AllotedFinishDate = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _AllotedFinishDate = ""
+        Else
+          _AllotedFinishDate = value
+        End If
       End Set
     End Property
     Public Property AllotedOn() As String
@@ -405,11 +407,11 @@ Namespace SIS.QCM
         Return _AllotedOn
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _AllotedOn = ""
-				 Else
-					 _AllotedOn = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _AllotedOn = ""
+        Else
+          _AllotedOn = value
+        End If
       End Set
     End Property
     Public Property AllotedBy() As String
@@ -417,11 +419,11 @@ Namespace SIS.QCM
         Return _AllotedBy
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _AllotedBy = ""
-				 Else
-					 _AllotedBy = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _AllotedBy = ""
+        Else
+          _AllotedBy = value
+        End If
       End Set
     End Property
     Public Property AllotmentRemarks() As String
@@ -429,11 +431,11 @@ Namespace SIS.QCM
         Return _AllotmentRemarks
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _AllotmentRemarks = ""
-				 Else
-					 _AllotmentRemarks = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _AllotmentRemarks = ""
+        Else
+          _AllotmentRemarks = value
+        End If
       End Set
     End Property
     Public Property InspectionStartDate() As String
@@ -444,11 +446,11 @@ Namespace SIS.QCM
         Return _InspectionStartDate
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _InspectionStartDate = ""
-				 Else
-					 _InspectionStartDate = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _InspectionStartDate = ""
+        Else
+          _InspectionStartDate = value
+        End If
       End Set
     End Property
     Public Property InspectionFinishDate() As String
@@ -459,11 +461,11 @@ Namespace SIS.QCM
         Return _InspectionFinishDate
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _InspectionFinishDate = ""
-				 Else
-					 _InspectionFinishDate = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _InspectionFinishDate = ""
+        Else
+          _InspectionFinishDate = value
+        End If
       End Set
     End Property
     Public Property InspectionStatusID() As String
@@ -471,11 +473,11 @@ Namespace SIS.QCM
         Return _InspectionStatusID
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _InspectionStatusID = ""
-				 Else
-					 _InspectionStatusID = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _InspectionStatusID = ""
+        Else
+          _InspectionStatusID = value
+        End If
       End Set
     End Property
     Public Property CancelledOn() As String
@@ -486,11 +488,11 @@ Namespace SIS.QCM
         Return _CancelledOn
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _CancelledOn = ""
-				 Else
-					 _CancelledOn = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _CancelledOn = ""
+        Else
+          _CancelledOn = value
+        End If
       End Set
     End Property
     Public Property CancelledBy() As String
@@ -498,11 +500,11 @@ Namespace SIS.QCM
         Return _CancelledBy
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _CancelledBy = ""
-				 Else
-					 _CancelledBy = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _CancelledBy = ""
+        Else
+          _CancelledBy = value
+        End If
       End Set
     End Property
     Public Property CancellationRemarks() As String
@@ -510,11 +512,11 @@ Namespace SIS.QCM
         Return _CancellationRemarks
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _CancellationRemarks = ""
-				 Else
-					 _CancellationRemarks = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _CancellationRemarks = ""
+        Else
+          _CancellationRemarks = value
+        End If
       End Set
     End Property
     Public Property RegionID() As String
@@ -522,11 +524,11 @@ Namespace SIS.QCM
         Return _RegionID
       End Get
       Set(ByVal value As String)
-				 If Convert.IsDBNull(Value) Then
-					 _RegionID = ""
-				 Else
-					 _RegionID = value
-			   End If
+        If Convert.IsDBNull(value) Then
+          _RegionID = ""
+        Else
+          _RegionID = value
+        End If
       End Set
     End Property
     Public Property HRM_Employees1_EmployeeName() As String
@@ -625,7 +627,7 @@ Namespace SIS.QCM
         _QCM_Regions12_RegionName = value
       End Set
     End Property
-    Public Readonly Property DisplayField() As String
+    Public ReadOnly Property DisplayField() As String
       Get
         If _Description.Length > 100 Then
           Return "[" & _RequestID & "] " & _Description.Substring(0, 99)
@@ -634,7 +636,7 @@ Namespace SIS.QCM
         End If
       End Get
     End Property
-    Public Readonly Property PrimaryKey() As String
+    Public ReadOnly Property PrimaryKey() As String
       Get
         Return _RequestID
       End Get
@@ -648,15 +650,15 @@ Namespace SIS.QCM
       End Set
     End Property
     Public Class PKqcmRequests
-			Private _RequestID As Int32 = 0
-			Public Property RequestID() As Int32
-				Get
-					Return _RequestID
-				End Get
-				Set(ByVal value As Int32)
-					_RequestID = value
-				End Set
-			End Property
+      Private _RequestID As Int32 = 0
+      Public Property RequestID() As Int32
+        Get
+          Return _RequestID
+        End Get
+        Set(ByVal value As Int32)
+          _RequestID = value
+        End Set
+      End Property
     End Class
     Public ReadOnly Property FK_QCM_Requests_Createdby() As SIS.QCM.qcmEmployees
       Get
@@ -666,18 +668,18 @@ Namespace SIS.QCM
         Return _FK_QCM_Requests_Createdby
       End Get
     End Property
-    Public ReadOnly Property FK_QCM_Requests_AllotedTo() As SIS.QCM.qcmEmployees
+    Public ReadOnly Property FK_QCM_Requests_AllotedTo() As SIS.QCM.qcmUsers
       Get
         If _FK_QCM_Requests_AllotedTo Is Nothing Then
-          _FK_QCM_Requests_AllotedTo = SIS.QCM.qcmEmployees.qcmEmployeesGetByID(_AllotedTo)
+          _FK_QCM_Requests_AllotedTo = SIS.QCM.qcmUsers.qcmUsersGetByID(_AllotedTo)
         End If
         Return _FK_QCM_Requests_AllotedTo
       End Get
     End Property
-    Public ReadOnly Property FK_QCM_Requests_AllotedBy() As SIS.QCM.qcmEmployees
+    Public ReadOnly Property FK_QCM_Requests_AllotedBy() As SIS.QCM.qcmUsers
       Get
         If _FK_QCM_Requests_AllotedBy Is Nothing Then
-          _FK_QCM_Requests_AllotedBy = SIS.QCM.qcmEmployees.qcmEmployeesGetByID(_AllotedBy)
+          _FK_QCM_Requests_AllotedBy = SIS.QCM.qcmUsers.qcmUsersGetByID(_AllotedBy)
         End If
         Return _FK_QCM_Requests_AllotedBy
       End Get
@@ -738,7 +740,7 @@ Namespace SIS.QCM
         Return _FK_QCM_Requests_RegionID
       End Get
     End Property
-    <DataObjectMethod(DataObjectMethodType.Select)> _
+    <DataObjectMethod(DataObjectMethodType.Select)>
     Public Shared Function qcmRequestsSelectList(ByVal OrderBy As String) As List(Of SIS.QCM.qcmRequests)
       Dim Results As List(Of SIS.QCM.qcmRequests) = Nothing
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
@@ -746,7 +748,7 @@ Namespace SIS.QCM
           If OrderBy = String.Empty Then OrderBy = "RequestID DESC"
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spqcmRequestsSelectList"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NvarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
           Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
           Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
@@ -763,35 +765,35 @@ Namespace SIS.QCM
       End Using
       Return Results
     End Function
-    <DataObjectMethod(DataObjectMethodType.Select)> _
+    <DataObjectMethod(DataObjectMethodType.Select)>
     Public Shared Function qcmRequestsGetNewRecord() As SIS.QCM.qcmRequests
       Return New SIS.QCM.qcmRequests()
     End Function
-    <DataObjectMethod(DataObjectMethodType.Select)> _
+    <DataObjectMethod(DataObjectMethodType.Select)>
     Public Shared Function qcmRequestsGetByID(ByVal RequestID As Int32) As SIS.QCM.qcmRequests
       Dim Results As SIS.QCM.qcmRequests = Nothing
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spqcmRequestsSelectByID"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestID",SqlDbType.Int,RequestID.ToString.Length, RequestID)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NvarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestID", SqlDbType.Int, RequestID.ToString.Length, RequestID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
           Con.Open()
           Dim Reader As SqlDataReader = Cmd.ExecuteReader()
-					If Reader.Read() Then
-						Results = New SIS.QCM.qcmRequests(Reader)
-					End If
-					Reader.Close()
+          If Reader.Read() Then
+            Results = New SIS.QCM.qcmRequests(Reader)
+          End If
+          Reader.Close()
         End Using
       End Using
       Return Results
     End Function
     'Select By ID One Record Filtered Overloaded GetByID
-    <DataObjectMethod(DataObjectMethodType.Select)> _
+    <DataObjectMethod(DataObjectMethodType.Select)>
     Public Shared Function qcmRequestsGetByID(ByVal RequestID As Int32, ByVal Filter_ProjectID As String, ByVal Filter_SupplierID As String, ByVal Filter_RequestStateID As String, ByVal Filter_InspectionStatusID As Int32) As SIS.QCM.qcmRequests
       Return qcmRequestsGetByID(RequestID)
     End Function
-    <DataObjectMethod(DataObjectMethodType.Insert, True)> _
+    <DataObjectMethod(DataObjectMethodType.Insert, True)>
     Public Shared Function qcmRequestsInsert(ByVal Record As SIS.QCM.qcmRequests) As SIS.QCM.qcmRequests
       Dim _Rec As SIS.QCM.qcmRequests = SIS.QCM.qcmRequests.qcmRequestsGetNewRecord()
       With _Rec
@@ -808,7 +810,7 @@ Namespace SIS.QCM
         .ReceivedBy = Record.ReceivedBy
         .ReceivingMediumID = Record.ReceivingMediumID
         .CreationRemarks = Record.CreationRemarks
-        .CreatedBy =  Global.System.Web.HttpContext.Current.Session("LoginID")
+        .CreatedBy = Global.System.Web.HttpContext.Current.Session("LoginID")
         .CreatedOn = Now
         .RequestStateID = "OPEN"
         .RegionID = Record.RegionID
@@ -816,6 +818,7 @@ Namespace SIS.QCM
         .UOM = Record.UOM
         .InspectionStageiD = Record.InspectionStageiD
         .ReturnRemarks = Record.ReturnRemarks
+        .POWeight = Record.POWeight
       End With
       Return SIS.QCM.qcmRequests.InsertData(_Rec)
     End Function
@@ -825,37 +828,37 @@ Namespace SIS.QCM
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spqcmRequestsInsert"
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ProjectID", SqlDbType.NVarChar, 7, IIf(Record.ProjectID = "", Convert.DBNull, Record.ProjectID))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderNo",SqlDbType.NVarChar,51, Iif(Record.OrderNo= "" ,Convert.DBNull, Record.OrderNo))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderDate",SqlDbType.DateTime,21, Iif(Record.OrderDate= "" ,Convert.DBNull, Record.OrderDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderNo", SqlDbType.NVarChar, 51, IIf(Record.OrderNo = "", Convert.DBNull, Record.OrderNo))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderDate", SqlDbType.DateTime, 21, IIf(Record.OrderDate = "", Convert.DBNull, Record.OrderDate))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierID", SqlDbType.NVarChar, 9, IIf(Record.SupplierID = "", Convert.DBNull, Record.SupplierID))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Description",SqlDbType.NVarChar,501, Record.Description)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalRequestedQuantity",SqlDbType.NVarChar,51, Iif(Record.TotalRequestedQuantity= "" ,Convert.DBNull, Record.TotalRequestedQuantity))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Description", SqlDbType.NVarChar, 501, Record.Description)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalRequestedQuantity", SqlDbType.NVarChar, 51, IIf(Record.TotalRequestedQuantity = "", Convert.DBNull, Record.TotalRequestedQuantity))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestedInspectionStartDate", SqlDbType.DateTime, 21, IIf(Record.RequestedInspectionStartDate = "", Convert.DBNull, Record.RequestedInspectionStartDate))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestedInspectionFinishDate", SqlDbType.DateTime, 21, IIf(Record.RequestedInspectionFinishDate = "", Convert.DBNull, Record.RequestedInspectionFinishDate))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ClientInspectionRequired", SqlDbType.Bit, 3, Record.ClientInspectionRequired)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ThirdPartyInspectionRequired",SqlDbType.Bit,3, Record.ThirdPartyInspectionRequired)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedOn",SqlDbType.DateTime,21, Iif(Record.ReceivedOn= "" ,Convert.DBNull, Record.ReceivedOn))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedBy",SqlDbType.NVarChar,9, Iif(Record.ReceivedBy= "" ,Convert.DBNull, Record.ReceivedBy))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivingMediumID",SqlDbType.Int,11, Iif(Record.ReceivingMediumID= "" ,Convert.DBNull, Record.ReceivingMediumID))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreationRemarks",SqlDbType.NVarChar,501, Iif(Record.CreationRemarks= "" ,Convert.DBNull, Record.CreationRemarks))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedBy",SqlDbType.NVarChar,9, Record.CreatedBy)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn",SqlDbType.DateTime,21, Record.CreatedOn)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestStateID",SqlDbType.NVarChar,11, Record.RequestStateID)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@FileAttached",SqlDbType.Bit,3, Record.FileAttached)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStageiD",SqlDbType.Int,11, Iif(Record.InspectionStageiD= "" ,Convert.DBNull, Record.InspectionStageiD))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedTo",SqlDbType.NVarChar,9, Iif(Record.AllotedTo= "" ,Convert.DBNull, Record.AllotedTo))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedStartDate",SqlDbType.DateTime,21, Iif(Record.AllotedStartDate= "" ,Convert.DBNull, Record.AllotedStartDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedFinishDate",SqlDbType.DateTime,21, Iif(Record.AllotedFinishDate= "" ,Convert.DBNull, Record.AllotedFinishDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedOn",SqlDbType.DateTime,21, Iif(Record.AllotedOn= "" ,Convert.DBNull, Record.AllotedOn))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedBy",SqlDbType.NVarChar,9, Iif(Record.AllotedBy= "" ,Convert.DBNull, Record.AllotedBy))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotmentRemarks",SqlDbType.NVarChar,501, Iif(Record.AllotmentRemarks= "" ,Convert.DBNull, Record.AllotmentRemarks))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStartDate",SqlDbType.DateTime,21, Iif(Record.InspectionStartDate= "" ,Convert.DBNull, Record.InspectionStartDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionFinishDate",SqlDbType.DateTime,21, Iif(Record.InspectionFinishDate= "" ,Convert.DBNull, Record.InspectionFinishDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStatusID",SqlDbType.Int,11, Iif(Record.InspectionStatusID= "" ,Convert.DBNull, Record.InspectionStatusID))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancelledOn",SqlDbType.DateTime,21, Iif(Record.CancelledOn= "" ,Convert.DBNull, Record.CancelledOn))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancelledBy",SqlDbType.NVarChar,9, Iif(Record.CancelledBy= "" ,Convert.DBNull, Record.CancelledBy))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancellationRemarks",SqlDbType.NVarChar,501, Iif(Record.CancellationRemarks= "" ,Convert.DBNull, Record.CancellationRemarks))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RegionID",SqlDbType.Int,11, Iif(Record.RegionID= "" ,Convert.DBNull, Record.RegionID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ThirdPartyInspectionRequired", SqlDbType.Bit, 3, Record.ThirdPartyInspectionRequired)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedOn", SqlDbType.DateTime, 21, IIf(Record.ReceivedOn = "", Convert.DBNull, Record.ReceivedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedBy", SqlDbType.NVarChar, 9, IIf(Record.ReceivedBy = "", Convert.DBNull, Record.ReceivedBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivingMediumID", SqlDbType.Int, 11, IIf(Record.ReceivingMediumID = "", Convert.DBNull, Record.ReceivingMediumID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreationRemarks", SqlDbType.NVarChar, 501, IIf(Record.CreationRemarks = "", Convert.DBNull, Record.CreationRemarks))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedBy", SqlDbType.NVarChar, 9, Record.CreatedBy)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn", SqlDbType.DateTime, 21, Record.CreatedOn)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestStateID", SqlDbType.NVarChar, 11, Record.RequestStateID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@FileAttached", SqlDbType.Bit, 3, Record.FileAttached)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStageiD", SqlDbType.Int, 11, IIf(Record.InspectionStageiD = "", Convert.DBNull, Record.InspectionStageiD))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedTo", SqlDbType.NVarChar, 9, IIf(Record.AllotedTo = "", Convert.DBNull, Record.AllotedTo))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedStartDate", SqlDbType.DateTime, 21, IIf(Record.AllotedStartDate = "", Convert.DBNull, Record.AllotedStartDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedFinishDate", SqlDbType.DateTime, 21, IIf(Record.AllotedFinishDate = "", Convert.DBNull, Record.AllotedFinishDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedOn", SqlDbType.DateTime, 21, IIf(Record.AllotedOn = "", Convert.DBNull, Record.AllotedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedBy", SqlDbType.NVarChar, 9, IIf(Record.AllotedBy = "", Convert.DBNull, Record.AllotedBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotmentRemarks", SqlDbType.NVarChar, 501, IIf(Record.AllotmentRemarks = "", Convert.DBNull, Record.AllotmentRemarks))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStartDate", SqlDbType.DateTime, 21, IIf(Record.InspectionStartDate = "", Convert.DBNull, Record.InspectionStartDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionFinishDate", SqlDbType.DateTime, 21, IIf(Record.InspectionFinishDate = "", Convert.DBNull, Record.InspectionFinishDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStatusID", SqlDbType.Int, 11, IIf(Record.InspectionStatusID = "", Convert.DBNull, Record.InspectionStatusID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancelledOn", SqlDbType.DateTime, 21, IIf(Record.CancelledOn = "", Convert.DBNull, Record.CancelledOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancelledBy", SqlDbType.NVarChar, 9, IIf(Record.CancelledBy = "", Convert.DBNull, Record.CancelledBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancellationRemarks", SqlDbType.NVarChar, 501, IIf(Record.CancellationRemarks = "", Convert.DBNull, Record.CancellationRemarks))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RegionID", SqlDbType.Int, 11, IIf(Record.RegionID = "", Convert.DBNull, Record.RegionID))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReturnRemarks", SqlDbType.NVarChar, 250, IIf(Record.ReturnRemarks = "", Convert.DBNull, Record.ReturnRemarks))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@UOM", SqlDbType.NVarChar, 10, IIf(Record.UOM = "", Convert.DBNull, Record.UOM))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentID", SqlDbType.NVarChar, 50, IIf(Record.DocumentID = "", Convert.DBNull, Record.DocumentID))
@@ -864,6 +867,7 @@ Namespace SIS.QCM
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PausedHrs", SqlDbType.Decimal, 21, Record.PausedHrs)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalHrs", SqlDbType.Decimal, 21, Record.TotalHrs)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LastPausedOn", SqlDbType.DateTime, 21, IIf(Record.LastPausedOn = "", Convert.DBNull, Record.LastPausedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@POWeight", SqlDbType.Decimal, 21, Record.POWeight)
           Cmd.Parameters.Add("@Return_RequestID", SqlDbType.Int, 11)
           Cmd.Parameters("@Return_RequestID").Direction = ParameterDirection.Output
           Con.Open()
@@ -873,7 +877,7 @@ Namespace SIS.QCM
       End Using
       Return Record
     End Function
-    <DataObjectMethod(DataObjectMethodType.Update, True)> _
+    <DataObjectMethod(DataObjectMethodType.Update, True)>
     Public Shared Function qcmRequestsUpdate(ByVal Record As SIS.QCM.qcmRequests) As SIS.QCM.qcmRequests
       Dim _Rec As SIS.QCM.qcmRequests = SIS.QCM.qcmRequests.qcmRequestsGetByID(Record.RequestID)
       With _Rec
@@ -895,6 +899,7 @@ Namespace SIS.QCM
         .UOM = Record.UOM
         .InspectionStageiD = Record.InspectionStageiD
         .ReturnRemarks = Record.ReturnRemarks
+        .POWeight = Record.POWeight
       End With
       Return SIS.QCM.qcmRequests.UpdateData(_Rec)
     End Function
@@ -903,39 +908,39 @@ Namespace SIS.QCM
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spqcmRequestsUpdate"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_RequestID",SqlDbType.Int,11, Record.RequestID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_RequestID", SqlDbType.Int, 11, Record.RequestID)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ProjectID", SqlDbType.NVarChar, 7, IIf(Record.ProjectID = "", Convert.DBNull, Record.ProjectID))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderNo", SqlDbType.NVarChar, 51, IIf(Record.OrderNo = "", Convert.DBNull, Record.OrderNo))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderDate",SqlDbType.DateTime,21, Iif(Record.OrderDate= "" ,Convert.DBNull, Record.OrderDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderDate", SqlDbType.DateTime, 21, IIf(Record.OrderDate = "", Convert.DBNull, Record.OrderDate))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@SupplierID", SqlDbType.NVarChar, 9, IIf(Record.SupplierID = "", Convert.DBNull, Record.SupplierID))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Description", SqlDbType.NVarChar, 501, Record.Description)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalRequestedQuantity",SqlDbType.NVarChar,51, Iif(Record.TotalRequestedQuantity= "" ,Convert.DBNull, Record.TotalRequestedQuantity))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalRequestedQuantity", SqlDbType.NVarChar, 51, IIf(Record.TotalRequestedQuantity = "", Convert.DBNull, Record.TotalRequestedQuantity))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestedInspectionStartDate", SqlDbType.DateTime, 21, IIf(Record.RequestedInspectionStartDate = "", Convert.DBNull, Record.RequestedInspectionStartDate))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestedInspectionFinishDate", SqlDbType.DateTime, 21, IIf(Record.RequestedInspectionFinishDate = "", Convert.DBNull, Record.RequestedInspectionFinishDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ClientInspectionRequired",SqlDbType.Bit,3, Record.ClientInspectionRequired)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ThirdPartyInspectionRequired",SqlDbType.Bit,3, Record.ThirdPartyInspectionRequired)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedOn",SqlDbType.DateTime,21, Iif(Record.ReceivedOn= "" ,Convert.DBNull, Record.ReceivedOn))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedBy",SqlDbType.NVarChar,9, Iif(Record.ReceivedBy= "" ,Convert.DBNull, Record.ReceivedBy))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivingMediumID",SqlDbType.Int,11, Iif(Record.ReceivingMediumID= "" ,Convert.DBNull, Record.ReceivingMediumID))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreationRemarks",SqlDbType.NVarChar,501, Iif(Record.CreationRemarks= "" ,Convert.DBNull, Record.CreationRemarks))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedBy",SqlDbType.NVarChar,9, Record.CreatedBy)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn",SqlDbType.DateTime,21, Record.CreatedOn)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestStateID",SqlDbType.NVarChar,11, Record.RequestStateID)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@FileAttached",SqlDbType.Bit,3, Record.FileAttached)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStageiD",SqlDbType.Int,11, Iif(Record.InspectionStageiD= "" ,Convert.DBNull, Record.InspectionStageiD))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedTo",SqlDbType.NVarChar,9, Iif(Record.AllotedTo= "" ,Convert.DBNull, Record.AllotedTo))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedStartDate",SqlDbType.DateTime,21, Iif(Record.AllotedStartDate= "" ,Convert.DBNull, Record.AllotedStartDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedFinishDate",SqlDbType.DateTime,21, Iif(Record.AllotedFinishDate= "" ,Convert.DBNull, Record.AllotedFinishDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedOn",SqlDbType.DateTime,21, Iif(Record.AllotedOn= "" ,Convert.DBNull, Record.AllotedOn))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedBy",SqlDbType.NVarChar,9, Iif(Record.AllotedBy= "" ,Convert.DBNull, Record.AllotedBy))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotmentRemarks",SqlDbType.NVarChar,501, Iif(Record.AllotmentRemarks= "" ,Convert.DBNull, Record.AllotmentRemarks))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStartDate",SqlDbType.DateTime,21, Iif(Record.InspectionStartDate= "" ,Convert.DBNull, Record.InspectionStartDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionFinishDate",SqlDbType.DateTime,21, Iif(Record.InspectionFinishDate= "" ,Convert.DBNull, Record.InspectionFinishDate))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStatusID",SqlDbType.Int,11, Iif(Record.InspectionStatusID= "" ,Convert.DBNull, Record.InspectionStatusID))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancelledOn",SqlDbType.DateTime,21, Iif(Record.CancelledOn= "" ,Convert.DBNull, Record.CancelledOn))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancelledBy",SqlDbType.NVarChar,9, Iif(Record.CancelledBy= "" ,Convert.DBNull, Record.CancelledBy))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancellationRemarks",SqlDbType.NVarChar,501, Iif(Record.CancellationRemarks= "" ,Convert.DBNull, Record.CancellationRemarks))
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RegionID",SqlDbType.Int,11, Iif(Record.RegionID= "" ,Convert.DBNull, Record.RegionID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ClientInspectionRequired", SqlDbType.Bit, 3, Record.ClientInspectionRequired)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ThirdPartyInspectionRequired", SqlDbType.Bit, 3, Record.ThirdPartyInspectionRequired)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedOn", SqlDbType.DateTime, 21, IIf(Record.ReceivedOn = "", Convert.DBNull, Record.ReceivedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivedBy", SqlDbType.NVarChar, 9, IIf(Record.ReceivedBy = "", Convert.DBNull, Record.ReceivedBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReceivingMediumID", SqlDbType.Int, 11, IIf(Record.ReceivingMediumID = "", Convert.DBNull, Record.ReceivingMediumID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreationRemarks", SqlDbType.NVarChar, 501, IIf(Record.CreationRemarks = "", Convert.DBNull, Record.CreationRemarks))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedBy", SqlDbType.NVarChar, 9, Record.CreatedBy)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CreatedOn", SqlDbType.DateTime, 21, Record.CreatedOn)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RequestStateID", SqlDbType.NVarChar, 11, Record.RequestStateID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@FileAttached", SqlDbType.Bit, 3, Record.FileAttached)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStageiD", SqlDbType.Int, 11, IIf(Record.InspectionStageiD = "", Convert.DBNull, Record.InspectionStageiD))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedTo", SqlDbType.NVarChar, 9, IIf(Record.AllotedTo = "", Convert.DBNull, Record.AllotedTo))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedStartDate", SqlDbType.DateTime, 21, IIf(Record.AllotedStartDate = "", Convert.DBNull, Record.AllotedStartDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedFinishDate", SqlDbType.DateTime, 21, IIf(Record.AllotedFinishDate = "", Convert.DBNull, Record.AllotedFinishDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedOn", SqlDbType.DateTime, 21, IIf(Record.AllotedOn = "", Convert.DBNull, Record.AllotedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotedBy", SqlDbType.NVarChar, 9, IIf(Record.AllotedBy = "", Convert.DBNull, Record.AllotedBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@AllotmentRemarks", SqlDbType.NVarChar, 501, IIf(Record.AllotmentRemarks = "", Convert.DBNull, Record.AllotmentRemarks))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStartDate", SqlDbType.DateTime, 21, IIf(Record.InspectionStartDate = "", Convert.DBNull, Record.InspectionStartDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionFinishDate", SqlDbType.DateTime, 21, IIf(Record.InspectionFinishDate = "", Convert.DBNull, Record.InspectionFinishDate))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@InspectionStatusID", SqlDbType.Int, 11, IIf(Record.InspectionStatusID = "", Convert.DBNull, Record.InspectionStatusID))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancelledOn", SqlDbType.DateTime, 21, IIf(Record.CancelledOn = "", Convert.DBNull, Record.CancelledOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancelledBy", SqlDbType.NVarChar, 9, IIf(Record.CancelledBy = "", Convert.DBNull, Record.CancelledBy))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@CancellationRemarks", SqlDbType.NVarChar, 501, IIf(Record.CancellationRemarks = "", Convert.DBNull, Record.CancellationRemarks))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@RegionID", SqlDbType.Int, 11, IIf(Record.RegionID = "", Convert.DBNull, Record.RegionID))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@ReturnRemarks", SqlDbType.NVarChar, 250, IIf(Record.ReturnRemarks = "", Convert.DBNull, Record.ReturnRemarks))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@UOM", SqlDbType.NVarChar, 10, IIf(Record.UOM = "", Convert.DBNull, Record.UOM))
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DocumentID", SqlDbType.NVarChar, 50, IIf(Record.DocumentID = "", Convert.DBNull, Record.DocumentID))
@@ -944,6 +949,7 @@ Namespace SIS.QCM
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@PausedHrs", SqlDbType.Decimal, 21, Record.PausedHrs)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@TotalHrs", SqlDbType.Decimal, 21, Record.TotalHrs)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LastPausedOn", SqlDbType.DateTime, 21, IIf(Record.LastPausedOn = "", Convert.DBNull, Record.LastPausedOn))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@POWeight", SqlDbType.Decimal, 21, Record.POWeight)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1
@@ -954,14 +960,14 @@ Namespace SIS.QCM
       End Using
       Return Record
     End Function
-    <DataObjectMethod(DataObjectMethodType.Delete, True)> _
+    <DataObjectMethod(DataObjectMethodType.Delete, True)>
     Public Shared Function qcmRequestsDelete(ByVal Record As SIS.QCM.qcmRequests) As Int32
-      Dim _Result as Integer = 0
+      Dim _Result As Integer = 0
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spqcmRequestsDelete"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_RequestID",SqlDbType.Int,Record.RequestID.ToString.Length, Record.RequestID)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_RequestID", SqlDbType.Int, Record.RequestID.ToString.Length, Record.RequestID)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

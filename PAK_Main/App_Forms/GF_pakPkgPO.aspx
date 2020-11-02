@@ -177,18 +177,27 @@
           <ItemStyle CssClass="alignCenter" />
           <HeaderStyle HorizontalAlign="Center" Width="30px" />
         </asp:TemplateField>
+        <asp:TemplateField HeaderText="PKG" >
+          <ItemTemplate>
+            <div style="display:flex; flex-direction:row;justify-content:center;">
+              <div title="Packing Lists" style='font-weight:bold;padding:5px;border-radius:10px;background-color:#ff0033;color:white;'><%# Eval("PKGCount") %></div>
+            </div>
+          </ItemTemplate>
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle Width="30px" />
+        </asp:TemplateField>
         <asp:TemplateField HeaderText="Serial No" SortExpression="SerialNo">
           <ItemTemplate>
             <asp:Label ID="LabelSerialNo" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("SerialNo") %>'></asp:Label>
           </ItemTemplate>
-          <ItemStyle CssClass="alignright" />
-          <HeaderStyle CssClass="alignright" Width="40px" />
+          <ItemStyle CssClass="alignCenter" />
+          <HeaderStyle CssClass="alignCenter" Width="40px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="PO Number" SortExpression="PONumber">
           <ItemTemplate>
             <asp:Label ID="LabelPONumber" runat="server" ForeColor='<%# EVal("ForeColor") %>' Text='<%# Bind("PONumber") %>'></asp:Label>
           </ItemTemplate>
-          <ItemStyle CssClass="" />
+          <ItemStyle CssClass="alignCenter" />
         <HeaderStyle CssClass="" Width="50px" />
         </asp:TemplateField>
         <asp:TemplateField HeaderText="REV." SortExpression="PORevision">

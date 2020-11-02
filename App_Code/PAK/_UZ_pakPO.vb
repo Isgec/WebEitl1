@@ -6,6 +6,74 @@ Imports System.ComponentModel
 
 Namespace SIS.PAK
   Partial Public Class pakPO
+    Public ReadOnly Property ToAckCount As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            If IsSupplier Then
+              Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_POBItems where Changed=1 and serialno=" & SerialNo
+            Else
+              Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_POBItems where ChangedBySupplier=1 and serialno=" & SerialNo
+            End If
+            Con.Open()
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property GetAckCount As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            If IsSupplier Then
+              Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_POBItems where ChangedBySupplier=1 and serialno=" & SerialNo
+            Else
+              Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_POBItems where Changed=1 and serialno=" & SerialNo
+            End If
+            Con.Open()
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+
+    Public ReadOnly Property QCOCount As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_QCListH where serialno=" & SerialNo
+            Con.Open()
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property PKGCount As Integer
+      Get
+        Dim mRet As Integer = 0
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = "select isnull(count(*),0) as cnt from PAK_PKGListH where serialno=" & SerialNo
+            Con.Open()
+            mRet = Cmd.ExecuteScalar
+          End Using
+        End Using
+        Return mRet
+      End Get
+    End Property
+
+
+
     Public ReadOnly Property GetPrintLink() As String
       Get
         Dim UrlAuthority As String = HttpContext.Current.Request.Url.Authority
@@ -58,10 +126,19 @@ Namespace SIS.PAK
       Dim mRet As Boolean = True
       Return mRet
     End Function
+    Private _IsSupplier As Boolean = False
+    Public Property IsSupplier As Boolean
+      Get
+        Return _IsSupplier
+      End Get
+      Set(value As Boolean)
+        _IsSupplier = value
+      End Set
+    End Property
     Public Function GetEditable() As Boolean
       Dim mRet As Boolean = False
       Select Case POStatusID
-        Case pakPOStates.Free, pakPOStates.UnderISGECApproval, pakPOStates.ImportedFromERP
+        Case pakPOStates.Free, pakPOStates.ImportedFromERP
           mRet = True
       End Select
       Return mRet
@@ -79,7 +156,39 @@ Namespace SIS.PAK
     Public ReadOnly Property Deleteable() As Boolean
       Get
         Dim mRet As Boolean = False
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property DeleteWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
         Try
+          Select Case POStatusID
+            Case pakPOStates.Free, pakPOStates.ImportedFromERP
+              mRet = True
+            Case pakPOStates.UnderISGECApproval, pakPOStates.UnderSupplierVerification, pakPOStates.UnderDespatch
+              If HttpContext.Current.Session("LoginID") = "0340" Then
+                mRet = True
+              End If
+          End Select
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property UpdateWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          Select Case POTypeID
+            Case pakErpPOTypes.Boughtout, pakErpPOTypes.ISGECEngineered
+              mRet = True
+            Case pakErpPOTypes.Package
+              'Update PO is also Enabled for Package, If Not using Package Master, BOM can be added from PO
+              If POStatusID = pakPOStates.Free Or POStatusID = pakPOStates.UnderISGECApproval Then
+                mRet = True
+              End If
+          End Select
         Catch ex As Exception
         End Try
         Return mRet
@@ -90,7 +199,7 @@ Namespace SIS.PAK
         Dim mRet As Boolean = False
         Try
           Select Case POStatusID
-            Case pakPOStates.Free, pakPOStates.UnderISGECApproval
+            Case pakPOStates.Free, pakPOStates.ImportedFromERP
               mRet = True
           End Select
         Catch ex As Exception
@@ -171,29 +280,203 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
+    Public ReadOnly Property SubmitWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          Select Case POStatusID
+            Case pakPOStates.UnderISGECApproval
+              If Not IsSupplier Then
+                mRet = True
+              End If
+            Case pakPOStates.UnderSupplierVerification
+              If IsSupplier Then
+                mRet = True
+              End If
+          End Select
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property FreezeWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          Select Case POStatusID
+            Case pakPOStates.UnderISGECApproval
+              If Not IsSupplier Then
+                mRet = True
+              End If
+          End Select
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public ReadOnly Property UnFreezeWFVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          Select Case POStatusID
+            Case pakPOStates.UnderDespatch
+              If Not IsSupplier Then
+                mRet = True
+              End If
+          End Select
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+    Public Shared Function CreateHistory(SerialNo As Integer) As Boolean
+      Dim mRet As Boolean = False
+      Try
+        Dim Sql As String = ""
+        Sql &= " declare @hid int, @sl int "
+        Sql &= " set @sl = " & SerialNo
+        Sql &= " select @hid=isnull(max(histid),0)+1 from pak_h_po "
+        Sql &= " insert into PAK_H_PO select @hid as HistID, * from pak_po where serialno=@sl "
+        Sql &= " insert into PAK_H_POBOM select @hid as HistID, * from PAK_POBOM where serialno=@sl "
+        Sql &= " insert into PAK_H_POBItems select @hid as HistID, * from PAK_POBItems where serialno=@sl "
+        Sql &= " insert into PAK_H_POBIDocuments select @hid as HistID, * from PAK_POBIDocuments where serialno=@sl "
+        Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+          Using Cmd As SqlCommand = Con.CreateCommand()
+            Cmd.CommandType = CommandType.Text
+            Cmd.CommandText = Sql
+            Con.Open()
+            mRet = Cmd.ExecuteNonQuery
+          End Using
+        End Using
+        mRet = True
+      Catch ex As Exception
+      End Try
+      Return mRet
+    End Function
+
+    Public Shared Function FreezeBOMWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
+      '===========BOM Freezing By Isgec==========
+      Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
+      Dim tmp As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.UZ_pakPOBOMSelectList(0, 999, "", False, "", SerialNo)
+      For Each ttmp As SIS.PAK.pakPOBOM In tmp
+        Dim cnt As Integer = 0
+        cnt = SIS.PAK.pakPOBItems.GetChangedBySupplierCount(ttmp.SerialNo, ttmp.BOMNo)
+        If cnt > 0 Then
+          Throw New Exception("There are Item(s) NOT Acknowledged, Pl. ACK them before Freezing.")
+        End If
+        cnt = SIS.PAK.pakPOBItems.GetChangedCount(ttmp.SerialNo, ttmp.BOMNo)
+        If cnt > 0 Then
+          Throw New Exception("There are changes done by you and NOT Acknowledged by Supplier, Pl. submit and get ACK them before Freezing.")
+        End If
+      Next
+      For Each bom As SIS.PAK.pakPOBOM In tmp
+        SIS.PAK.pakPOBItems.FreezeWF(bom.SerialNo, bom.BOMNo, bom.ItemNo)
+      Next
+      With Results
+        .POStatusID = pakPOStates.UnderDespatch
+        .ClosedBy = HttpContext.Current.Session("LoginID")
+        .ClosedOn = Now
+      End With
+      Results = SIS.PAK.pakSPO.UpdateData(Results)
+      SIS.PAK.pakPO.CreateHistory(SerialNo)
+      '===========================================
+      'Send BOM Freezed E-Mail=>Supplier may Start work TC, QC, Despatch
+      'SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POApproval)
+      '===========================================
+      Return Results
+    End Function
+    Public Shared Function UnFreezeBOMWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
+      '===========BOM Freezing By Isgec==========
+      Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
+      Dim tmp As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.UZ_pakPOBOMSelectList(0, 999, "", False, "", SerialNo)
+      For Each bom As SIS.PAK.pakPOBOM In tmp
+        SIS.PAK.pakPOBItems.UnFreezeWF(bom.SerialNo, bom.BOMNo, bom.ItemNo)
+      Next
+      With Results
+        .POStatusID = pakPOStates.UnderISGECApproval
+        .ClosedBy = HttpContext.Current.Session("LoginID")
+        .ClosedOn = Now
+      End With
+      Results = SIS.PAK.pakSPO.UpdateData(Results)
+      SIS.PAK.pakPO.CreateHistory(SerialNo)
+      Return Results
+    End Function
+
+    Public Shared Function SubmitWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
+      '========BOM Prepareing Submit By Isgec and Supplier to Each Other=======
+      Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
+      Dim tmp As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.UZ_pakPOBOMSelectList(0, 999, "", False, "", SerialNo)
+      For Each ttmp As SIS.PAK.pakPOBOM In tmp
+        Dim cnt As Integer = 0
+        If Results.IsSupplier Then
+          cnt = SIS.PAK.pakPOBItems.GetChangedCount(ttmp.SerialNo, ttmp.BOMNo)
+        Else
+          cnt = SIS.PAK.pakPOBItems.GetChangedBySupplierCount(ttmp.SerialNo, ttmp.BOMNo)
+        End If
+        If cnt > 0 Then
+          Throw New Exception("There are Item(s) NOT Acknowledged by you, Pl. ACK them before submitting.")
+        End If
+      Next
+      With Results
+        If Results.IsSupplier Then
+          .POStatusID = pakPOStates.UnderISGECApproval
+        Else
+          .POStatusID = pakPOStates.UnderSupplierVerification
+        End If
+        .ClosedBy = HttpContext.Current.Session("LoginID")
+        .ClosedOn = Now
+      End With
+      Results = SIS.PAK.pakSPO.UpdateData(Results)
+      '===========================================
+      'Send Verification DONE E-Mail
+      SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POApproval)
+      '===========================================
+      Return Results
+    End Function
+    Public Shared Function DeleteWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
+      Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
+      If Results.QCOCount > 0 Or Results.PKGCount > 0 Then
+        Throw New Exception("Quality Inspection or Packing List found, can not delete.")
+      End If
+      Dim BOMs As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.UZ_pakPOBOMSelectList(0, 999, "", False, "", SerialNo)
+      For Each bom As SIS.PAK.pakPOBOM In BOMs
+        Dim tmp As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(bom.SerialNo, bom.BOMNo, bom.ItemNo)
+        If tmp IsNot Nothing Then
+          If Not SIS.PAK.pakPOBItems.CanBeDeleted(tmp) Then
+            Throw New Exception("There are QC or Despatch in Item [tree from here], CAN Not perform Delete. You may try to delete individual Item.")
+          End If
+        End If
+      Next
+      For Each bom As SIS.PAK.pakPOBOM In BOMs
+        SIS.PAK.pakPOBItems.AcceptDeleteWF(bom.SerialNo, bom.BOMNo, bom.ItemNo)
+        SIS.PAK.pakPOBOM.pakPOBOMDelete(bom)
+      Next
+      SIS.PAK.pakPO.pakPODelete(Results)
+      Return Results
+    End Function
+
     Public Shared Function InitiateWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
+      '====================PO Issue By ISGEC==================
       Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
       Dim tmp As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.UZ_pakPOBOMSelectList(0, 999, "", False, "", SerialNo)
       If tmp.Count <= 0 Then
-        Throw New Exception("Package Item NOT Linked to this PO, can NOT send for verification.")
+        Throw New Exception("NO PO Line found or Package Item NOT Linked to this PO, can NOT be issued.")
       End If
-      If Results.POStatusID = pakPOStates.UnderISGECApproval Then
-        For Each ttmp As SIS.PAK.pakPOBOM In tmp
-          'All Items not checked 
-          Dim tmpI As Integer = SIS.PAK.pakPOBItems.GetpakPOBItemsUnCheckedISGECCount(ttmp.SerialNo, ttmp.BOMNo)
-          If tmpI > 0 Then
-            Throw New Exception("All Items NOT checked/updated, can NOT send for Re-verification.")
-          End If
-        Next
-      End If
+      If Results.PortRequired AndAlso Results.PortID = String.Empty Then Results.PortID = "1"
       With Results
-        .POStatusID = pakPOStates.UnderSupplierVerification
+        If Results.POTypeID = pakErpPOTypes.Package Then
+          .POStatusID = pakPOStates.UnderSupplierVerification
+        Else
+          'Issued to Supplier status, when supplier acknowledge then Under Despatch status
+          'But Hold this logic for time being
+          '.POStatusID = pakPOStates.IssuedtoSupplier
+          .POStatusID = pakPOStates.UnderDespatch
+        End If
         .IssuedBy = HttpContext.Current.Session("LoginID")
         .IssuedOn = Now
       End With
       Results = SIS.PAK.pakPO.UpdateData(Results)
       'Create WebUser for supplier
-      ''WebLoginID
       Dim LoginID As String = Results.SupplierID.Substring(1, 8).Trim
       Dim owUsr As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(LoginID)
       If owUsr Is Nothing Then
@@ -226,11 +509,13 @@ Namespace SIS.PAK
         End If
       End If
       '===========================================
-      'Send Verification E-Mail
       If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
-        SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POVerification)
+        If Results.POTypeID = pakErpPOTypes.Package Then
+          SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POVerification)
+        Else
+          SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POIssued)
+        End If
       End If
-      '===========================================
       Try
         SIS.CT.ctUpdates.CT_POIssued(Results)
       Catch ex As Exception
@@ -239,85 +524,6 @@ Namespace SIS.PAK
       Return Results
     End Function
 
-    Public Shared Function ApproveWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
-      Dim tmp As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.UZ_pakPOBOMSelectList(0, 999, "", False, "", SerialNo)
-      If tmp.Count <= 0 Then
-        Throw New Exception("Package Item NOT Linked to this PO, can NOT be Issued.")
-      Else
-        For Each tmpB As SIS.PAK.pakPOBOM In tmp
-          Dim cnt As Integer = SIS.PAK.pakPOBItems.GetpakPOBItemsUnFreezedCount(tmpB.SerialNo, tmpB.BOMNo)
-          If cnt > 0 Then
-            Throw New Exception("All BOM Items are NOT Freezed, PO can NOT be Issued.")
-          End If
-        Next
-      End If
-      Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
-      If Results.PortRequired AndAlso Results.PortID = String.Empty Then
-        Throw New Exception("Pl. EDIT PO and Select PORT of Shipment before PO Issue.")
-      End If
-      With Results
-        .POStatusID = pakPOStates.UnderDespatch
-        .IssuedBy = HttpContext.Current.Session("LoginID")
-        .IssuedOn = Now
-      End With
-      Results = SIS.PAK.pakPO.UpdateData(Results)
-      '===============================
-      'If Results.POTypeID = pakErpPOTypes.ISGECEngineered Then
-      '==============================
-      'Create WebUser for supplier
-      ''WebLoginID
-      Dim LoginID As String = Results.SupplierID.Substring(1, 8).Trim
-        Dim owUsr As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(LoginID)
-        If owUsr Is Nothing Then
-          owUsr = New SIS.QCM.qcmUsers
-          With owUsr
-            .UserName = LoginID
-            .UserFullName = Results.FK_PAK_SupplierID.BPName
-            .ActiveState = 1
-            .EMailID = Results.FK_PAK_SupplierID.EMailID
-          End With
-          owUsr.PW = SIS.QCM.qcmUsers.CreateWebUser(owUsr)
-          SIS.QCM.qcmUsers.UpdateData(owUsr)
-        End If
-        If owUsr IsNot Nothing Then
-          owUsr = SIS.QCM.qcmUsers.ValidatePassword(owUsr)
-          Dim oWS As New WebAuthorization.WebAuthorizationServiceSoapClient
-          Dim Roles() As String = Web.Configuration.WebConfigurationManager.AppSettings("SupplierRoleID").ToString.Split(",".ToCharArray)
-          Dim str As String = ""
-          For Each role As String In Roles
-            str = oWS.CreateWebAuthorization(23, owUsr.UserName, role)
-            If str <> String.Empty Then
-              Exit For
-            End If
-          Next
-          If str <> String.Empty Then
-            Roles = Web.Configuration.WebConfigurationManager.AppSettings("SupplierRoleID1").ToString.Split(",".ToCharArray)
-            For Each role As String In Roles
-              str = oWS.CreateWebAuthorization(23, owUsr.UserName, role)
-            Next
-          End If
-        End If
-      'End If
-      'Send Issue E-Mail
-      If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
-        SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POIssued)
-      End If
-      Try
-        SIS.CT.ctUpdates.CT_POIssued(Results)
-      Catch ex As Exception
-        Throw New Exception(ex.Message)
-      End Try
-
-      Return Results
-    End Function
-    Public Shared Function RejectWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
-      Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
-      Return Results
-    End Function
-    Public Shared Function CompleteWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
-      Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
-      Return Results
-    End Function
     Public Shared Function UZ_pakPOSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal POTypeID As Int32, ByVal SupplierID As String, ByVal ProjectID As String, ByVal BuyerID As String, ByVal POStatusID As Int32, ByVal IssuedBy As String) As List(Of SIS.PAK.pakPO)
       Dim Results As List(Of SIS.PAK.pakPO) = Nothing
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
@@ -325,11 +531,46 @@ Namespace SIS.PAK
           Cmd.CommandType = CommandType.StoredProcedure
           If SearchState Then
             Cmd.CommandText = "sppak_LG_POSelectListSearch"
-            'Cmd.CommandText = "sppakPOSelectListSearch"
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
           Else
             Cmd.CommandText = "sppak_LG_POSelectListFilteres"
-            'Cmd.CommandText = "sppakPOSelectListFilteres"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_POTypeID", SqlDbType.Int, 10, IIf(POTypeID = Nothing, 0, POTypeID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SupplierID", SqlDbType.NVarChar, 9, IIf(SupplierID Is Nothing, String.Empty, SupplierID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_ProjectID", SqlDbType.NVarChar, 6, IIf(ProjectID Is Nothing, String.Empty, ProjectID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_BuyerID", SqlDbType.NVarChar, 8, IIf(BuyerID Is Nothing, String.Empty, BuyerID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_POStatusID", SqlDbType.Int, 10, IIf(POStatusID = Nothing, 0, POStatusID))
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_IssuedBy", SqlDbType.NVarChar, 8, IIf(IssuedBy Is Nothing, String.Empty, IssuedBy))
+          End If
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@StartRowIndex", SqlDbType.Int, -1, StartRowIndex)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@MaximumRows", SqlDbType.Int, -1, MaximumRows)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@OrderBy", SqlDbType.NVarChar, 50, OrderBy)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@DivisionID", SqlDbType.Int, 10, Global.System.Web.HttpContext.Current.Session("DivisionID"))
+          Cmd.Parameters.Add("@RecordCount", SqlDbType.Int)
+          Cmd.Parameters("@RecordCount").Direction = ParameterDirection.Output
+          _RecordCount = -1
+          Results = New List(Of SIS.PAK.pakPO)()
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            Results.Add(New SIS.PAK.pakPO(Reader))
+          End While
+          Reader.Close()
+          _RecordCount = Cmd.Parameters("@RecordCount").Value
+        End Using
+      End Using
+      Return Results
+    End Function
+    Public Shared Function UZ_PackagePOSelectList(ByVal StartRowIndex As Integer, ByVal MaximumRows As Integer, ByVal OrderBy As String, ByVal SearchState As Boolean, ByVal SearchText As String, ByVal POTypeID As Int32, ByVal SupplierID As String, ByVal ProjectID As String, ByVal BuyerID As String, ByVal POStatusID As Int32, ByVal IssuedBy As String) As List(Of SIS.PAK.pakPO)
+      Dim Results As List(Of SIS.PAK.pakPO) = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.StoredProcedure
+          If SearchState Then
+            Cmd.CommandText = "sppak_LG_PackagePOSelectListSearch"
+            SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
+          Else
+            Cmd.CommandText = "sppak_LG_PackagePOSelectListFilteres"
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_POTypeID", SqlDbType.Int, 10, IIf(POTypeID = Nothing, 0, POTypeID))
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SupplierID", SqlDbType.NVarChar, 9, IIf(SupplierID Is Nothing, String.Empty, SupplierID))
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_ProjectID", SqlDbType.NVarChar, 6, IIf(ProjectID Is Nothing, String.Empty, ProjectID))
