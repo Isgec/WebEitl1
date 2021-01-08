@@ -539,6 +539,7 @@ Partial Class filedownload
         .Cells("C").Clear()
         For Each tmp As SIS.PAK.pakUnits In oUOMs
           On Error Resume Next
+          If tmp.Description.ToUpper.Trim = "LOT" Then Continue For
           .Cells(r, 3).Value = tmp.Description
           r += 1
         Next

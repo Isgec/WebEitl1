@@ -1,8 +1,29 @@
 Imports System.Web.Script.Serialization
 Partial Class GF_pakTCPO
   Inherits SIS.SYS.GridBase
-  Private SerialNo As Integer = 0
+  Public Property SerialNo As Int32
+    Get
+      If ViewState("SerialNo") IsNot Nothing Then
+        Return Convert.ToInt32(ViewState("SerialNo"))
+      End If
+      Return False
+    End Get
+    Set(value As Int32)
+      ViewState.Add("SerialNo", value)
+    End Set
+  End Property
   Private ShowPopup As Boolean = False
+  Public Property ShowLoginSelect As Boolean
+    Get
+      If ViewState("ShowLoginSelect") IsNot Nothing Then
+        Return Convert.ToBoolean(ViewState("ShowLoginSelect"))
+      End If
+      Return False
+    End Get
+    Set(value As Boolean)
+      ViewState.Add("ShowLoginSelect", value)
+    End Set
+  End Property
   Private Sub GF_pakTCPO_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
     If ShowPopup Then
       Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
@@ -11,6 +32,9 @@ Partial Class GF_pakTCPO
       HeaderText.Text = Supplier.BPName
       F_EMailIDs.Text = Supplier.EMailID
       mPopup.Show()
+    End If
+    If ShowLoginSelect Then
+      ls1.ShowLoginSelecter()
     End If
   End Sub
   Private Sub cmdOK_Click(sender As Object, e As EventArgs) Handles cmdOK.Click
@@ -47,7 +71,17 @@ Partial Class GF_pakTCPO
     End If
     If e.CommandName.ToLower = "initiatewf".ToLower Then
       Try
-        Dim SerialNo As Int32 = GVpakTCPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        SerialNo = GVpakTCPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
+        Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+        Dim LoginID As String = SIS.PAK.pakBPLoginMap.GetLoginID(PO.SupplierID, Comp)
+        If LoginID = "" Then
+          ls1.Company = Comp
+          ls1.SupplierID = PO.SupplierID
+          ls1.SearchText = PO.FK_PAK_SupplierID.BPName
+          ShowLoginSelect = True
+          Exit Sub
+        End If
         SIS.PAK.pakTCPO.InitiateWF(SerialNo)
         GVpakTCPO.DataBind()
       Catch ex As Exception
@@ -544,4 +578,13 @@ Partial Class GF_pakTCPO
 
   End Sub
 
+  Private Sub ls1_OKClicked() Handles ls1.OKClicked
+    Try
+      SIS.PAK.pakTCPO.InitiateWF(SerialNo)
+      GVpakTCPO.DataBind()
+    Catch ex As Exception
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+    End Try
+
+  End Sub
 End Class

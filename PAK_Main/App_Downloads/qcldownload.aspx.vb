@@ -171,6 +171,8 @@ Partial Class qcldownload
             .Cells(r, c, r, c + 10).Style.Locked = True
           End If
           c += 1
+          .Cells(r, c).Value = tmp.PAK_Documents4_cmba
+          c += 1
           If tmp.Bottom Then
             Dim OfferedQuantity As Decimal = 0
             Dim InspectionStage As String = ""
@@ -268,16 +270,21 @@ Partial Class qcldownload
       Dim cnt As Integer = 1
 
 
+      Dim tmpPO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
       With xlWS
         .Cells(1, 3).Value = SerialNo
         .Cells(2, 3).Value = QCLNo
         .Cells(3, 3).Value = BOMNo
+        .Cells(4, 3).Value = tmpPO.PONumber
+        .Cells(5, 3).Value = tmpPO.VR_BusinessPartner9_BPName
+        .Cells(4, 10).Value = tmpPO.ProjectID
+        .Cells(5, 10).Value = tmpPO.IDM_Projects4_Description
       End With
 
       r = 9
       c = 1
       Try
-        PORTRequired = SIS.PAK.pakPO.pakPOGetByID(SerialNo).PortRequired
+        PORTRequired = tmpPO.PortRequired
       Catch ex As Exception
       End Try
 
@@ -303,6 +310,8 @@ Partial Class qcldownload
             .Cells(r, c).Style.Font.Color.SetColor(tmp.GetColor)
             .Cells(r, c, r, c + 10).Style.Locked = True
           End If
+          c += 1
+          .Cells(r, c).Value = tmp.PAK_Documents4_cmba
           cnt += 1
           r += 1
         End With

@@ -291,10 +291,10 @@ Partial Class EF_pakQCPO
                 tmpBomNo = wsD.Cells(I, 2).Text
                 If tmpBomNo = String.Empty Then Exit For
                 tmpItemNo = wsD.Cells(I, 3).Text
-                Updatable = IIf(wsD.Cells(I, 6).Text <> String.Empty, True, False)
+                Updatable = IIf(wsD.Cells(I, 7).Text <> String.Empty, True, False)
                 If Not Updatable Then Continue For
-                tmpQCQuantity = wsD.Cells(I, 14).Text.Trim
-                tmpStage = wsD.Cells(I, 15).Text.Trim
+                tmpQCQuantity = wsD.Cells(I, 15).Text.Trim
+                tmpStage = wsD.Cells(I, 16).Text.Trim
                 '======================================
                 If tmpQCQuantity = "" Then Continue For
                 If Not IsNumeric(tmpQCQuantity) Then Continue For

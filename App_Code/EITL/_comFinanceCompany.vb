@@ -101,6 +101,19 @@ Namespace SIS.COM
         End Set
       End Property
     End Class
+    Public Shared Function GetPrefix(FinComp As String) As String
+      Dim mret As String = ""
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = "Select LoginPrefix from SYS_FinanceCompany where FinanceCompany='" & FinComp & "'"
+          Con.Open()
+          mret = Cmd.ExecuteScalar
+        End Using
+      End Using
+      Return mret
+    End Function
+
     <DataObjectMethod(DataObjectMethodType.Select)> _
     Public Shared Function comFinanceCompanySelectList(ByVal OrderBy As String) As List(Of SIS.COM.comFinanceCompany)
       Dim Results As List(Of SIS.COM.comFinanceCompany) = Nothing

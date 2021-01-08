@@ -95,11 +95,9 @@ Namespace SIS.PAK
           Cmd.CommandType = CommandType.StoredProcedure
           If SearchState Then
             Cmd.CommandText = "sppak_LG_STCPOSelectListSearch"
-            Cmd.CommandText = "sppakSTCPOSelectListSearch"
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@KeyWord", SqlDbType.NVarChar, 250, SearchText)
           Else
             Cmd.CommandText = "sppak_LG_STCPOSelectListFilteres"
-            Cmd.CommandText = "sppakSTCPOSelectListFilteres"
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_POTypeID", SqlDbType.Int, 10, IIf(POTypeID = Nothing, 0, POTypeID))
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_SupplierID", SqlDbType.NVarChar, 9, IIf(SupplierID Is Nothing, String.Empty, SupplierID))
             SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Filter_ProjectID", SqlDbType.NVarChar, 6, IIf(ProjectID Is Nothing, String.Empty, ProjectID))

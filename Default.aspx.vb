@@ -11,6 +11,7 @@ Partial Class LGDefault
 
   Private Sub F_FinanceCompany_SelectedIndexChanged(sender As Object, e As EventArgs) Handles F_FinanceCompany.SelectedIndexChanged
     HttpContext.Current.Session("FinanceCompany") = F_FinanceCompany.SelectedValue
+    HttpContext.Current.Session("SupplierID") = SIS.PAK.pakBPLoginMap.GetSupplierID(HttpContext.Current.Session("LoginID"), HttpContext.Current.Session("FinanceCompany"))
   End Sub
   Private Sub LGDefault_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
     div1.Visible = False

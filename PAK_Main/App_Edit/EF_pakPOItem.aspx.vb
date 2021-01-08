@@ -307,25 +307,34 @@ Partial Class EF_pakPOItem
                 Catch ex As Exception
                   w = 0
                 End Try
-                If UOMQty <> "" Then
-                  Dim tmpUnit As SIS.PAK.pakUnits = SIS.PAK.pakUnits.pakUnitsGetByDescription(UOMQty)
-                  If tmpUnit IsNot Nothing Then
-                    UOMQty = tmpUnit.UnitID
+                If q > 0 Then
+                  If UOMQty.ToUpper.Trim = "LOT" Then Continue For
+                  If UOMQty <> "" Then
+                    Dim tmpUnit As SIS.PAK.pakUnits = SIS.PAK.pakUnits.pakUnitsGetByDescription(UOMQty)
+                    If tmpUnit IsNot Nothing Then
+                      UOMQty = tmpUnit.UnitID
+                    Else
+                      Continue For 'As ESGP Comments [Keep UOM Mandatory to be entered by User]
+                      UOMQty = 8 'Nos
+                    End If
                   Else
+                    Continue For 'As ESGP Comments [Keep UOM Mandatory to be entered by User]
                     UOMQty = 8 'Nos
                   End If
-                Else
-                  UOMQty = 8 'Nos
                 End If
-                If UOMWt <> "" Then
-                  Dim tmpUnit As SIS.PAK.pakUnits = SIS.PAK.pakUnits.pakUnitsGetByDescription(UOMWt)
-                  If tmpUnit IsNot Nothing Then
-                    UOMWt = tmpUnit.UnitID
+                If w > 0 Then
+                  If UOMWt <> "" Then
+                    Dim tmpUnit As SIS.PAK.pakUnits = SIS.PAK.pakUnits.pakUnitsGetByDescription(UOMWt)
+                    If tmpUnit IsNot Nothing Then
+                      UOMWt = tmpUnit.UnitID
+                    Else
+                      Continue For 'As ESGP Comments [Keep UOM Mandatory to be entered by User]
+                      UOMWt = 6 'Kg
+                    End If
                   Else
+                    Continue For 'As ESGP Comments [Keep UOM Mandatory to be entered by User]
                     UOMWt = 6 'Kg
                   End If
-                Else
-                  UOMWt = 6 'Kg
                 End If
                 If ItemNo <> String.Empty Then
                   'Existing Item

@@ -16,6 +16,79 @@
   </script>
   <asp:ContentPlaceHolder ID="cphMain" runat="server" EnableViewState="true">
   </asp:ContentPlaceHolder>
+  <style>
+
+    .nt-chk-danger{
+      border: 1pt solid #FF99CC;
+      background-color: #FFEBCD;
+      color: #000066;
+    }
+    .nt-but-danger {
+      border: 1pt solid #960825;
+      background-color: #d1062f;
+      color: white;
+    }
+
+    .nt-but-primary {
+      border: 1pt solid #5780f8;
+      background-color: #2196F3;
+      color: white;
+    }
+    .nt-but-gray {
+      border: 1pt solid gray;
+      background-color: #bdbcbc;
+      color: black;
+    }
+
+    .nt-but-grey {
+      border: 1pt solid gray;
+      background-color: #bdbcbc;
+      color: black;
+      cursor:pointer;
+    }
+
+    .nt-but-success {
+      border: 1pt solid #049317;
+      background-color: #06bf1e;
+      color: white;
+    }
+
+    .nt-but-warning {
+      border: 1pt solid #eab402;
+      background-color: #ffc300;
+      color: black;
+    }
+
+    .nt-but-killer {
+      border: 1pt solid #12fa30;
+      background-color: #f86d0a;
+      color: white;
+    }
+
+    .nt-chk-danger,
+    .nt-but-killer,
+    .nt-but-danger,
+    .nt-but-grey,
+    .nt-but-primary,
+    .nt-but-warning,
+    .nt-but-success {
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      padding:2px;
+    }
+
+      .nt-but-killer:hover,
+      .nt-but-danger:hover,
+      .nt-but-grey:hover,
+      .nt-but-primary:hover,
+      .nt-but-warning:hover,
+      .nt-but-success:hover {
+        border: 1pt solid orange;
+        opacity: 0.7;
+      }
+  </style>
+
 </head>
 <body>
   <form id="form1" runat="server">

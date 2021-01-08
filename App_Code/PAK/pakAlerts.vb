@@ -48,7 +48,7 @@ Namespace SIS.PAK
 
         oRow = New TableRow
         oCol = New TableCell
-        Dim supplierID As String = oPO.SupplierID.Substring(1, 8)
+        Dim supplierID As String = SIS.PAK.pakBPLoginMap.GetLoginID(oPO.SupplierID, HttpContext.Current.Session("FinanceCompany"))
         SIS.QCM.qcmUsers.ChangePassword(supplierID, supplierID)
         oCol.Text = "Dear Supplier, <br /><br /> Your password has been reset."
         oCol.Text &= "<br /><b>URL:</b> http://cloud.isgec.co.in/WebEitl1"
@@ -831,8 +831,9 @@ Namespace SIS.PAK
           oCol.Text = "Dear Supplier, <br /><br /> Purchase Order No.: " & oPO.PONumber & " issued to you from ISGEC, is available online to update Items and Documents information."
           If IncludeAuthorization Then
             oCol.Text &= "<br /><b>URL:</b> http://cloud.isgec.co.in/WebEitl1"
-            oCol.Text &= "<br /><b>User ID:</b> " & oPO.SupplierID.Substring(1, 8)
-            oCol.Text &= "<br /><b>Password:</b> " & SIS.QCM.qcmUsers.qcmUsersGetByID(oPO.SupplierID.Substring(1, 8)).PW
+            Dim SupplierLoginID As String = SIS.PAK.pakBPLoginMap.GetLoginID(oPO.SupplierID, HttpContext.Current.Session("FinanceCompany"))
+            oCol.Text &= "<br /><b>User ID:</b> " & SupplierLoginID
+            oCol.Text &= "<br /><b>Password:</b> " & SIS.QCM.qcmUsers.qcmUsersGetByID(SupplierLoginID).PW
           Else
             oCol.Text &= "<br />Login ID & Password has been sent separately."
           End If
@@ -1038,8 +1039,9 @@ Namespace SIS.PAK
           oCol.Text = "Dear Supplier, <br /><br /> Purchase Order No.: " & oPO.PONumber & " issued to you from ISGEC, is available online to submit documents for technical clearance."
           If IncludeAuthorization Then
             oCol.Text &= "<br /><b>URL:</b> http://cloud.isgec.co.in/WebEitl1"
-            oCol.Text &= "<br /><b>User ID:</b> " & oPO.SupplierID.Substring(1, 8)
-            oCol.Text &= "<br /><b>Password:</b> " & SIS.QCM.qcmUsers.qcmUsersGetByID(oPO.SupplierID.Substring(1, 8)).PW
+            Dim SupplierLoginID As String = SIS.PAK.pakBPLoginMap.GetLoginID(oPO.SupplierID, HttpContext.Current.Session("FinanceCompany"))
+            oCol.Text &= "<br /><b>User ID:</b> " & SupplierLoginID
+            oCol.Text &= "<br /><b>Password:</b> " & SIS.QCM.qcmUsers.qcmUsersGetByID(SupplierLoginID).PW
           Else
             oCol.Text &= "<br />Login ID & Password has been sent separately."
           End If

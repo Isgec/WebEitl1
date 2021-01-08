@@ -4,12 +4,14 @@ Imports ejiVault
 Namespace SIS.SYS.Utilities
 	Public Class ApplicationSpacific
     Public Shared Sub Initialize()
+      Dim LoginID As String = HttpContext.Current.Session("LoginID")
       With HttpContext.Current
         .Session("ApplicationID") = 23
         .Session("ApplicationDefaultPage") = "~/Default.aspx"
         .Session("IsSupplier") = False
-        .Session("DivisionID") = GetDivision(HttpContext.Current.Session("LoginID"))
+        .Session("DivisionID") = GetDivision(LoginID)
         .Session("FinanceCompany") = "200"
+        .Session("SupplierID") = GetSupplierID(LoginID, "200")
       End With
       EJI.DBCommon.BaaNLive = Convert.ToBoolean(ConfigurationManager.AppSettings("BaaNLive"))
       EJI.DBCommon.JoomlaLive = Convert.ToBoolean(ConfigurationManager.AppSettings("JoomlaLive"))
@@ -17,12 +19,24 @@ Namespace SIS.SYS.Utilities
       EJI.DBCommon.IsLocalISGECVault = Convert.ToBoolean(ConfigurationManager.AppSettings("IsLocalISGECVault"))
       EJI.DBCommon.ISGECVaultIP = ConfigurationManager.AppSettings("ISGECVaultIP")
     End Sub
+    Public Shared Function GetSupplierID(LoginID As String, FinComp As String) As String
+      Dim SupplierID As String = ""
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = "select isnull(bpid,'') from sys_bploginmap where loginid='" & LoginID & "' and comp='" & FinComp & "'"
+          Con.Open()
+          SupplierID = Cmd.ExecuteScalar
+        End Using
+      End Using
+      Return SupplierID
+    End Function
 
     Public Shared Function GetDivision(ByVal CardNo As String) As Integer
       Dim Found As Boolean = False
       Dim Division As String = ""
       Dim Department As String = ""
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetToolsConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
           Cmd.CommandText = "spqcmEmployeesSelectByID"

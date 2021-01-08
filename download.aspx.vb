@@ -8,9 +8,13 @@ Imports ejiVault
 Partial Class docdownload
   Inherits System.Web.UI.Page
   Private st As Long = HttpContext.Current.Server.ScriptTimeout
+  Private Comp As String = "200"
   Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
     HttpContext.Current.Server.ScriptTimeout = Integer.MaxValue
     Dim Value As String = ""
+    If Request.QueryString("comp") IsNot Nothing Then
+      Comp = Request.QueryString("comp")
+    End If
     If Request.QueryString("doc") IsNot Nothing Then
       Value = Request.QueryString("doc")
       DownloadDoc(Value)
@@ -30,7 +34,7 @@ Partial Class docdownload
 
   End Sub
   Private Sub DownloadAll(ByVal pk As String)
-    Dim docHndl As String = "TRANSMITTALLINES_200"
+    Dim docHndl As String = "TRANSMITTALLINES_" & Comp
     Dim libPath As String = ""
     Dim filePath As String = ""
     Dim fileName As String = pk & ".zip"
@@ -100,7 +104,7 @@ Partial Class docdownload
 
 
   Private Sub DownloadDoc(ByVal pk As String)
-    Dim docHndl As String = "TRANSMITTALLINES_200"
+    Dim docHndl As String = "TRANSMITTALLINES_" & Comp
     Dim docIndx As String = pk.Replace("|", "_")
     Dim libPath As String = ""
     Dim filePath As String = ""
@@ -130,7 +134,7 @@ Partial Class docdownload
   End Sub
 
   Private Sub DownloadSAll(ByVal pk As String)
-    Dim docHndl As String = "TRANSMITTALLINES_200"
+    Dim docHndl As String = "TRANSMITTALLINES_" & Comp
     Dim libPath As String = ""
     Dim filePath As String = ""
     Dim fileName As String = pk & ".zip"
@@ -179,7 +183,7 @@ Partial Class docdownload
 
   End Sub
   Private Sub DownloadSDoc(ByVal pk As String)
-    Dim docHndl As String = "TRANSMITTALLINES_200"
+    Dim docHndl As String = "TRANSMITTALLINES_" & Comp
     Dim docIndx As String = pk.Replace("|", "_")
     Dim libPath As String = ""
     Dim filePath As String = ""

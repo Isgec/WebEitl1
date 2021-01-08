@@ -152,9 +152,8 @@ Partial Class LC_comFinanceCompany
   End Sub
   Protected Sub DDLcomFinanceCompany_DataBinding(ByVal sender As Object, ByVal e As System.EventArgs) Handles DDLcomFinanceCompany.DataBinding
     If _IncludeDefault Then
-      DDLcomFinanceCompany.Items.Add(new ListItem(_DefaultText, _DefaultValue))
+      DDLcomFinanceCompany.Items.Add(New ListItem(_DefaultText, _DefaultValue))
     End If
-    DDLcomFinanceCompany.Items.Add(New ListItem("REDECAM", "700"))
   End Sub
   Protected Sub DDLcomFinanceCompany_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles DDLcomFinanceCompany.SelectedIndexChanged
     HttpContext.Current.Session("FinanceCompany") = DDLcomFinanceCompany.SelectedValue

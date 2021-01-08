@@ -454,7 +454,6 @@ Namespace SIS.PAK
       SIS.PAK.pakPO.pakPODelete(Results)
       Return Results
     End Function
-
     Public Shared Function InitiateWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
       '====================PO Issue By ISGEC==================
       Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
@@ -477,37 +476,7 @@ Namespace SIS.PAK
       End With
       Results = SIS.PAK.pakPO.UpdateData(Results)
       'Create WebUser for supplier
-      Dim LoginID As String = Results.SupplierID.Substring(1, 8).Trim
-      Dim owUsr As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(LoginID)
-      If owUsr Is Nothing Then
-        owUsr = New SIS.QCM.qcmUsers
-        With owUsr
-          .UserName = LoginID
-          .UserFullName = Results.FK_PAK_SupplierID.BPName
-          .ActiveState = 1
-          .EMailID = Results.FK_PAK_SupplierID.EMailID
-        End With
-        owUsr.PW = SIS.QCM.qcmUsers.CreateWebUser(owUsr)
-        SIS.QCM.qcmUsers.UpdateData(owUsr)
-      End If
-      If owUsr IsNot Nothing Then
-        owUsr = SIS.QCM.qcmUsers.ValidatePassword(owUsr)
-        Dim oWS As New WebAuthorization.WebAuthorizationServiceSoapClient
-        Dim Roles() As String = Web.Configuration.WebConfigurationManager.AppSettings("SupplierRoleID").ToString.Split(",".ToCharArray)
-        Dim str As String = ""
-        For Each role As String In Roles
-          str = oWS.CreateWebAuthorization(23, owUsr.UserName, role)
-          If str <> String.Empty Then
-            Exit For
-          End If
-        Next
-        If str <> String.Empty Then
-          Roles = Web.Configuration.WebConfigurationManager.AppSettings("SupplierRoleID1").ToString.Split(",".ToCharArray)
-          For Each role As String In Roles
-            str = oWS.CreateWebAuthorization(23, owUsr.UserName, role)
-          Next
-        End If
-      End If
+      Dim owUsr As SIS.QCM.qcmUsers = SIS.PAK.pakSTCPO.CreateSupplierLogin(Results.SupplierID)
       '===========================================
       If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
         If Results.POTypeID = pakErpPOTypes.Package Then

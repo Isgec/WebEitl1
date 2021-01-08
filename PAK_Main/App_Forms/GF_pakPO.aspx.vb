@@ -5,8 +5,29 @@ Imports OfficeOpenXml
 Imports System.Web.Script.Serialization
 Partial Class GF_pakPO
   Inherits SIS.SYS.GridBase
-  Private SerialNo As Integer = 0
+  Public Property SerialNo As Int32
+    Get
+      If ViewState("SerialNo") IsNot Nothing Then
+        Return Convert.ToInt32(ViewState("SerialNo"))
+      End If
+      Return False
+    End Get
+    Set(value As Int32)
+      ViewState.Add("SerialNo", value)
+    End Set
+  End Property
   Private ShowPopup As Boolean = False
+  Public Property ShowLoginSelect As Boolean
+    Get
+      If ViewState("ShowLoginSelect") IsNot Nothing Then
+        Return Convert.ToBoolean(ViewState("ShowLoginSelect"))
+      End If
+      Return False
+    End Get
+    Set(value As Boolean)
+      ViewState.Add("ShowLoginSelect", value)
+    End Set
+  End Property
   Protected Sub GVpakPO_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakPO.RowCommand
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
@@ -30,9 +51,7 @@ Partial Class GF_pakPO
         End Select
         GVpakPO.DataBind()
       Catch ex As Exception
-        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
-        Dim script As String = String.Format("alert({0});", message)
-        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
     If e.CommandName.ToLower = "ResetWF".ToLower Then
@@ -51,21 +70,27 @@ Partial Class GF_pakPO
         SerialNo = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
         ShowPopup = True
       Catch ex As Exception
-        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
-        Dim script As String = String.Format("alert({0});", message)
-        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
     If e.CommandName.ToLower = "initiatewf".ToLower Then
       'PO Issue
       Try
-        Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        SerialNo = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
+        Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+        Dim LoginID As String = SIS.PAK.pakBPLoginMap.GetLoginID(PO.SupplierID, Comp)
+        If LoginID = "" Then
+          ls1.Company = Comp
+          ls1.SupplierID = PO.SupplierID
+          ls1.SearchText = PO.FK_PAK_SupplierID.BPName
+          ShowLoginSelect = True
+          Exit Sub
+        End If
         SIS.PAK.pakPO.InitiateWF(SerialNo)
         GVpakPO.DataBind()
       Catch ex As Exception
-        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
-        Dim script As String = String.Format("alert({0});", message)
-        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
     If e.CommandName.ToLower = "DeleteWF".ToLower Then
@@ -75,12 +100,11 @@ Partial Class GF_pakPO
         SIS.PAK.pakPO.DeleteWF(SerialNo)
         GVpakPO.DataBind()
       Catch ex As Exception
-        Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
-        Dim script As String = String.Format("alert({0});", message)
-        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
   End Sub
+
   Protected Sub GVpakPO_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles GVpakPO.Init
     DataClassName = "GpakPO"
     SetGridView = GVpakPO
@@ -602,6 +626,9 @@ Partial Class GF_pakPO
       F_EMailIDs.Text = Supplier.EMailID
       mPopup.Show()
     End If
+    If ShowLoginSelect Then
+      ls1.ShowLoginSelecter()
+    End If
   End Sub
   Private Sub cmdOK_Click(sender As Object, e As EventArgs) Handles cmdOK.Click
     Dim SupplierID As String = L_PrimaryKey.Text
@@ -613,5 +640,15 @@ Partial Class GF_pakPO
         SIS.PAK.pakBusinessPartner.UpdateData(BP)
       End If
     End If
+  End Sub
+
+  Private Sub ls1_OKClicked() Handles ls1.OKClicked
+    Try
+      SIS.PAK.pakPO.InitiateWF(SerialNo)
+      GVpakPO.DataBind()
+    Catch ex As Exception
+      ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+    End Try
+
   End Sub
 End Class

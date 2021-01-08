@@ -6,6 +6,94 @@ Imports System.ComponentModel
 Namespace SIS.PAK
 
 #Region " ERP Components Classes "
+  Public Class docs
+    Public Property DocumentID As String = ""
+    Public Property RevisionNo As String = ""
+    Sub New(rd As SqlDataReader)
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, rd)
+    End Sub
+    Sub New()
+
+    End Sub
+    Public Shared Function IsUpdatable(PONo As String) As Boolean
+      Dim epoDocs As List(Of SIS.PAK.docs) = SIS.PAK.docs.GetERPPODocs(PONo)
+      Dim ipoDocs As List(Of SIS.PAK.docs) = SIS.PAK.docs.GetIssuedPODocs(PONo)
+      For Each edoc As SIS.PAK.docs In epoDocs
+        Dim Found As Boolean = False
+        For Each idoc As SIS.PAK.docs In ipoDocs
+          If edoc.DocumentID.Trim = idoc.DocumentID.Trim Then
+            Dim er As Integer = 0
+            Dim ir As Integer = 0
+            Try
+              er = edoc.RevisionNo
+            Catch ex As Exception
+              er = 0
+            End Try
+            Try
+              ir = idoc.RevisionNo
+            Catch ex As Exception
+              ir = 0
+            End Try
+            If er < ir Then
+              Return False
+            End If
+          End If
+        Next
+      Next
+      Return True
+    End Function
+    Public Shared Function GetERPPODocs(PONo As String) As List(Of SIS.PAK.docs)
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
+      Dim mRet As New List(Of SIS.PAK.docs)
+      Dim Sql As String = ""
+      Sql &= ""
+      Sql &= " select distinct "
+      Sql &= "  t_docn as DocumentID, "
+      Sql &= "  t_revi as RevisionNo "
+      Sql &= " from ttdisg002" & Comp
+      Sql &= " where t_orno ='" & PONo & "'"
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            mRet.Add(New SIS.PAK.docs(Reader))
+          End While
+          Reader.Close()
+        End Using
+      End Using
+      Return mRet
+    End Function
+    Public Shared Function GetIssuedPODocs(PONo As String) As List(Of SIS.PAK.docs)
+      Dim mRet As New List(Of SIS.PAK.docs)
+      Dim Sql As String = ""
+      Sql &= ""
+      Sql &= " select distinct "
+      Sql &= "  cc.DocumentID, "
+      Sql &= "  cc.DocumentRevision as RevisionNo "
+      Sql &= " from PAK_PO as aa"
+      Sql &= " inner join PAK_POBItems as bb on aa.SerialNo=bb.SerialNo "
+      Sql &= " inner join PAK_Documents as cc on bb.DocumentNo=cc.DocumentNo "
+      Sql &= " where aa.PONumber ='" & PONo & "'"
+      Sql &= " and aa.POFOR = 'PK' "
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            mRet.Add(New SIS.PAK.docs(Reader))
+          End While
+          Reader.Close()
+        End Using
+      End Using
+      Return mRet
+    End Function
+
+  End Class
   Public Class erpData
     Private Shared Sub CreatePOMasters(oePO As SIS.PAK.pakPO)
       '1. Check Supplier
@@ -121,6 +209,21 @@ Namespace SIS.PAK
           oePO = SIS.PAK.pakPO.InsertData(oePO)
           oPO = oePO
         Else
+          '=====before updating documents as documents are automatically updated in Joomla after release
+          '=====do not update from PO if it containd old revisions of document
+          '==============================
+          If Not ForTC Then
+            Select Case oePO.POTypeID
+              Case pakErpPOTypes.ISGECEngineered, pakErpPOTypes.Boughtout
+                Try
+                  If Not SIS.PAK.docs.IsUpdatable(PONumber) Then
+                    Throw New Exception("PO in ERP does NOT contains Latest version of Released Documents as compared to Issued PO. Can NOT Update PO.")
+                  End If
+                Catch ex As Exception
+                End Try
+            End Select
+          End If
+          '==============================
           oPO.PORevision = oePO.PORevision
           If oePO.erpPOStatus = "30" Then
             oPO.POStatusID = 5
@@ -190,7 +293,7 @@ Namespace SIS.PAK
                       If POLC.t_qnty < 0.0001 Then POLC.t_qnty = 0
                       If oPO.QCRequired Then
                         If POLC.t_qnty < xPOBItem.QualityClearedQty Then
-                          POLC.t_qnty = xPOBItem.QualityClearedQty
+                          'POLC.t_qnty = xPOBItem.QualityClearedQty
                         End If
                       Else
                         If POLC.t_qnty < xPOBItem.QuantityDespatched Then

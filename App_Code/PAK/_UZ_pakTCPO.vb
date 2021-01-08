@@ -7,6 +7,7 @@ Namespace SIS.PAK
   Partial Public Class pakTCPO
     Public ReadOnly Property GetItems As Integer
       Get
+        Dim x As String = UpdateUploadStatusFromERP
         Dim mRet As Integer = 0
         Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
           Con.Open()
@@ -246,32 +247,39 @@ Namespace SIS.PAK
         Return mRet
       End Get
     End Property
-    Public Shared Function InitiateWF(ByVal SerialNo As Int32) As SIS.PAK.pakTCPO
-      Dim tmpPO As SIS.PAK.pakTCPO = pakTCPOGetByID(SerialNo)
-      Dim tmpItems As List(Of SIS.PAK.pakTCPOL) = SIS.PAK.pakTCPOL.pakTCPOLSelectList(0, 9999, "", False, "", tmpPO.SerialNo)
-      If tmpItems.Count <= 0 Then
-        Throw New Exception("Item NOT Found in this PO, can not be issued to Supplier.")
+    Public Shared Function CreateSupplierLogin(SupplierID As String) As SIS.QCM.qcmUsers
+      Dim owUsr As SIS.QCM.qcmUsers = Nothing
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
+      Dim LoginID As String = SIS.PAK.pakBPLoginMap.GetLoginID(SupplierID, Comp)
+      If LoginID = "" Then
+        Dim TryThis As String = SupplierID.Substring(1, 8).Trim
+        owUsr = SIS.QCM.qcmUsers.qcmUsersGetByID(TryThis)
+        If owUsr Is Nothing Then
+          LoginID = TryThis
+        Else
+          owUsr = Nothing
+          LoginID = SIS.COM.comFinanceCompany.GetPrefix(Comp) & SupplierID.Substring(3, 6).Trim
+        End If
       End If
-      With tmpPO
-        .POStatusID = pakTCPOStates.IssuedToSupplier
-        .IssuedBy = HttpContext.Current.Session("LoginID")
-        .IssuedOn = Now
-      End With
-      tmpPO = SIS.PAK.pakTCPO.UpdateData(tmpPO)
-      'Create WebUser for supplier
-      ''WebLoginID
-      Dim LoginID As String = tmpPO.SupplierID.Substring(1, 8).Trim
-      Dim owUsr As SIS.QCM.qcmUsers = SIS.QCM.qcmUsers.qcmUsersGetByID(LoginID)
+      owUsr = SIS.QCM.qcmUsers.qcmUsersGetByID(LoginID)
       If owUsr Is Nothing Then
+        Dim bp As SIS.PAK.pakBusinessPartner = SIS.PAK.pakBusinessPartner.pakBusinessPartnerGetByID(SupplierID)
         owUsr = New SIS.QCM.qcmUsers
         With owUsr
           .UserName = LoginID
-          .UserFullName = tmpPO.FK_PAK_SupplierID.BPName
+          .UserFullName = bp.BPName
           .ActiveState = 1
-          .EMailID = tmpPO.FK_PAK_SupplierID.EMailID
+          .EMailID = bp.EMailID
         End With
         owUsr.PW = SIS.QCM.qcmUsers.CreateWebUser(owUsr)
         SIS.QCM.qcmUsers.UpdateData(owUsr)
+        Dim slm As New SIS.PAK.pakBPLoginMap
+        With slm
+          .LoginID = LoginID
+          .BPID = SupplierID
+          .Comp = Comp
+        End With
+        SIS.PAK.pakBPLoginMap.UZ_pakBPLoginMapInsert(slm)
       End If
       If owUsr IsNot Nothing Then
         owUsr = SIS.QCM.qcmUsers.ValidatePassword(owUsr)
@@ -292,11 +300,28 @@ Namespace SIS.PAK
           Next
         End If
       End If
+      Return owUsr
+    End Function
+    Public Shared Function InitiateWF(ByVal SerialNo As Int32) As SIS.PAK.pakTCPO
+      Dim tmpPO As SIS.PAK.pakTCPO = pakTCPOGetByID(SerialNo)
+      Dim tmpItems As List(Of SIS.PAK.pakTCPOL) = SIS.PAK.pakTCPOL.pakTCPOLSelectList(0, 9999, "", False, "", tmpPO.SerialNo)
+      If tmpItems.Count <= 0 Then
+        Throw New Exception("Item NOT Found in this PO, can not be issued to Supplier.")
+      End If
+      With tmpPO
+        .POStatusID = pakTCPOStates.IssuedToSupplier
+        .IssuedBy = HttpContext.Current.Session("LoginID")
+        .IssuedOn = Now
+      End With
+      tmpPO = SIS.PAK.pakTCPO.UpdateData(tmpPO)
+      'Create WebUser for supplier
+      Dim owUsr As SIS.QCM.qcmUsers = CreateSupplierLogin(tmpPO.SupplierID)
       '===========================================
       'Send TC
-      SIS.PAK.Alerts.TCAlert(SerialNo, pakAlertEvents.TCPOIssued)
+      If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+        SIS.PAK.Alerts.TCAlert(SerialNo, pakAlertEvents.TCPOIssued)
+      End If
       '===========================================
-
       Return tmpPO
     End Function
     Public Shared Function ApproveWF(ByVal SerialNo As Int32) As SIS.PAK.pakTCPO
