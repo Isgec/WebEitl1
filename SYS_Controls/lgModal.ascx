@@ -27,7 +27,7 @@
   </asp:Panel>
   <asp:Panel ID="pnlFooter" runat="server" Height="40px" Width="100%" style="margin-bottom:2px;border-top:1pt solid lightgray;">
     <asp:Button ID="cmdOK" runat="server" Width="70px" Text="OK" style="text-align:center;margin-right:30px;" />
-    <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancle" style="text-align:center;margin-right:30px;" />
+    <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancel" style="text-align:center;margin-right:30px;" />
   </asp:Panel>
 </asp:Panel>
 <AJX:ModalPopupExtender 

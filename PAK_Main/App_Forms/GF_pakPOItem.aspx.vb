@@ -5,6 +5,18 @@ Imports OfficeOpenXml
 Imports System.Web.Script.Serialization
 Partial Class GF_pakPOItem
   Inherits SIS.SYS.GridBase
+  Public Property SerialNo As Int32
+    Get
+      If ViewState("SerialNo") IsNot Nothing Then
+        Return Convert.ToInt32(ViewState("SerialNo"))
+      End If
+      Return False
+    End Get
+    Set(value As Int32)
+      ViewState.Add("SerialNo", value)
+    End Set
+  End Property
+  Private ShowPopup As Boolean = False
   Protected Sub GVpakPO_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GVpakPO.RowCommand
     If e.CommandName.ToLower = "lgedit".ToLower Then
       Try
@@ -46,6 +58,14 @@ Partial Class GF_pakPOItem
         Dim message As String = New JavaScriptSerializer().Serialize(ex.Message.ToString())
         Dim script As String = String.Format("alert({0});", message)
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", script, True)
+      End Try
+    End If
+    If e.CommandName.ToLower = "lgEMailIDs".ToLower Then
+      Try
+        SerialNo = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        ShowPopup = True
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
   End Sub
@@ -516,6 +536,29 @@ Partial Class GF_pakPOItem
     End If
     Return mRet
   End Function
+
+  Private Sub GF_pakPOItem_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
+    If ShowPopup Then
+      Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+      Dim Supplier As SIS.PAK.pakBusinessPartner = PO.FK_PAK_SupplierID
+      L_PrimaryKey.Text = Supplier.BPID
+      HeaderText.Text = Supplier.BPName
+      F_EMailIDs.Text = Supplier.EMailID
+      mPopup.Show()
+    End If
+
+  End Sub
+  Private Sub cmdOK_Click(sender As Object, e As EventArgs) Handles cmdOK.Click
+    Dim SupplierID As String = L_PrimaryKey.Text
+    If SupplierID <> "" Then
+      Dim EMailIDs As String = F_EMailIDs.Text
+      If EMailIDs <> "" Then
+        Dim BP As SIS.PAK.pakBusinessPartner = SIS.PAK.pakBusinessPartner.pakBusinessPartnerGetByID(SupplierID)
+        BP.EMailID = EMailIDs
+        SIS.PAK.pakBusinessPartner.UpdateData(BP)
+      End If
+    End If
+  End Sub
 
   'Private Sub cmdImport_Click(sender As Object, e As EventArgs) Handles cmdImport.Click
   '  Try

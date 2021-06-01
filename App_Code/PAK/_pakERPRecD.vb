@@ -214,7 +214,7 @@ Namespace SIS.PAK
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakERPRecDSelectByID"
+          Cmd.CommandText = "sppakERPRecDSelectByID_" & HttpContext.Current.Session("FinanceCompany")
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_rcno",SqlDbType.VarChar,t_rcno.ToString.Length, t_rcno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_revn",SqlDbType.VarChar,t_revn.ToString.Length, t_revn)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_srno",SqlDbType.Int,t_srno.ToString.Length, t_srno)
@@ -294,7 +294,7 @@ Namespace SIS.PAK
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakERPRecDInsert"
+          Cmd.CommandText = "sppakERPRecDInsert_" & HttpContext.Current.Session("FinanceCompany")
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_rcno", SqlDbType.VarChar, 10, Record.t_rcno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_revn", SqlDbType.VarChar, 21, Record.t_revn)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_srno", SqlDbType.Int, 11, Record.t_srno)
@@ -341,26 +341,26 @@ Namespace SIS.PAK
       Return SIS.PAK.pakERPRecD.UpdateData(_Rec)
     End Function
     Public Shared Function UpdateData(ByVal Record As SIS.PAK.pakERPRecD) As SIS.PAK.pakERPRecD
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakERPRecDUpdate"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_rcno",SqlDbType.VarChar,10, Record.t_rcno)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_revn",SqlDbType.VarChar,21, Record.t_revn)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_srno",SqlDbType.Int,11, Record.t_srno)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_rcno",SqlDbType.VarChar,10, Record.t_rcno)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_revn",SqlDbType.VarChar,21, Record.t_revn)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_srno",SqlDbType.Int,11, Record.t_srno)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_docn",SqlDbType.VarChar,33, Record.t_docn)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_revi",SqlDbType.VarChar,21, Record.t_revi)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_dsca",SqlDbType.VarChar,101, Record.t_dsca)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_idoc",SqlDbType.VarChar,33, Record.t_idoc)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_irev",SqlDbType.VarChar,21, Record.t_irev)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_date",SqlDbType.DateTime,21, Record.t_date)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_remk",SqlDbType.VarChar,101, Record.t_remk)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_proc",SqlDbType.Int,11, Record.t_proc)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_Refcntd",SqlDbType.Int,11, Record.t_Refcntd)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_Refcntu",SqlDbType.Int,11, Record.t_Refcntu)
+          Cmd.CommandText = "sppakERPRecDUpdate_" & HttpContext.Current.Session("FinanceCompany")
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_rcno", SqlDbType.VarChar, 10, Record.t_rcno)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_revn", SqlDbType.VarChar, 21, Record.t_revn)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_srno", SqlDbType.Int, 11, Record.t_srno)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_rcno", SqlDbType.VarChar, 10, Record.t_rcno)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_revn", SqlDbType.VarChar, 21, Record.t_revn)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_srno", SqlDbType.Int, 11, Record.t_srno)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_docn", SqlDbType.VarChar, 33, Record.t_docn)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_revi", SqlDbType.VarChar, 21, Record.t_revi)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_dsca", SqlDbType.VarChar, 101, Record.t_dsca)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_idoc", SqlDbType.VarChar, 33, Record.t_idoc)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_irev", SqlDbType.VarChar, 21, Record.t_irev)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_date", SqlDbType.DateTime, 21, Record.t_date)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_remk", SqlDbType.VarChar, 101, Record.t_remk)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_proc", SqlDbType.Int, 11, Record.t_proc)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_Refcntd", SqlDbType.Int, 11, Record.t_Refcntd)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_Refcntu", SqlDbType.Int, 11, Record.t_Refcntu)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1
@@ -374,13 +374,13 @@ Namespace SIS.PAK
     <DataObjectMethod(DataObjectMethodType.Delete, True)> _
     Public Shared Function pakERPRecDDelete(ByVal Record As SIS.PAK.pakERPRecD) As Int32
       Dim _Result as Integer = 0
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakERPRecDDelete"
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_rcno",SqlDbType.VarChar,Record.t_rcno.ToString.Length, Record.t_rcno)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_revn",SqlDbType.VarChar,Record.t_revn.ToString.Length, Record.t_revn)
-          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_srno",SqlDbType.Int,Record.t_srno.ToString.Length, Record.t_srno)
+          Cmd.CommandText = "sppakERPRecDDelete_" & HttpContext.Current.Session("FinanceCompany")
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_rcno", SqlDbType.VarChar, Record.t_rcno.ToString.Length, Record.t_rcno)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_revn", SqlDbType.VarChar, Record.t_revn.ToString.Length, Record.t_revn)
+          SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_srno", SqlDbType.Int, Record.t_srno.ToString.Length, Record.t_srno)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)
           Cmd.Parameters("@RowCount").Direction = ParameterDirection.Output
           _RecordCount = -1

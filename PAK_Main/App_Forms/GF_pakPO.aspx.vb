@@ -103,6 +103,18 @@ Partial Class GF_pakPO
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
+    If e.CommandName.ToLower = "updFromDWG".ToLower Then
+      Try
+        Dim SerialNo As Int32 = GVpakPO.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim Results As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+        Select Case Results.POTypeID
+          Case pakErpPOTypes.ISGECEngineered, pakErpPOTypes.Boughtout
+            SIS.PAK.pakPO.UpdateLatestReleasedDWG(SerialNo)
+        End Select
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
   End Sub
 
   Protected Sub GVpakPO_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles GVpakPO.Init

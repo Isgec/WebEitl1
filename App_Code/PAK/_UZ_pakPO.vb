@@ -5,7 +5,106 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 
 Namespace SIS.PAK
+  Public Class EffectedPOByDrawings
+
+    Public Property PONumber As String = ""
+    Public Property POLine As Integer = 0
+
+
+    Public Shared Function GetPOList(DocumentID As String, Comp As String) As List(Of EffectedPOByDrawings)
+      Dim Sql As String = ""
+      Sql &= " SELECT distinct t_orno as PONumber,t_pono As POLine FROM ttdisg002" & Comp
+      Sql &= " WHERE t_docn='" & DocumentID & "' "
+      Dim mRet As New List(Of EffectedPOByDrawings)
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            mRet.Add(New EffectedPOByDrawings(Reader))
+          End While
+          Reader.Close()
+        End Using
+      End Using
+      Return mRet
+    End Function
+    Sub New(rd As SqlDataReader)
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, rd)
+    End Sub
+  End Class
+
+
+  Public Class PODocs
+    Public Property DocumentID As String = ""
+    Public Property DocumentRevision As String = ""
+    Public Shared Function GetDocs(SerialNo As String) As List(Of SIS.PAK.PODocs)
+      Dim mRet As New List(Of SIS.PAK.PODocs)
+      Dim Sql As String = ""
+      Sql &= "  select "
+      Sql &= "  distinct doc.DocumentID, "
+      Sql &= "  doc.DocumentRevision "
+      Sql &= "  from pak_pobitems as itm "
+      Sql &= "  inner join pak_documents as doc on itm.documentno=doc.documentno "
+      Sql &= "  where itm.serialno= " & SerialNo
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Rd As SqlDataReader = Cmd.ExecuteReader
+          While Rd.Read
+            mRet.Add(New SIS.PAK.PODocs(Rd))
+          End While
+        End Using
+      End Using
+      Return mRet
+    End Function
+    Public Shared Function getLatestERPDoc(DocumentID As String, Comp As String) As SIS.PAK.PODocs
+      Dim mRet As SIS.PAK.PODocs = Nothing
+      Dim Sql As String = ""
+      Sql &= " select "
+      Sql &= "  dm.t_docn As DocumentID, "
+      Sql &= "  dm.t_revn as DocumentRevision "
+      Sql &= "  from tdmisg001" & Comp & " as dm "
+      Sql &= "  where t_docn='" & DocumentID & "' "
+      Sql &= "  and t_revn = (select max(xx.t_revn) from tdmisg001" & Comp & " as xx where xx.t_docn=dm.t_docn) "
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          If (Reader.Read()) Then
+            mRet = New SIS.PAK.PODocs(Reader)
+          End If
+          Reader.Close()
+        End Using
+      End Using
+      Return mRet
+    End Function
+    Sub New(rD As SqlDataReader)
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, rD)
+    End Sub
+  End Class
   Partial Public Class pakPO
+    Public ReadOnly Property UpdFromDWGVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          Select Case POStatusID
+            Case pakPOStates.UnderDespatch
+              If HttpContext.Current.Session("LoginID") = "0340" Then
+                mRet = True
+              End If
+          End Select
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+
     Public ReadOnly Property ToAckCount As Integer
       Get
         Dim mRet As Integer = 0
@@ -418,18 +517,18 @@ Namespace SIS.PAK
         End If
       Next
       With Results
+        'Closed by is used to store, BOM prepration action last submitted by login ID
+        .ClosedBy = HttpContext.Current.Session("LoginID")
+        .ClosedOn = Now
         If Results.IsSupplier Then
           .POStatusID = pakPOStates.UnderISGECApproval
         Else
           .POStatusID = pakPOStates.UnderSupplierVerification
         End If
-        .ClosedBy = HttpContext.Current.Session("LoginID")
-        .ClosedOn = Now
       End With
       Results = SIS.PAK.pakSPO.UpdateData(Results)
       '===========================================
-      'Send Verification DONE E-Mail
-      SIS.PAK.Alerts.Alert(SerialNo, pakAlertEvents.POApproval)
+      SIS.PAK.Alerts.BomSubmitted(SerialNo)
       '===========================================
       Return Results
     End Function
@@ -454,13 +553,162 @@ Namespace SIS.PAK
       SIS.PAK.pakPO.pakPODelete(Results)
       Return Results
     End Function
+    Public Shared Function UpdateLatestReleasedDWG(SerialNo As String) As Boolean
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
+      Dim mRet As Boolean = True
+      Dim tmpPODocs As List(Of SIS.PAK.PODocs) = SIS.PAK.PODocs.GetDocs(SerialNo)
+      For Each doc As SIS.PAK.PODocs In tmpPODocs
+        Dim eDoc As SIS.PAK.PODocs = SIS.PAK.PODocs.getLatestERPDoc(doc.DocumentID, Comp)
+        If eDoc IsNot Nothing Then
+          If eDoc.DocumentRevision > doc.DocumentRevision Then
+            Dim xPOs As List(Of SIS.PAK.EffectedPOByDrawings) = SIS.PAK.EffectedPOByDrawings.GetPOList(doc.DocumentID, Comp)
+            Dim MoreThanOnePO As Boolean = IIf(xPOs.Count > 1, True, False)
+            Dim PO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+            Dim ePO As SIS.PAK.EffectedPOByDrawings = xPOs.Find(Function(n) n.PONumber = PO.PONumber)
+            'Update BOM
+            UpdateIssuedPOFromDrawing(SerialNo, ePO, PO, doc.DocumentID, doc.DocumentRevision, eDoc.DocumentRevision, Comp, MoreThanOnePO)
+          End If
+        End If
+      Next
+      Return mRet
+    End Function
+    Private Shared Function GetNextItemNo(ByVal SerialNo As Integer, ByVal BomNo As Integer) As Integer
+      Dim tmp As Integer = 0
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString)
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Dim mSql As String = "SELECT MAX(ISNULL(ItemNo,0)) FROM [PAK_POBitems] WHERE SerialNo = " & SerialNo & " and BOMNo=" & BomNo
+          Cmd.CommandType = System.Data.CommandType.Text
+          Cmd.CommandText = mSql
+          Con.Open()
+          Try
+            tmp = Cmd.ExecuteScalar()
+            tmp += 1
+          Catch ex As Exception
+            tmp = 1
+          End Try
+        End Using
+      End Using
+      Return tmp
+    End Function
+
+    Public Shared Sub UpdateIssuedPOFromDrawing(SerialNo As String, ePO As SIS.PAK.EffectedPOByDrawings, PO As SIS.PAK.pakPO, DocumentID As String, RevisionNo As String, eRevisionNo As String, Comp As String, MoreThanOnePO As Boolean)
+      If PO IsNot Nothing Then
+        Try
+          Dim dmItems As List(Of dmisg002) = dmisg002.GetItems(DocumentID, eRevisionNo, Comp)
+          Dim bItems As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByDocRev(PO.SerialNo, ePO.POLine, DocumentID, eRevisionNo)
+          Dim Found As Boolean = False
+          For Each dmItem As dmisg002 In dmItems
+            Found = False
+            Dim bItem As SIS.PAK.pakPOBItems = Nothing
+            For Each bItem In bItems
+              If bItem.ItemCode.Trim = dmItem.t_item.Trim Then
+                Found = True
+                Exit For
+              End If
+            Next
+            If Not Found Then
+              If MoreThanOnePO Then
+                Continue For 'Do Not Insert New Item
+              End If
+              bItem = bItems(0)
+              Dim mNextItemNo As Integer = GetNextItemNo(bItem.SerialNo, bItem.BOMNo)
+              With bItem
+                .ItemNo = mNextItemNo
+                .ItemCode = dmItem.t_item.Trim
+                .ItemDescription = dmItem.t_dsca
+                .QuantityToPack = 0
+                .TotalWeightToPack = 0
+                .QuantityToDespatch = 0
+                .TotalWeightToDespatch = 0
+                .QuantityDespatched = 0
+                .TotalWeightDespatched = 0
+                .QuantityReceived = 0
+                .TotalWeightReceived = 0
+              End With
+            End If
+            With bItem
+              Try
+                .ItemDescription = dmItem.t_dsca
+                If dmItem.t_cuni <> "" Then
+                  .UOMQuantity = SIS.PAK.pakUnits.pakUnitsGetByDescription(dmItem.t_cuni).UnitID
+                End If
+                If dmItem.t_qnty < 0.0001 Then dmItem.t_qnty = 0
+                If PO.QCRequired Then
+                  If dmItem.t_qnty < bItem.QualityClearedQty Then
+                    dmItem.t_qnty = bItem.QualityClearedQty
+                  End If
+                Else
+                  If dmItem.t_qnty < bItem.QuantityDespatched Then
+                    dmItem.t_qnty = bItem.QuantityDespatched
+                  End If
+                End If
+                .Quantity = dmItem.t_qnty
+                .UOMWeight = SIS.PAK.pakUnits.pakUnitsGetByDescription("kg").UnitID
+                If dmItem.t_wght >= 0.0001 AndAlso dmItem.t_qnty >= 0.0001 Then
+                  .WeightPerUnit = dmItem.t_wght / dmItem.t_qnty
+                Else
+                  .WeightPerUnit = 0
+                End If
+              Catch ex As Exception
+                Throw New Exception("Err Updating: " & ex.Message)
+              End Try
+            End With
+            If Found Then
+              bItem = SIS.PAK.pakPOBItems.UpdateData(bItem)
+            Else
+              bItem = SIS.PAK.pakPOBItems.InsertData(bItem)
+            End If
+          Next
+          'Update Document Revision
+          SIS.PAK.pakPOBItems.CreateNewRevDocumentAndLink(PO.SerialNo, ePO.POLine, DocumentID, eRevisionNo)
+          'Reverse check to Delete Items Removed from Drawing
+          'Do Not Reverse Check to delete if more than One PO
+          If Not MoreThanOnePO Then
+            For Each bItem As SIS.PAK.pakPOBItems In bItems
+              Found = False
+              For Each dmItem As dmisg002 In dmItems
+                If bItem.ItemCode.Trim = dmItem.t_item.Trim Then
+                  Found = True
+                  Exit For
+                End If
+              Next
+              If Not Found Then
+                If SIS.PAK.pakPOBItems.CanBeDeleted(bItem) Then
+                  SIS.PAK.pakPOBItems.pakPOBItemsDeleteRecursive(bItem)
+                Else
+                  bItem.DeletedInERP = True
+                  SIS.PAK.pakPOBItems.UpdateData(bItem)
+                End If
+              End If
+            Next
+          End If
+        Catch ex As Exception
+        End Try
+      End If
+    End Sub
+
     Public Shared Function InitiateWF(ByVal SerialNo As Int32) As SIS.PAK.pakPO
       '====================PO Issue By ISGEC==================
       Dim Results As SIS.PAK.pakPO = pakPOGetByID(SerialNo)
+      If Results.FK_PAK_SupplierID.EMailID = "" Then
+        Throw New Exception("Supplier E-Mail IDs is blank.")
+      End If
       Dim tmp As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.UZ_pakPOBOMSelectList(0, 999, "", False, "", SerialNo)
       If tmp.Count <= 0 Then
         Throw New Exception("NO PO Line found or Package Item NOT Linked to this PO, can NOT be issued.")
       End If
+      '=====Update Released Drawings======
+      If Convert.ToBoolean(ConfigurationManager.AppSettings("UpdateDWGOnPOIssue")) Then
+        Select Case Results.POTypeID
+          Case pakErpPOTypes.ISGECEngineered, pakErpPOTypes.Boughtout
+            Try
+              UpdateLatestReleasedDWG(SerialNo)
+            Catch ex As Exception
+              Throw New Exception("Error: Updating Latest Revision of PO Document.")
+            End Try
+        End Select
+      End If
+      '===================================
       If Results.PortRequired AndAlso Results.PortID = String.Empty Then Results.PortID = "1"
       With Results
         If Results.POTypeID = pakErpPOTypes.Package Then
@@ -668,4 +916,54 @@ Namespace SIS.PAK
       Return Results
     End Function
   End Class
+  Public Class dmisg002
+    Public Property t_docn As String = ""
+    Public Property t_revn As String = ""
+    Public Property t_srno As Integer = 0
+    Public Property t_item As String = ""
+    Public Property t_dsca As String = ""
+    Public Property t_citg As String = ""
+    Public Property t_qnty As Double = 0
+    Public Property t_wght As Double = 0
+    Public Property t_itmt As String = ""
+    Public Property t_txta As Integer = 0
+    Public Property t_txtb As Integer = 0
+    Public Property t_cuni As String = ""
+    Public Property t_oitm As String = ""
+    Public Property t_elem As String = ""
+    Public Property t_Refcntd As Integer = 0
+    Public Property t_Refcntu As Integer = 0
+    Public Property t_sitm As String = ""
+
+    Public Shared Function GetItems(DocumentID As String, RevisionNo As String, comp As String) As List(Of dmisg002)
+      Dim Ret As New List(Of dmisg002)
+      Dim Sql As String = ""
+      Sql &= "select *  "
+      Sql &= "  from tdmisg002" & comp & "  "
+      Sql &= "  where t_docn ='" & DocumentID & "'"
+      Sql &= "    and t_revn ='" & RevisionNo & "'"
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          Do While (Reader.Read())
+            Ret.Add(New dmisg002(Reader))
+          Loop
+          Reader.Close()
+        End Using
+      End Using
+      Return Ret
+    End Function
+
+    Sub New(ByVal rd As SqlDataReader)
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, rd)
+    End Sub
+    Sub New()
+      MyBase.New()
+    End Sub
+
+  End Class
+
 End Namespace

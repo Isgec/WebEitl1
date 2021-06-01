@@ -5,6 +5,20 @@ Imports System.Data.SqlClient
 Imports System.ComponentModel
 Namespace SIS.PAK
   Partial Public Class pakIQCListH
+    Public ReadOnly Property RevertQCUploadVisible() As Boolean
+      Get
+        Dim mRet As Boolean = False
+        Try
+          Select Case StatusID
+            Case pakQCStates.QCCompleted, pakQCStates.QCClosed
+              mRet = SIS.SYS.Utilities.SessionManager.IsAdmin
+          End Select
+        Catch ex As Exception
+        End Try
+        Return mRet
+      End Get
+    End Property
+
     Public ReadOnly Property MICNIWAttachHandle As String
       Get
         Return "J_PKGQC_MICNIW_" & HttpContext.Current.Session("FinanceCompany")
@@ -226,6 +240,36 @@ Namespace SIS.PAK
         SIS.CT.ctUpdates.CT_QCCleared(Results)
       Catch ex As Exception
       End Try
+      Return Results
+    End Function
+    Public Shared Function RevertQI(ByVal SerialNo As Int32, ByVal QCLNo As Int32, ByVal QCRequestNo As String, ByVal Remarks As String) As SIS.PAK.pakIQCListH
+      If QCRequestNo Is Nothing Then QCRequestNo = ""
+      Dim Results As SIS.PAK.pakIQCListH = pakIQCListHGetByID(SerialNo, QCLNo)
+      Dim tmpDs As List(Of SIS.PAK.pakIQCListD) = SIS.PAK.pakIQCListD.pakIQCListDSelectList(0, 99999, "", False, "", SerialNo, QCLNo)
+      For Each tmpD As SIS.PAK.pakIQCListD In tmpDs
+        Dim tmpItm As SIS.PAK.pakPOBItems = SIS.PAK.pakPOBItems.pakPOBItemsGetByID(tmpD.SerialNo, tmpD.BOMNo, tmpD.ItemNo)
+        If tmpItm IsNot Nothing Then
+          Dim x As Decimal = 0
+          If tmpD.QualityClearedQty <> "" Then x = Convert.ToDecimal(tmpD.QualityClearedQty)
+          Select Case tmpD.InspectionStageID
+            Case "2", "3"
+              tmpItm.QualityClearedQty -= x
+            Case Else
+              tmpItm.QualityClearedQtyStage -= x
+          End Select
+          tmpItm = SIS.PAK.pakPOBItems.UpdateData(tmpItm)
+        End If
+      Next
+      With Results
+        .ClearedBy = HttpContext.Current.Session("LoginID")
+        .ClearedOn = Now
+        .StatusID = pakQCStates.UnderQualityInspection
+        If Results.QCRequestNo = "" Then
+          .QCRequestNo = QCRequestNo
+        End If
+        .Remarks = Remarks
+      End With
+      Results = SIS.PAK.pakIQCListH.UpdateData(Results)
       Return Results
     End Function
     Public Shared Function RejectWF(ByVal SerialNo As Int32, ByVal QCLNo As Int32, ByVal Remarks As String) As SIS.PAK.pakIQCListH

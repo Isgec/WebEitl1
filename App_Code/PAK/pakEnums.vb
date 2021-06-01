@@ -112,3 +112,13 @@ Public Enum pakQCStates
   PackingListCreated = 5
   QCClosed = 6
 End Enum
+Public Enum enumEngFunc
+  Mechanical = 1
+  Structures = 2
+  Piping = 3
+  Process = 4
+  CnI = 5
+  Electrical = 6
+  Quality = 7
+  Projects = 8
+End Enum

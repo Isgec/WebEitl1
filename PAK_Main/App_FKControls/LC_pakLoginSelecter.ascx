@@ -98,7 +98,7 @@
     </asp:Panel>
     <asp:Panel ID="pnlFooter" runat="server" CssClass="m-box-f">
       <asp:Button ID="cmdOK" runat="server" CssClass="nt-but-success" Width="70px" Text="OK" style="text-align:center;margin-right:30px;" />
-      <asp:Button ID="cmdCancel" runat="server" CssClass="nt-but-danger" Width="70px" Text="Cancle" style="text-align:center;margin-right:30px;" />
+      <asp:Button ID="cmdCancel" runat="server" CssClass="nt-but-danger" Width="70px" Text="Cancel" style="text-align:center;margin-right:30px;" />
     </asp:Panel>
     <asp:Label runat="server" ForeColor="#999999"><b>Remember:</b> If supplier will issued separate Login ID for different company, he would not be able to view PO of other company by changing company from dropdown. He will have to logout and login with different credential.</asp:Label>
   </asp:Panel>

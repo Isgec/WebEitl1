@@ -80,7 +80,7 @@ Namespace SIS.PAK
         .WeightPerUnit = 0
         .DocumentNo = ""
         .ParentItemNo = ""
-        .StatusID = pakItemStates.FreezedbyISGEC
+        .StatusID = pakItemStates.CreatedByISGEC
         .ISGECRemarks = ""
         .SupplierRemarks = ""
         .ISGECQuantity = 0

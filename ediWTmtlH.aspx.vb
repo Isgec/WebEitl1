@@ -17,6 +17,9 @@ Partial Class EF_ediWTmtlH
     If HttpContext.Current.Session("LoginID") Is Nothing Then
       SIS.SYS.Utilities.SessionManager.InitializeEnvironment("")
     End If
+    If Request.QueryString("comp") IsNot Nothing Then
+      HttpContext.Current.Session("FinanceCompany") = Request.QueryString("comp")
+    End If
   End Sub
 
 End Class

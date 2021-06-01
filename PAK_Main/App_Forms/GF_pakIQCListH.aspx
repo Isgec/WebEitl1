@@ -550,6 +550,7 @@
                     <asp:TemplateField HeaderText="Ins. Done">
                       <ItemTemplate>
                         <asp:ImageButton ID="cmdApproveWF" ValidationGroup='<%# "Approve" & Container.DataItemIndex %>' CausesValidation="true" runat="server" Visible='<%# EVal("ApproveWFVisible") %>' Enabled='<%# EVal("ApproveWFEnable") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="After uploading Cleared Quantity List, click to complete." SkinID="approve" OnClientClick='<%# "return Page_ClientValidate(""Approve" & Container.DataItemIndex & """) && confirm(""Update and close cleared quantity ?"");" %>' CommandName="ApproveWF" CommandArgument='<%# Container.DataItemIndex %>' />
+                        <asp:ImageButton ID="cmdUndoApr" runat="server" Visible='<%# Eval("RevertQCUploadVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Revert QC Inspector Data Upload." SkinID="return"  OnClientClick="return confirm('Revert to Under Quality Inspection ?');" CommandName="RevertQI" CommandArgument='<%# Container.DataItemIndex %>' />
                       </ItemTemplate>
                       <ItemStyle CssClass="alignCenter" />
                       <HeaderStyle HorizontalAlign="Center" Width="30px" />

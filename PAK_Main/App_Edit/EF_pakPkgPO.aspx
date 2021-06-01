@@ -779,7 +779,7 @@
         <asp:Panel ID="pnlFooter" runat="server" Style="width: 100%; height: 33px; padding-top: 8px; text-align: right; border-top: 1pt solid lightgray;">
           <asp:Label ID="L_PrimaryKey" runat="server" Style="display: none;"></asp:Label>
           <asp:Button ID="cmdOK" runat="server" Width="70px" Text="OK" Style="text-align: center; margin-right: 30px;" />
-          <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancle" Style="text-align: center; margin-right: 30px;" />
+          <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancel" Style="text-align: center; margin-right: 30px;" />
         </asp:Panel>
       </asp:Panel>
       <asp:Button ID="dummy" runat="server" Style="display: none;" Text="show"></asp:Button>

@@ -441,10 +441,6 @@ Namespace SIS.PAK
     Public Shared Function Alert(ByVal PONo As Integer, ByVal AlertEvent As pakAlertEvents) As Boolean
       Dim oPO As SIS.PAK.pakPO = Nothing
       oPO = SIS.PAK.pakPO.pakPOGetByID(PONo)
-      Select Case AlertEvent
-        Case pakAlertEvents.OpenPORequested, pakAlertEvents.OpenPORequestExecuted
-        Case Else
-      End Select
       If oPO.POTypeID = pakErpPOTypes.Package Then
         If AlertEvent = pakAlertEvents.POVerification Then
           SendPasswordToSupplier(PONo)
@@ -482,13 +478,10 @@ Namespace SIS.PAK
                   .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID.Trim, oPO.FK_PAK_PO_BuyerID.UserFullName))
                 End If
               End If
-              'Default CC Include
-              .CC.Add(New MailAddress("harishkumar@isgec.co.in", "Harish Kumar"))
-              .CC.Add(New MailAddress("lalit@isgec.co.in", "Lalit Gupta"))
             Catch ex As Exception
               .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
               .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
-              .CC.Add(New MailAddress("harishkumar@isgec.co.in", "Harish Kumar"))
+              .CC.Add(New MailAddress("lalit@isgec.co.in", "Lalit Gupta"))
             End Try
             'TO Supplier
             If oPO.FK_PAK_SupplierID.EMailID = String.Empty Then
@@ -520,8 +513,15 @@ Namespace SIS.PAK
                 .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
                 .CC.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
               Else
-                .From = New MailAddress(oPO.FK_PAK_SupplierID.EMailID.Trim, oPO.FK_PAK_SupplierID.BPName)
-                .CC.Add(New MailAddress(oPO.FK_PAK_SupplierID.EMailID.Trim, oPO.FK_PAK_SupplierID.BPName))
+                Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(",;".ToCharArray)
+                Dim First As Boolean = True
+                For Each eid As String In aIDs
+                  If First Then
+                    .From = New MailAddress(eid.Trim, oPO.FK_PAK_SupplierID.BPName)
+                    First = False
+                  End If
+                  .CC.Add(New MailAddress(eid.Trim, eid.Trim))
+                Next
               End If
               'End of Supplier ID
             Catch ex As Exception
@@ -846,7 +846,7 @@ Namespace SIS.PAK
           oRow = New TableRow
           oCol = New TableCell
           oCol.ColumnSpan = "6"
-          oCol.Text = "<br /><br /> Purchase Order No.: " & oPO.PONumber & " is verified by supplier, and submitted for approval."
+          oCol.Text = "<br /><br /> Purchase Order No.: " & oPO.PONumber & " is submitted for BOM creation/verification."
           oCol.Style.Add("text-align", "left")
           oCol.Style.Add("border-bottom", "none")
           oCol.Font.Size = "10"
@@ -1325,5 +1325,276 @@ Namespace SIS.PAK
       Next
       Return oTbl
     End Function
+    Public Shared Function BomSubmitted(ByVal SerialNo As Integer) As Boolean
+      Dim peUsers As New List(Of SIS.PAK.dmisg133)
+      Dim oPO As SIS.PAK.pakPO = SIS.PAK.pakPO.pakPOGetByID(SerialNo)
+      Dim oBOMs As List(Of SIS.PAK.pakPOBOM) = SIS.PAK.pakPOBOM.pakPOBOMSelectList(0, 9999, "", False, "", SerialNo)
+      For Each bom As SIS.PAK.pakPOBOM In oBOMs
+        Dim tmpUsers As List(Of SIS.PAK.dmisg133) = SIS.PAK.dmisg133.GetEngFuncUsers(oPO.ProjectID, bom.ItemCode)
+        peUsers.AddRange(tmpUsers)
+      Next
+      Dim peMUser As SIS.PAK.dmisg133 = Nothing
+      If peUsers.Count > 0 Then
+        peMUser = peUsers(0)
+        For Each tmp As SIS.PAK.dmisg133 In peUsers
+          If tmp.t_ownr Then
+            peMUser = tmp
+            Exit For
+          End If
+        Next
+      End If
+
+      Dim aErr As New ArrayList
+      Dim mRet As String = ""
+      Dim oClient As SmtpClient = New SmtpClient("192.9.200.214", 25)
+      oClient.Credentials = New Net.NetworkCredential("adskvaultadmin", "isgec@123")
+      Dim oMsg As System.Net.Mail.MailMessage = New System.Net.Mail.MailMessage()
+      With oMsg
+        'CC to Buyer
+        If oPO.FK_PAK_PO_BuyerID.EMailID <> String.Empty Then
+          .CC.Add(New MailAddress(oPO.FK_PAK_PO_BuyerID.EMailID.Trim, oPO.FK_PAK_PO_BuyerID.UserFullName))
+        End If
+        'CC to Issuer
+        If oPO.FK_PAK_PO_IssuedBy.EMailID <> String.Empty Then
+          .CC.Add(New MailAddress(oPO.FK_PAK_PO_IssuedBy.EMailID.Trim, oPO.FK_PAK_PO_IssuedBy.UserFullName))
+        End If
+        'Engg Team
+        For Each tmp As SIS.PAK.dmisg133 In peUsers
+          If tmp.t_logn <> peMUser.t_logn Then
+            If tmp.t_mail <> "" Then
+              .CC.Add(New MailAddress(tmp.t_mail.Trim, tmp.t_nama))
+            End If
+          End If
+        Next
+        'Add Project wise Alert Group in CC
+        Dim Users As List(Of SIS.EITL.eitlProjectWiseUser) = SIS.EITL.eitlProjectWiseUser.GetByProjectID(oPO.ProjectID, "")
+        For Each usr As SIS.EITL.eitlProjectWiseUser In Users
+          Try
+            Dim ad As MailAddress = New MailAddress(usr.FK_EITL_ProjectWiseUser_UserID.EMailID.Trim, usr.FK_EITL_ProjectWiseUser_UserID.UserFullName)
+            If Not .CC.Contains(ad) Then
+              .CC.Add(ad)
+            End If
+          Catch ex As Exception
+          End Try
+        Next
+        Select Case oPO.POStatusID
+          Case pakPOStates.UnderSupplierVerification
+            .Subject = "BOM submitted by ISGEC for Order No.: " & oPO.PONumber
+            '1. from Isgec
+            If peMUser IsNot Nothing Then
+              If peMUser.t_mail <> "" Then
+                .From = New MailAddress(peMUser.t_mail.Trim, peMUser.t_nama)
+              End If
+            End If
+            '2. TO Supplier
+            If oPO.FK_PAK_SupplierID.EMailID <> String.Empty Then
+              Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(";,".ToCharArray)
+              For Each tmp As String In aIDs
+                .To.Add(New MailAddress(tmp.Trim, tmp.Trim))
+              Next
+            End If
+          Case pakPOStates.UnderISGECApproval
+            .Subject = "BOM submitted by Supplier for Order No.: " & oPO.PONumber
+            '1. From Supplier
+            Dim aIDs() As String = oPO.FK_PAK_SupplierID.EMailID.Split(",;".ToCharArray)
+            Dim First As Boolean = True
+            For Each eid As String In aIDs
+              If First Then
+                .From = New MailAddress(eid.Trim, oPO.FK_PAK_SupplierID.BPName)
+                First = False
+              End If
+              .CC.Add(New MailAddress(eid.Trim, eid.Trim))
+            Next
+            '2. To ISGEC Engg
+            If peMUser IsNot Nothing Then
+              If peMUser.t_mail <> "" Then
+                .From = New MailAddress(peMUser.t_mail.Trim, peMUser.t_nama)
+              End If
+            End If
+        End Select
+        If .To.Count <= 0 Then
+          .To.Add(New MailAddress("baansupport@isgec.co.in", "BaaN Support"))
+        End If
+        If .From Is Nothing Then
+          .From = New MailAddress("baansupport@isgec.co.in", "BaaN Support")
+        End If
+
+      End With
+      With oMsg
+        .IsBodyHtml = True
+        Dim sb As StringBuilder = New StringBuilder()
+        Dim sw As IO.StringWriter = New IO.StringWriter(sb)
+        Dim writer As HtmlTextWriter = New HtmlTextWriter(sw)
+        Try
+          Dim oTbl As Table = GetPOTable(oPO, pakAlertEvents.POApproval)
+          oTbl.RenderControl(writer)
+          sb.Append("<br /><br />")
+          oTbl = GetItemTable(oPO)
+          oTbl.RenderControl(writer)
+          sb.Append("<br /><br />")
+        Catch ex As Exception
+
+        End Try
+
+        Dim Header As String = ""
+        Header = Header & "<html xmlns=""http://www.w3.org/1999/xhtml"">"
+        Header = Header & "<head>"
+        Header = Header & "<title></title>"
+        Header = Header & "<style>"
+        Header = Header & "body{margin: 10px auto auto 60px;}"
+        Header = Header & ".tblHd, .tblHd td{font-size: 12px;font-weight: bold;height: 30px !important;background-color:lightgray;}"
+        Header = Header & "table{"
+        Header = Header & "border: solid 1pt black;"
+        Header = Header & "border-collapse:collapse;"
+        Header = Header & "font-family: Tahoma;}"
+
+        Header = Header & "td{padding-left: 4px;"
+        Header = Header & "border: solid 1pt black;"
+        Header = Header & "font-family: Tahoma;"
+        Header = Header & "font-size: 9px;"
+        Header = Header & "vertical-align:top;}"
+
+        Header = Header & "</style>"
+        Header = Header & "</head>"
+        Header = Header & "<body>"
+        Header = Header & sb.ToString
+        Header = Header & "</body></html>"
+        .Body = Header
+      End With
+      Try
+        If Not Convert.ToBoolean(ConfigurationManager.AppSettings("Testing")) Then
+          oClient.Send(oMsg)
+        End If
+      Catch ex As Exception
+      End Try
+      Return True
+    End Function
+  End Class
+
+  Public Class dmisg164
+    'Item wise engg functions
+    Public Property t_eunt As String = ""
+    Public Property t_item As String = ""
+    Public Property t_sent_1 As Integer = 0
+    Public Property t_sent_2 As Integer = 0
+    Public Property t_sent_3 As Integer = 0
+    Public Property t_sent_4 As Integer = 0
+    Public Property t_sent_5 As Integer = 0
+    Public Property t_sent_6 As Integer = 0
+    Public Property t_sent_7 As Integer = 0
+    Public Property t_Refcntd As Integer = 0
+    Public Property t_Refcntu As Integer = 0
+    Public Property t_ownr As Integer = 0
+
+    Public Shared Function GetEngFunc(cprj As String, item As String) As SIS.PAK.dmisg164
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
+      Dim Sql As String = ""
+      Sql &= " select * from tdmisg164" & Comp & " as dm "
+      Sql &= " inner Join ttppdm600" & Comp & " as tp on ltrim(dm.t_eunt) = 'EU'+ltrim(str(tp.t_ncmp)) "
+      Sql &= " where LTrim(dm.t_item) ='" & item & "' "
+      Sql &= " And tp.t_cprj ='" & cprj & "'"
+      Dim Results As SIS.PAK.dmisg164 = Nothing
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          If Reader.Read() Then
+            Results = New SIS.PAK.dmisg164(Reader)
+          End If
+          Reader.Close()
+        End Using
+      End Using
+      Return Results
+    End Function
+    Sub New(rd As SqlDataReader)
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, rd)
+    End Sub
+    Sub New()
+
+    End Sub
+  End Class
+  Public Class dmisg133
+    'Project wise engg function users
+    Public Property t_engi As Integer = 0
+    Public Property t_logn As String = ""
+    Public Property t_cprj As String = ""
+    Public Property t_eunt As String = ""
+    Public Property t_nama As String = ""
+    Public Property t_mail As String = ""
+    Public Property t_ownr As Boolean = False
+
+    Public Shared Function GetUsers(cprj As String) As List(Of SIS.PAK.dmisg133)
+      Dim Comp As String = HttpContext.Current.Session("FinanceCompany")
+      Dim Sql As String = ""
+      Sql &= " select "
+      Sql &= " dm.t_engi, "
+      Sql &= " dm.t_logn, "
+      Sql &= " dm.t_cprj, "
+      Sql &= " dm.t_eunt, "
+      Sql &= " emp.t_nama, "
+      Sql &= " bpe.t_mail  "
+      Sql &= " from tdmisg133" & Comp & " as dm "
+      Sql &= " inner Join ttccom001" & Comp & " as emp on emp.t_emno = dm.t_logn "
+      Sql &= " left outer join tbpmdm001" & Comp & " as bpe on emp.t_emno=bpe.t_emno "
+      Sql &= " where dm.t_cprj ='" & cprj & "'"
+      Dim Results As New List(Of SIS.PAK.dmisg133)
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While Reader.Read()
+            Results.Add(New SIS.PAK.dmisg133(Reader))
+          End While
+          Reader.Close()
+        End Using
+      End Using
+      Return Results
+    End Function
+
+    Public Shared Function GetEngFuncUsers(cprj As String, item As String) As List(Of SIS.PAK.dmisg133)
+      Dim Results As New List(Of SIS.PAK.dmisg133)
+      Dim Users As List(Of SIS.PAK.dmisg133) = SIS.PAK.dmisg133.GetUsers(cprj)
+      If Users.Count > 0 Then
+        Dim ef As SIS.PAK.dmisg164 = SIS.PAK.dmisg164.GetEngFunc(cprj, item)
+        If ef IsNot Nothing Then
+          For Each usr As SIS.PAK.dmisg133 In Users
+            If ef.t_ownr = usr.t_engi Then usr.t_ownr = True
+            Select Case usr.t_engi
+              Case 1
+                If ef.t_sent_1 = 1 Then Results.Add(usr)
+              Case 2
+                If ef.t_sent_2 = 1 Then Results.Add(usr)
+              Case 3
+                If ef.t_sent_3 = 1 Then Results.Add(usr)
+              Case 4
+                If ef.t_sent_4 = 1 Then Results.Add(usr)
+              Case 5
+                If ef.t_sent_5 = 1 Then Results.Add(usr)
+              Case 6
+                If ef.t_sent_6 = 1 Then Results.Add(usr)
+              Case 7
+                If ef.t_sent_7 = 1 Then Results.Add(usr)
+            End Select
+          Next
+        Else
+          For Each usr As SIS.PAK.dmisg133 In Users
+            usr.t_ownr = True
+          Next
+          Results = Users
+        End If
+      End If
+      Return Results
+    End Function
+    Sub New(rd As SqlDataReader)
+      SIS.SYS.SQLDatabase.DBCommon.NewObj(Me, rd)
+    End Sub
+    Sub New()
+
+    End Sub
+
   End Class
 End Namespace

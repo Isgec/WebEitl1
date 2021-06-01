@@ -127,6 +127,23 @@ Partial Class GF_pakIQCListH
         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
       End Try
     End If
+    If e.CommandName.ToLower = "RevertQI".ToLower Then
+      'Admin Option for debugging issue
+      'This is to revert to Under Inspection From QCCompleted or QC Closed or Packing List Created
+      'Quantity is revered from BItems->QualityClearedQty
+      'User has to manually reset the status to QC Closed or Packing List Created after QCCompleted
+      'Which will be done by QC Completed button.
+      Try
+        Dim Remarks As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_ReturnRemarks"), TextBox).Text
+        Dim SerialNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("SerialNo")
+        Dim QCLNo As Int32 = GVpakIQCListH.DataKeys(e.CommandArgument).Values("QCLNo")
+        Dim QCRequestNo As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_QCRequestNo"), LC_qcmSRequests).SelectedValue
+        SIS.PAK.pakIQCListH.RevertQI(SerialNo, QCLNo, QCRequestNo, Remarks)
+        GVpakIQCListH.DataBind()
+      Catch ex As Exception
+        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "", "alert('" & New JavaScriptSerializer().Serialize(ex.Message) & "');", True)
+      End Try
+    End If
     If e.CommandName.ToLower = "rejectwf".ToLower Then
       Try
         Dim Remarks As String = CType(GVpakIQCListH.Rows(e.CommandArgument).FindControl("F_ReturnRemarks"), TextBox).Text

@@ -209,6 +209,10 @@ Namespace SIS.PAK
           oePO = SIS.PAK.pakPO.InsertData(oePO)
           oPO = oePO
         Else
+          oePO.POFOR = oPO.POFOR
+          oePO.UsePackageMaster = oPO.UsePackageMaster
+          oePO.POTypeID = oPO.POTypeID
+          oePO.PortRequired = oPO.PortRequired
           '=====before updating documents as documents are automatically updated in Joomla after release
           '=====do not update from PO if it containd old revisions of document
           '==============================
@@ -662,7 +666,7 @@ Namespace SIS.PAK
         '--cdf_catg=1 Boughtout,2 Fabrication, 3 General
         Sql &= "select TOP 1 "
         Sql &= "  apo.t_orno as PONumber,"
-        Sql &= "  apo.t_vrsn as PORevision,"
+        Sql &= "  (select isnull(max(t_vrsn),0) from ttdmsl400200 where t_orno='" & PONumber & "') as PORevision,"
         Sql &= "  apo.t_apdt as PODate,"
         Sql &= "  lpo.t_cprj as ProjectID,"
         Sql &= "  hpo.t_otbp as SupplierID,"
@@ -677,7 +681,10 @@ Namespace SIS.PAK
         Sql &= "              ) lpo "
         Sql &= "  inner join ttdpur400" & Comp & " as hpo on apo.t_orno = hpo.t_orno "
         Sql &= "  WHERE apo.t_work = 3 "
-        Sql &= "  and apo.t_vrsn = (select max(tmp.t_vrsn) from ttdmsl400" & Comp & " tmp where tmp.t_orno=apo.t_orno) "
+        'Line is commented, It checks the latest revision to be locked or NOT
+        'Which is Now changed to Zero revision must be locked, latter revision may be in any state
+        'Sql &= "  and apo.t_vrsn = (select max(tmp.t_vrsn) from ttdmsl400" & Comp & " tmp where tmp.t_orno=apo.t_orno) "
+        Sql &= "  and apo.t_vrsn = 0 "
         If PODivision <> "0" Then
           'Sql &= "  and substring(apo.t_orno+'ZZ',2,1) = '" & PODivision & "'"
         End If

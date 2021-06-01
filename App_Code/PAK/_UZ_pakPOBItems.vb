@@ -421,13 +421,23 @@ Namespace SIS.PAK
 
     Private Shared Sub rCopyCWF(ByVal pItm As SIS.PAK.pakPOBItems, ByVal ParentItemNo As Integer)
       Dim Items As List(Of SIS.PAK.pakPOBItems) = SIS.PAK.pakPOBItems.GetByParentPOBItemNo(pItm.SerialNo, pItm.BOMNo, ParentItemNo, "")
+      Dim isSupplier As Boolean = HttpContext.Current.Session("IsSupplier")
       If Items.Count > 0 Then
         For Each Itm As SIS.PAK.pakPOBItems In Items
           Dim ItemNo As Integer = Itm.ItemNo
-          Itm.ItemNo = GetMaxItemNo(Itm.SerialNo, Itm.BOMNo)
-          Itm.ParentItemNo = pItm.ItemNo
-          Itm.Free = True
-          Itm.StatusID = pakItemStates.CreatedByISGEC
+          With Itm
+            .ItemNo = GetMaxItemNo(Itm.SerialNo, Itm.BOMNo)
+            .ParentItemNo = pItm.ItemNo
+            If isSupplier Then
+              .CreatedBySupplier = True
+              .StatusID = pakItemStates.CreatedBySupplier
+              .ChangedBySupplier = True
+            Else
+              .Free = True
+              .StatusID = pakItemStates.CreatedByISGEC
+              .Changed = True
+            End If
+          End With
           Itm = pakPOBItems.pakPOBItemsInsert(Itm)
           rCopyCWF(Itm, ItemNo)
         Next
@@ -436,10 +446,18 @@ Namespace SIS.PAK
 
     Public Shared Function CopyCWF(ByVal SerialNo As Int32, ByVal BOMNo As Int32, ByVal ItemNo As Int32) As SIS.PAK.pakPOBItems
       Dim Results As SIS.PAK.pakPOBItems = pakPOBItemsGetByID(SerialNo, BOMNo, ItemNo)
+      Dim isSupplier As Boolean = HttpContext.Current.Session("IsSupplier")
       With Results
         .ItemNo = GetMaxItemNo(SerialNo, BOMNo)
-        .Free = True
-        .StatusID = pakItemStates.CreatedByISGEC
+        If isSupplier Then
+          .CreatedBySupplier = True
+          .StatusID = pakItemStates.CreatedBySupplier
+          .ChangedBySupplier = True
+        Else
+          .Free = True
+          .StatusID = pakItemStates.CreatedByISGEC
+          .Changed = True
+        End If
       End With
       Results = pakPOBItems.pakPOBItemsInsert(Results)
       rCopyCWF(Results, ItemNo)
@@ -844,6 +862,80 @@ Namespace SIS.PAK
         End Try
       End With
       Return sender
+    End Function
+    Public Shared Function GetByDocRev(serialNo As Integer, ItemNo As Integer, doc As String, rev As String) As List(Of SIS.PAK.pakPOBItems)
+      Dim mRet As New List(Of SIS.PAK.pakPOBItems)
+      Dim Sql As String = ""
+      Sql &= " select a.* "
+      Sql &= " from PAK_POBItems as a"
+      Sql &= " inner join PAK_Documents as b "
+      Sql &= " on a.DocumentNo = b.DocumentNo "
+      Sql &= " where a.SerialNo=" & serialNo
+      Sql &= " and a.ParentItemNo=" & ItemNo
+      Sql &= " and b.DocumentID='" & doc & "'"
+      Sql &= " and b.DocumentRevision =(select isnull(max(c.DocumentRevision),'') from PAK_Documents as c where c.DocumentID=b.DocumentID and c.DocumentRevision < '" & rev & "')"
+      Sql &= ""
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Con.Open()
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            mRet.Add(New SIS.PAK.pakPOBItems(Reader))
+          End While
+          Reader.Close()
+        End Using
+      End Using
+      Return mRet
+    End Function
+    Public Shared Function CreateNewRevDocumentAndLink(serialNo As Integer, ItemNo As Integer, doc As String, n_rev As String) As List(Of SIS.PAK.pakPOBItems)
+      Dim mRet As New List(Of SIS.PAK.pakPOBItems)
+      Dim Sql As String = ""
+      Dim NewDocNo As String = ""
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+        Con.Open()
+        '1. Create and select New Revision`s documntno
+        Sql = ""
+        Sql &= " Insert Into PAK_Documents "
+        Sql &= " (DocumentID, DocumentRevision, Description, ExternalDocument, Filename, DisskFile)"
+        Sql &= " SELECT TOP 1 DocumentID, '" & n_rev & "' as DR, Description, 0 AS ed, NULL AS fn, NULL AS df "
+        Sql &= " from pak_documents where "
+        Sql &= " DocumentID='" & doc & "'"
+        Sql &= " and DocumentRevision =(select isnull(max(c.DocumentRevision),'') from PAK_Documents as c where c.DocumentID='" & doc & "' and c.DocumentRevision < '" & n_rev & "')"
+        Sql &= " Select * From PAK_Documents "
+        Sql &= " where "
+        Sql &= " DocumentID='" & doc & "'"
+        Sql &= " and DocumentRevision ='" & n_rev & "'"
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Dim Reader As SqlDataReader = Cmd.ExecuteReader()
+          While (Reader.Read())
+            NewDocNo = Reader("DocumentNo")
+          End While
+          Reader.Close()
+        End Using
+
+        Sql = ""
+        Sql &= " update "
+        Sql &= " PAK_POBItems "
+        Sql &= " set DocumentNo=" & NewDocNo
+        Sql &= " where SerialNo=" & serialNo
+        Sql &= " and ParentItemNo=" & ItemNo
+        Sql &= " and DocumentNo=("
+        Sql &= " SELECT TOP 1 DocumentNo from pak_documents "
+        Sql &= "   where "
+        Sql &= "   DocumentID='" & doc & "'"
+        Sql &= "   and DocumentRevision =(select isnull(max(c.DocumentRevision),'') from PAK_Documents as c where c.DocumentID='" & doc & "' and c.DocumentRevision < '" & n_rev & "')"
+        Sql &= "   )"
+        Using Cmd As SqlCommand = Con.CreateCommand()
+          Cmd.CommandType = CommandType.Text
+          Cmd.CommandText = Sql
+          Cmd.ExecuteNonQuery()
+        End Using
+      End Using
+      Return mRet
     End Function
   End Class
 End Namespace

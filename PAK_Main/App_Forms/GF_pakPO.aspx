@@ -269,7 +269,7 @@
                       </tr>
                       <tr>
                         <td colspan="5">
-                          <asp:CheckBox ID="chkRevertConfig" runat="server" Text="Revert Configuration USE Package Master" />
+                          <asp:CheckBox ID="chkRevertConfig" runat="server" Text="USE Package Master" />
                         </td>
                       </tr>
                     </table>
@@ -379,6 +379,7 @@
                     <asp:TemplateField HeaderText="ISS">
                       <ItemTemplate>
                         <asp:ImageButton ID="cmdInitiateWF" runat="server" Visible='<%# Eval("InitiateWFVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Send to supplier" SkinID="forward" OnClientClick="return confirm('Issue PO to supplier ?');" CommandName="InitiateWF" CommandArgument='<%# Container.DataItemIndex %>' />
+                        <asp:ImageButton ID="cmdUpdDwg" runat="server" Visible='<%# Eval("updFromDwgVisible") %>' AlternateText='<%# EVal("PrimaryKey") %>' ToolTip="Update from released DWG" SkinID="dwg" OnClientClick="return confirm('Update from released DWG ?');" CommandName="UpdFromDwg" CommandArgument='<%# Container.DataItemIndex %>' />
                       </ItemTemplate>
                       <ItemStyle CssClass="alignCenter" />
                       <HeaderStyle HorizontalAlign="Center" Width="30px" />
@@ -462,7 +463,7 @@
         <asp:Panel ID="pnlFooter" runat="server" Style="width: 100%; height: 33px; padding-top: 8px; text-align: right; border-top: 1pt solid lightgray;">
           <asp:Label ID="L_PrimaryKey" runat="server" Style="display: none;"></asp:Label>
           <asp:Button ID="cmdOK" runat="server" Width="70px" Text="OK" Style="text-align: center; margin-right: 30px;" />
-          <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancle" Style="text-align: center; margin-right: 30px;" />
+          <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancel" Style="text-align: center; margin-right: 30px;" />
         </asp:Panel>
       </asp:Panel>
       <asp:Button ID="dummy" runat="server" Style="display: none;" Text="show"></asp:Button>

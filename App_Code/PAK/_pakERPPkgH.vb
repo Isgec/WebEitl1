@@ -224,10 +224,10 @@ Namespace SIS.PAK
     <DataObjectMethod(DataObjectMethodType.Select)>
     Public Shared Function pakERPPkgHGetByID(ByVal t_orno As String, ByVal t_pkno As Int32) As SIS.PAK.pakERPPkgH
       Dim Results As SIS.PAK.pakERPPkgH = Nothing
-      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetConnectionString())
+      Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakERPPkgHSelectByID"
+          Cmd.CommandText = "sppakERPPkgHSelectByID_" & HttpContext.Current.Session("FinanceCompany")
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_orno", SqlDbType.VarChar, t_orno.ToString.Length, t_orno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_pkno", SqlDbType.Int, t_pkno.ToString.Length, t_pkno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@LoginID", SqlDbType.NVarChar, 9, HttpContext.Current.Session("LoginID"))
@@ -307,7 +307,7 @@ Namespace SIS.PAK
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakERPPkgHInsert"
+          Cmd.CommandText = "sppakERPPkgHInsert_" & HttpContext.Current.Session("FinanceCompany")
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_orno", SqlDbType.VarChar, 10, Record.t_orno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_pkno", SqlDbType.Int, 11, Record.t_pkno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_srno", SqlDbType.Int, 11, Record.t_srno)
@@ -359,7 +359,7 @@ Namespace SIS.PAK
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakERPPkgHUpdate"
+          Cmd.CommandText = "sppakERPPkgHUpdate_" & HttpContext.Current.Session("FinanceCompany")
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_orno", SqlDbType.VarChar, 10, Record.t_orno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_pkno", SqlDbType.Int, 11, Record.t_pkno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@t_orno", SqlDbType.VarChar, 10, Record.t_orno)
@@ -393,7 +393,7 @@ Namespace SIS.PAK
       Using Con As SqlConnection = New SqlConnection(SIS.SYS.SQLDatabase.DBCommon.GetBaaNConnectionString())
         Using Cmd As SqlCommand = Con.CreateCommand()
           Cmd.CommandType = CommandType.StoredProcedure
-          Cmd.CommandText = "sppakERPPkgHDelete"
+          Cmd.CommandText = "sppakERPPkgHDelete_" & HttpContext.Current.Session("FinanceCompany")
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_orno", SqlDbType.VarChar, Record.t_orno.ToString.Length, Record.t_orno)
           SIS.SYS.SQLDatabase.DBCommon.AddDBParameter(Cmd, "@Original_t_pkno", SqlDbType.Int, Record.t_pkno.ToString.Length, Record.t_pkno)
           Cmd.Parameters.Add("@RowCount", SqlDbType.Int)

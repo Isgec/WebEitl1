@@ -144,68 +144,98 @@ Partial Class RP_pakPO
       oColpakCItems.Font.Bold = True
       oColpakCItems.CssClass = "colHD"
       oColpakCItems.Style.Add("text-align", "center")
+      oColpakCItems.Style.Add("width", "60px")
       oRowpakCItems.Cells.Add(oColpakCItems)
-      'oColpakCItems = New TableCell
-      'oColpakCItems.Text = "Item Code"
-      'oColpakCItems.Font.Bold = True
-      'oColpakCItems.CssClass = "colHD"
-      'oColpakCItems.Style.Add("text-align", "left")
-      'oRowpakCItems.Cells.Add(oColpakCItems)
+      oColpakCItems = New TableCell
+      oColpakCItems.Text = "Item Code"
+      oColpakCItems.Font.Bold = True
+      oColpakCItems.CssClass = "colHD"
+      oColpakCItems.Style.Add("text-align", "left")
+      oColpakCItems.Style.Add("width", "150px")
+      oRowpakCItems.Cells.Add(oColpakCItems)
       oColpakCItems = New TableCell
       oColpakCItems.Text = "Item Description"
       oColpakCItems.Font.Bold = True
       oColpakCItems.CssClass = "colHD"
       oColpakCItems.Style.Add("text-align", "left")
+      oColpakCItems.Style.Add("width", "150px")
       oRowpakCItems.Cells.Add(oColpakCItems)
-      oColpakCItems = New TableCell
-      oColpakCItems.Text = "Element ID"
-      oColpakCItems.Font.Bold = True
-      oColpakCItems.CssClass = "colHD"
-      oColpakCItems.Style.Add("text-align", "left")
-      oRowpakCItems.Cells.Add(oColpakCItems)
+      'oColpakCItems = New TableCell
+      'oColpakCItems.Text = "Element ID"
+      'oColpakCItems.Font.Bold = True
+      'oColpakCItems.CssClass = "colHD"
+      'oColpakCItems.Style.Add("text-align", "left")
+      'oRowpakCItems.Cells.Add(oColpakCItems)
       oColpakCItems = New TableCell
       oColpakCItems.Text = "UOM Quantity"
       oColpakCItems.Font.Bold = True
       oColpakCItems.CssClass = "colHD"
       oColpakCItems.Style.Add("text-align", "right")
+      oColpakCItems.Style.Add("width", "60px")
       oRowpakCItems.Cells.Add(oColpakCItems)
       oColpakCItems = New TableCell
       oColpakCItems.Text = "Quantity"
       oColpakCItems.Font.Bold = True
       oColpakCItems.CssClass = "colHD"
       oColpakCItems.Style.Add("text-align", "right")
+      oColpakCItems.Style.Add("width", "60px")
       oRowpakCItems.Cells.Add(oColpakCItems)
+
+      oColpakCItems = New TableCell
+      oColpakCItems.Text = "Quality Cleared Qty"
+      oColpakCItems.Font.Bold = True
+      oColpakCItems.CssClass = "colHD"
+      oColpakCItems.Style.Add("text-align", "right")
+      oColpakCItems.Style.Add("width", "60px")
+      oRowpakCItems.Cells.Add(oColpakCItems)
+
+      oColpakCItems = New TableCell
+      oColpakCItems.Text = "Quantity Despatched"
+      oColpakCItems.Font.Bold = True
+      oColpakCItems.CssClass = "colHD"
+      oColpakCItems.Style.Add("text-align", "right")
+      oColpakCItems.Style.Add("width", "60px")
+      oRowpakCItems.Cells.Add(oColpakCItems)
+
+
       oColpakCItems = New TableCell
       oColpakCItems.Text = "UOM Weight"
       oColpakCItems.Font.Bold = True
       oColpakCItems.CssClass = "colHD"
       oColpakCItems.Style.Add("text-align", "right")
+      oColpakCItems.Style.Add("width", "60px")
       oRowpakCItems.Cells.Add(oColpakCItems)
       oColpakCItems = New TableCell
       oColpakCItems.Text = "Weight Per Unit"
       oColpakCItems.Font.Bold = True
       oColpakCItems.CssClass = "colHD"
       oColpakCItems.Style.Add("text-align", "right")
+      oColpakCItems.Style.Add("width", "60px")
       oRowpakCItems.Cells.Add(oColpakCItems)
       oColpakCItems = New TableCell
       oColpakCItems.Text = "Document No"
       oColpakCItems.Font.Bold = True
       oColpakCItems.CssClass = "colHD"
       oColpakCItems.Style.Add("text-align", "right")
+      oColpakCItems.Style.Add("width", "150px")
       oRowpakCItems.Cells.Add(oColpakCItems)
       oTblpakCItems.Rows.Add(oRowpakCItems)
       For Each opakCItems As SIS.PAK.pakPOBItems In opakCItemss
         oRowpakCItems = New TableRow
         oColpakCItems = New TableCell
         oColpakCItems.CssClass = "rowHD"
-        oColpakCItems.Text = opakCItems.ItemNo
+        If opakCItems.DeletedInERP Then
+          oColpakCItems.Text = "x " & opakCItems.ItemNo
+        Else
+          oColpakCItems.Text = opakCItems.ItemNo
+        End If
         oColpakCItems.Style.Add("text-align", "center")
         oRowpakCItems.Cells.Add(oColpakCItems)
-        'oColpakCItems = New TableCell
-        'oColpakCItems.CssClass = "rowHD"
-        'oColpakCItems.Text = opakCItems.ItemCode
-        'oColpakCItems.Style.Add("text-align", "left")
-        'oRowpakCItems.Cells.Add(oColpakCItems)
+        oColpakCItems = New TableCell
+        oColpakCItems.CssClass = "rowHD"
+        oColpakCItems.Text = opakCItems.ItemCode
+        oColpakCItems.Style.Add("text-align", "left")
+        oRowpakCItems.Cells.Add(oColpakCItems)
         oColpakCItems = New TableCell
         oColpakCItems.CssClass = "rowHD"
         oColpakCItems.Text = opakCItems.PItemDescription
@@ -215,11 +245,11 @@ Partial Class RP_pakPO
           .ForeColor = opakCItems.ForeColor
         End With
         oRowpakCItems.Cells.Add(oColpakCItems)
-        oColpakCItems = New TableCell
-        oColpakCItems.Text = opakCItems.PAK_Elements5_Description
-        oColpakCItems.CssClass = "rowHD"
-        oColpakCItems.Style.Add("text-align", "left")
-        oRowpakCItems.Cells.Add(oColpakCItems)
+        'oColpakCItems = New TableCell
+        'oColpakCItems.Text = opakCItems.PAK_Elements5_Description
+        'oColpakCItems.CssClass = "rowHD"
+        'oColpakCItems.Style.Add("text-align", "left")
+        'oRowpakCItems.Cells.Add(oColpakCItems)
         oColpakCItems = New TableCell
         oColpakCItems.Text = opakCItems.PAK_Units10_Description
         oColpakCItems.CssClass = "rowHD"
@@ -230,6 +260,23 @@ Partial Class RP_pakPO
         oColpakCItems.Text = opakCItems.PQuantity
         oColpakCItems.Style.Add("text-align", "right")
         oRowpakCItems.Cells.Add(oColpakCItems)
+
+        oColpakCItems = New TableCell
+        oColpakCItems.CssClass = "rowHD"
+        oColpakCItems.Text = opakCItems.QualityClearedQty
+        oColpakCItems.Style.Add("text-align", "right")
+        oRowpakCItems.Cells.Add(oColpakCItems)
+
+        oColpakCItems = New TableCell
+        oColpakCItems.CssClass = "rowHD"
+        If opakCItems.QuantityDespatchedToPort > 0 Then
+          oColpakCItems.Text = opakCItems.QuantityDespatchedToPort
+        Else
+          oColpakCItems.Text = opakCItems.QuantityDespatched
+        End If
+        oColpakCItems.Style.Add("text-align", "right")
+        oRowpakCItems.Cells.Add(oColpakCItems)
+
         oColpakCItems = New TableCell
         oColpakCItems.Text = opakCItems.PAK_Units11_Description
         oColpakCItems.CssClass = "rowHD"

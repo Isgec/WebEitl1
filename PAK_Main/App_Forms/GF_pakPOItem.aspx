@@ -276,7 +276,7 @@
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Supplier" SortExpression="VR_BusinessPartner9_BPName">
           <ItemTemplate>
-             <asp:Label ID="L_SupplierID" runat="server" ForeColor='<%# EVal("ForeColor") %>' Title='<%# EVal("SupplierID") %>' Text='<%# Eval("VR_BusinessPartner9_BPName") %>'></asp:Label>
+             <asp:Button ID="L_SupplierID" runat="server" ForeColor='<%# Eval("ForeColor") %>' BorderStyle="None" BackColor="Transparent" Style="cursor: pointer;" Font-Underline="true" Title='<%# EVal("SupplierID") %>' Text='<%# Eval("VR_BusinessPartner9_BPName") %>' CommandName="lgEmailIDs" CommandArgument='<%# Container.DataItemIndex %>'></asp:Button>
           </ItemTemplate>
           <HeaderStyle Width="200px" />
         </asp:TemplateField>
@@ -347,4 +347,38 @@
 </asp:UpdatePanel>
 </div>
 </div>
+  <asp:UpdatePanel runat="server">
+    <ContentTemplate>
+      <asp:Panel ID="pnl1" runat="server" Style="background-color: white; display: none; height: 226px" Width='400px'>
+        <asp:Panel ID="pnlHeader" runat="server" Style="width: 100%; height: 33px; padding-top: 8px; text-align: center; border-bottom: 1pt solid lightgray;">
+          <asp:Label ID="HeaderText" runat="server" Font-Size="16px" Font-Bold="true" Text='My Modal Text'></asp:Label>
+        </asp:Panel>
+        <asp:Panel ID="modalContent" runat="server" Style="width: 100%; height: 136px; padding: 4px;">
+          <asp:Label ID="L_EMailID" runat="server" Text="Update Supplier E-Mail IDs:" Font-Bold="true" Width="392px"></asp:Label>
+          <asp:TextBox ID="F_EMailIDs" runat="server" Width="386px" Height="100px" TextMode="MultiLine" onfocus="this.select();"></asp:TextBox>
+        </asp:Panel>
+        <asp:Panel ID="pnlFooter" runat="server" Style="width: 100%; height: 33px; padding-top: 8px; text-align: right; border-top: 1pt solid lightgray;">
+          <asp:Label ID="L_PrimaryKey" runat="server" Style="display: none;"></asp:Label>
+          <asp:Button ID="cmdOK" runat="server" Width="70px" Text="OK" Style="text-align: center; margin-right: 30px;" />
+          <asp:Button ID="cmdCancel" runat="server" Width="70px" Text="Cancel" Style="text-align: center; margin-right: 30px;" />
+        </asp:Panel>
+      </asp:Panel>
+      <asp:Button ID="dummy" runat="server" Style="display: none;" Text="show"></asp:Button>
+      <AJX:ModalPopupExtender
+        ID="mPopup"
+        TargetControlID="dummy"
+        BackgroundCssClass="modalBackground"
+        CancelControlID="cmdCancel"
+        OkControlID="cmdCancel"
+        PopupControlID="pnl1"
+        PopupDragHandleControlID="pnlHeader"
+        DropShadow="true"
+        runat="server">
+      </AJX:ModalPopupExtender>
+    </ContentTemplate>
+    <Triggers>
+      <asp:AsyncPostBackTrigger ControlID="cmdOK" EventName="Click" />
+    </Triggers>
+  </asp:UpdatePanel>
+
 </asp:Content>
